@@ -2,21 +2,31 @@ import "./globals.css";
 import { storeSettings } from "@/lib/store-config";
 
 export const metadata = {
-  metadataBase: new URL(storeSettings.siteUrl),
+  metadataBase: new URL("https://www.manarey.com.ar"),
   title: {
-    default: "Manarey | Muebles y soluciones para tu hogar",
+    default: "Manarey | Muebles y articulos del hogar",
     template: "%s | Manarey",
   },
   description:
-    "Catalogo online de Manarey con compra por WhatsApp o tarjeta, retiro en local y envios por zona.",
+    "Muebleria Manarey — muebles, dormitorios, cocina y mas. Compra online con envio o retiro en nuestras sucursales en el sur del Gran Buenos Aires.",
+  keywords: ["muebles", "muebleria", "hogar", "dormitorio", "cocina", "Buenos Aires", "Longchamps", "Glew", "Cane"],
   openGraph: {
-    title: "Manarey | Muebles y soluciones para tu hogar",
+    title: "Manarey | Muebles y articulos del hogar",
     description:
-      "Explora el catalogo, calcula envio por zona y compra con tarjeta o por WhatsApp.",
-    url: storeSettings.siteUrl,
+      "Muebleria Manarey — muebles, dormitorios, cocina y mas. Compra con tarjeta, transferencia o WhatsApp.",
+    url: "https://www.manarey.com.ar",
     siteName: "Manarey",
     locale: "es_AR",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Manarey | Muebles y articulos del hogar",
+    description: "Muebleria con sucursales en el sur del Gran Buenos Aires. Compra online.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

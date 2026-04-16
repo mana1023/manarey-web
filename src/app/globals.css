@@ -1520,6 +1520,11 @@ img {
 
   .cart-drawer {
     width: 100vw;
+    border-radius: 0;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
 

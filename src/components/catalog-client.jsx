@@ -50,16 +50,12 @@ function ProductPlaceholder({ title, compact = false }) {
   return (
     <div className={compact ? "product-visual compact" : "product-visual"}>
       <div className="visual-topline">
-        <div className="visual-badge">Coleccion Manarey</div>
+        <div className="visual-badge">Manarey</div>
         <div className="visual-dot" />
       </div>
       <div className="visual-body">
-        <div className="visual-title">{title}</div>
-        <p className="visual-caption">
-          Una seleccion pensada para mostrar el catalogo de forma mas clara y atractiva.
-        </p>
+        {title ? <div className="visual-title">{title}</div> : null}
       </div>
-      <div className="visual-footer">Explorar ambientacion</div>
     </div>
   );
 }
@@ -655,7 +651,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="hero-home-brand">
                 <div className="brand-panel editorial">
                   {featuredMainProduct?.imageData ? (
-                    <img alt={featuredMainProduct.nombre} className="product-image" src={featuredMainProduct.imageData} />
+                    <img alt={featuredMainProduct.nombre} className="product-image" loading="lazy" src={featuredMainProduct.imageData} />
                   ) : (
                     <ProductPlaceholder title="Seleccion destacada" />
                   )}
@@ -773,7 +769,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       >
                         <div className="showcase-mini-visual">
                           {product.imageData ? (
-                            <img alt={product.nombre} className="product-image" src={product.imageData} />
+                            <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                           ) : (
                             <ProductPlaceholder compact title={product.nombre} />
                           )}
@@ -962,7 +958,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           aria-label={`Ver detalle de ${product.nombre}`}
                         >
                           {product.imageData ? (
-                            <img alt={product.nombre} className="product-image" src={product.imageData} />
+                            <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                           ) : (
                             <div className="image-placeholder">
                               <BrandLogo compact />
@@ -1186,7 +1182,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
             <div className="detail-grid">
               <div className="detail-media">
                 {selectedProduct.imageData ? (
-                  <img alt={selectedProduct.nombre} className="product-image" src={selectedProduct.imageData} />
+                  <img alt={selectedProduct.nombre} className="product-image" loading="lazy" src={selectedProduct.imageData} />
                 ) : (
                   <div className="image-placeholder detail-placeholder">
                     <BrandLogo />
@@ -1334,7 +1330,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     >
                       <div className="related-visual">
                         {product.imageData ? (
-                          <img alt={product.nombre} className="product-image" src={product.imageData} />
+                          <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                         ) : (
                           <ProductPlaceholder compact title={product.nombre} />
                         )}
@@ -1663,20 +1659,20 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       <footer className="site-footer">
         <div>
           <p className="eyebrow">Manarey</p>
-          <h3>Una presencia digital mas solida para vender mejor.</h3>
+          <h3>Muebles y articulos del hogar.</h3>
         </div>
         <div className="footer-grid">
           <div>
-            <strong>Compra</strong>
-            <p>Catalogo visual, detalle de producto, carrito, QR, tarjeta y WhatsApp.</p>
+            <strong>Catalogo</strong>
+            <p>Compra por carrito, tarjeta, transferencia o WhatsApp.</p>
           </div>
           <div>
             <strong>Sucursales</strong>
-            <p>{storeBranches.map((branch) => branch.name).join(" · ")}</p>
+            <p>Zona sur del Gran Buenos Aires. Retiro en local o envio a domicilio.</p>
           </div>
           <div>
             <strong>Contacto</strong>
-            <p>{whatsappNumber ? `WhatsApp ${whatsappNumber}` : contactEmail}</p>
+            <p>{whatsappNumber ? `WhatsApp: ${whatsappNumber}` : contactEmail}</p>
           </div>
         </div>
       </footer>
