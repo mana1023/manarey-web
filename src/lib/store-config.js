@@ -3,7 +3,14 @@ export const storeSettings = {
   supportEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "ventas@manarey.com",
   supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || "",
   whatsappNumber: (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, ""),
-  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "https://manarey.com.ar").replace(/\/$/, ""),
+  siteUrl: (() => {
+    const raw = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
+    // Si está en localhost (variable mal configurada en Vercel), usar el dominio real
+    if (!raw || raw.includes("localhost") || raw.includes("127.0.0.1")) {
+      return "https://www.manarey.com.ar";
+    }
+    return raw;
+  })(),
   currency: "ARS",
   cardInstallmentsText:
     process.env.NEXT_PUBLIC_CARD_INSTALLMENTS_TEXT || "Paga con tarjeta de credito o debito",
