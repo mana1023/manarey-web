@@ -1,8 +1,15 @@
-const LONGCHAMPS_ORIGIN = {
-  label: "Sucursal Longchamps",
-  lat: -34.8589,
-  lon: -58.3946,
-};
+const DELIVERY_ORIGINS = [
+  {
+    label: "Sucursal Longchamps",
+    lat: -34.8589,
+    lon: -58.3946,
+  },
+  {
+    label: "Sucursal Glew",
+    lat: -34.8924,
+    lon: -58.3806,
+  },
+];
 
 /**
  * Distancias máximas preconfiguradas por localidad del GBA/CABA (desde Longchamps).
@@ -114,8 +121,8 @@ async function geocodeQuery(query) {
   };
 }
 
-async function getDrivingDistanceKm(destination) {
-  const coordinates = `${LONGCHAMPS_ORIGIN.lon},${LONGCHAMPS_ORIGIN.lat};${destination.lon},${destination.lat}`;
+async function getDrivingDistanceKmFrom(origin, destination) {
+  const coordinates = `${origin.lon},${origin.lat};${destination.lon},${destination.lat}`;
   const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=false`;
   const response = await fetch(url, { cache: "no-store" });
 
@@ -129,6 +136,27 @@ async function getDrivingDistanceKm(destination) {
   }
 
   return Math.round((distanceMeters / 1000) * 10) / 10;
+}
+
+/**
+ * Calcula la distancia mínima desde cualquiera de las sucursales de envío
+ * (Longchamps o Glew) al destino, y devuelve la más cercana.
+ */
+async function getBestDrivingDistanceKm(destination) {
+  const results = await Promise.allSettled(
+    DELIVERY_ORIGINS.map((origin) => getDrivingDistanceKmFrom(origin, destination).then((km) => ({ origin, km }))),
+  );
+
+  const successful = results
+    .filter((r) => r.status === "fulfilled")
+    .map((r) => r.value);
+
+  if (!successful.length) {
+    throw new Error("No se pudo calcular la ruta del envio.");
+  }
+
+  // Elegir la sucursal más cercana
+  return successful.reduce((best, cur) => (cur.km < best.km ? cur : best));
 }
 
 /**
@@ -173,11 +201,11 @@ export async function resolveShippingDistance(address, city) {
   try {
     const destination = await geocodeQuery(buildAddressQuery(address, city));
     if (destination) {
-      const distanceKm = await getDrivingDistanceKm(destination);
+      const best = await getBestDrivingDistanceKm(destination);
       return {
-        origin: LONGCHAMPS_ORIGIN,
+        origin: best.origin,
         destination,
-        distanceKm,
+        distanceKm: best.km,
         isFallback: false,
         fallbackReason: null,
       };
@@ -191,11 +219,11 @@ export async function resolveShippingDistance(address, city) {
     const cityQuery = [city, "Buenos Aires", "Argentina"].join(", ");
     const cityCoords = await geocodeQuery(cityQuery);
     if (cityCoords) {
-      const centerKm = await getDrivingDistanceKm(cityCoords);
+      const best = await getBestDrivingDistanceKm(cityCoords);
       // Sumar buffer para cubrir el punto más lejano de la localidad
-      const distanceKm = Math.round((centerKm + CITY_CENTER_BUFFER_KM) * 10) / 10;
+      const distanceKm = Math.round((best.km + CITY_CENTER_BUFFER_KM) * 10) / 10;
       return {
-        origin: LONGCHAMPS_ORIGIN,
+        origin: best.origin,
         destination: { ...cityCoords, label: city },
         distanceKm,
         isFallback: true,
@@ -209,7 +237,7 @@ export async function resolveShippingDistance(address, city) {
   // ─ Intento 3: tabla de máximos por localidad ────────────────────────────
   const distanceKm = getCityMaxDistance(city);
   return {
-    origin: LONGCHAMPS_ORIGIN,
+    origin: DELIVERY_ORIGINS[0], // Longchamps como fallback
     destination: { label: city },
     distanceKm,
     isFallback: true,

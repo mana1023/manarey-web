@@ -898,7 +898,7 @@ export function CheckoutFlow({ initialCustomer }) {
                   {shippingError && <p className="cf-error">{shippingError}</p>}
                   {distanceKm && !shippingQuoting && !shippingFallback && (
                     <p className="cf-muted">
-                      {distanceKm} km desde Longchamps → Envío estimado: {currencyFmt.format(calcShipping("delivery", distanceKm))}
+                      {distanceKm} km desde la sucursal más cercana → Envío estimado: {currencyFmt.format(calcShipping("delivery", distanceKm))}
                     </p>
                   )}
                   {distanceKm && !shippingQuoting && shippingFallback && (
@@ -913,6 +913,7 @@ export function CheckoutFlow({ initialCustomer }) {
                         <p className="cf-shipping-fallback-sub">
                           Se cotizó el punto más lejano de <strong>{deliveryAddress.city}</strong>:{" "}
                           {distanceKm} km → {currencyFmt.format(calcShipping("delivery", distanceKm))}.
+                          El envío sale desde Longchamps o Glew, lo que quede más cerca.
                           Si tu domicilio está más cerca, podemos ajustarlo al coordinar la entrega.
                         </p>
                       </div>

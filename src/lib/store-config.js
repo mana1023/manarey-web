@@ -65,7 +65,7 @@ export const shippingModes = [
   {
     id: "delivery",
     label: "Envio a domicilio",
-    description: "Base de $10.000 mas $1.500 por kilometro desde la sucursal de Longchamps.",
+    description: "Base de $10.000 mas $1.500 por kilometro desde la sucursal mas cercana (Longchamps o Glew).",
     eta: "Coordinacion segun ruta",
   },
 ];
