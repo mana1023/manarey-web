@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { fetchMercadoPagoPayment } from "@/lib/payments";
 import { markOrderPayment } from "@/lib/orders";
+import { query } from "@/lib/db";
+import { sendEmail, buildPaymentApprovedEmail } from "@/lib/email-sender";
 
 function mapMercadoPagoStatus(status) {
   switch (status) {
@@ -48,6 +50,25 @@ export async function POST(request) {
       status: mapped.orderStatus,
       rawPayload: JSON.stringify(payment),
     });
+
+    // Si el pago fue aprobado, enviar email de confirmación al cliente
+    if (mapped.paymentStatus === "approved") {
+      try {
+        const result = await query(
+          `SELECT customer_email, order_code FROM public.web_orders
+           WHERE external_reference = $1 OR order_code = $1 LIMIT 1`,
+          [payment.external_reference],
+        );
+        const row = result.rows[0];
+        if (row?.customer_email) {
+          const fakeOrder = { orderCode: row.order_code };
+          const { subject, html } = buildPaymentApprovedEmail({ order: fakeOrder });
+          sendEmail({ to: row.customer_email, subject, html }).catch(() => {});
+        }
+      } catch {
+        // No bloquear el flujo
+      }
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

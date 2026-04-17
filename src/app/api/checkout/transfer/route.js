@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createOrder, countPreviousPaidOrders } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { sendTransferPendingMessage } from "@/lib/whatsapp-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
 
 export async function POST(request) {
   try {
@@ -14,7 +15,6 @@ export async function POST(request) {
 
     const phone = order.customer.phone;
     if (phone) {
-      // Contar compras previas pagadas para personalizar el mensaje
       const prev = await countPreviousPaidOrders(phone, order.orderCode);
       sendTransferPendingMessage(
         phone,
@@ -23,6 +23,12 @@ export async function POST(request) {
         order.summary.total,
         prev,
       );
+    }
+
+    // Enviar email de confirmación con datos de transferencia (no bloquea si falla)
+    if (order.customer.email) {
+      const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "transfer" });
+      sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
 
     return NextResponse.json({

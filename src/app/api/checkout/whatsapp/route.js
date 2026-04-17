@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrder, syncOrderToVentas } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
 
 function buildWhatsAppUrl(message) {
   if (!storeSettings.whatsappNumber) {
@@ -57,6 +58,12 @@ export async function POST(request) {
       });
     } catch {
       // No bloquear el checkout
+    }
+
+    // Enviar email de confirmación (no bloquea si falla)
+    if (order.customer.email) {
+      const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "whatsapp" });
+      sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
 
     return NextResponse.json({

@@ -2109,6 +2109,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
             <strong>Contacto</strong>
             <p>+54 9 11 6428-2270</p>
             <p style={{ fontSize: "0.82rem", opacity: 0.7 }}>{contactEmail}</p>
+            <a
+              href="/politica-de-privacidad"
+              style={{ fontSize: "0.78rem", opacity: 0.55, color: "inherit", textDecoration: "underline", display: "block", marginTop: 6 }}
+            >
+              Política de privacidad
+            </a>
           </div>
           <div>
             <strong>Seguinos</strong>

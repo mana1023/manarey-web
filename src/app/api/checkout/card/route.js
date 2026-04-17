@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrder } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
 
 export async function POST(request) {
   try {
@@ -10,6 +11,12 @@ export async function POST(request) {
       order,
       customer: order.customer,
     });
+
+    // Enviar email de confirmación (no bloquea si falla)
+    if (order.customer.email) {
+      const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "card" });
+      sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
+    }
 
     return NextResponse.json({
       orderCode: order.orderCode,
