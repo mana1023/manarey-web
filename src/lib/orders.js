@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
 import { buildCheckoutSummary } from "@/lib/shipping";
+import { getShippingSettings } from "@/lib/settings-db";
 
 let ordersReadyPromise;
 
@@ -81,10 +82,13 @@ function normalizeCustomer(payload = {}) {
 
 export async function validateCheckoutPayload(payload = {}) {
   const customer = normalizeCustomer(payload.customer);
-  const summary = await buildCheckoutSummary({
+  let settings = null;
+  try { settings = await getShippingSettings(); } catch { /* usar defaults */ }
+  const summary = buildCheckoutSummary({
     items: payload.items,
     shippingModeId: payload.shippingModeId,
     distanceKm: customer.distanceKm,
+    settings,
   });
 
   if (!summary.items.length) {

@@ -45,21 +45,15 @@ export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings =
   };
 }
 
-export async function buildCheckoutSummary({ items, shippingModeId, distanceKm }) {
+/**
+ * buildCheckoutSummary — NO accede a la DB.
+ * Los settings deben venir del caller (server-side) vía getShippingSettings().
+ * Así shipping.js queda libre de pg/dns y puede bundlearse para el cliente.
+ */
+export function buildCheckoutSummary({ items, shippingModeId, distanceKm, settings = null }) {
   const normalizedItems = sanitizeCheckoutItems(items);
   const subtotal = calculateItemsSubtotal(normalizedItems);
-
-  // Leer precios de envío desde la DB (con fallback a env vars)
-  // Dynamic import para que pg/dns no llegue al bundle del browser
-  let settings = storeSettings;
-  try {
-    const { getShippingSettings } = await import("@/lib/settings-db");
-    settings = await getShippingSettings();
-  } catch {
-    // usar defaults
-  }
-
-  const shipping = calculateShippingCost(shippingModeId, distanceKm, settings);
+  const shipping = calculateShippingCost(shippingModeId, distanceKm, settings || storeSettings);
   const total = subtotal + shipping.cost;
 
   return {
