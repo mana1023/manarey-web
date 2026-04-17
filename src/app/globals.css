@@ -3665,3 +3665,92 @@ img {
   transition: background 0.12s;
 }
 .featured-remove-btn:hover { background: #fee2e2; }
+
+/* ─── INICIO: MEJORAS ────────────────────────────────────────────────────── */
+.hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 10px 0 22px;
+  max-width: 420px;
+}
+
+/* Franja de confianza */
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 18px;
+  background: var(--surface);
+}
+.trust-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+.trust-item strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
+.trust-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+/* Categorías mejoradas */
+.cat-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  margin-bottom: 6px;
+}
+.cat-card-cta {
+  font-size: 0.82rem;
+  color: var(--gold-strong);
+}
+
+/* Sucursales en inicio */
+.home-branches {
+  margin-top: 8px;
+}
+.home-branches-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.home-branches-sub {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+.home-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.home-branch-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.home-branch-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); transform: translateY(-1px); }
+.home-branch-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.home-branch-card strong { font-size: 0.88rem; display: block; margin-bottom: 3px; }
+.home-branch-card p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+@media (max-width: 900px) {
+  .trust-strip { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .trust-strip { grid-template-columns: 1fr; border-radius: 14px; }
+  .trust-item { padding: 14px 16px; }
+}

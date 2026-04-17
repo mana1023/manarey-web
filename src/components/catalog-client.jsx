@@ -645,25 +645,19 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
         {activeView === "inicio" ? (
           <>
+            {/* ── Hero ────────────────────────────────────────────────────── */}
             <section className="hero-home">
               <div className="hero-home-copy">
-                <p className="eyebrow">Muebleria Manarey</p>
-                <h1>Muebles y articulos del hogar para cada ambiente.</h1>
+                <p className="eyebrow">Empresa familiar desde 2017</p>
+                <h1>Tu hogar merece lo mejor.</h1>
+                <p className="hero-subtitle">Muebles y artículos del hogar con entrega a domicilio o retiro en nuestros 5 locales del sur del GBA.</p>
                 <div className="hero-home-actions">
                   <button className="hero-buy-button" onClick={() => navigateTo("catalogo")} type="button">
-                    Ver catalogo
+                    Ver catálogo
                   </button>
-                  <a
-                    className="ghost-button"
-                    href={buildContactLink(
-                      "Hola, quiero consultar por los productos de Manarey.",
-                      "Consulta Manarey",
-                    )}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {whatsappNumber ? "Consultar por WhatsApp" : "Consultar por correo"}
-                  </a>
+                  <button className="ghost-button" onClick={() => navigateTo("contacto")} type="button">
+                    Contactanos
+                  </button>
                 </div>
               </div>
 
@@ -675,71 +669,72 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     <ProductPlaceholder title="Seleccion destacada" />
                   )}
                   <div className="brand-panel-overlay">
-                    <p className="eyebrow">Destacado</p>
-                    <h2>{featuredMainProduct?.nombre || "Coleccion Manarey"}</h2>
-                    {featuredMainProduct ? (
-                      <p>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
-                    ) : null}
-                    {featuredMainProduct ? (
-                      <div className="showcase-overlay-actions" style={{ marginTop: 14 }}>
-                        <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
-                          Ver producto
-                        </button>
-                        <button className="ghost-button" onClick={() => { addToCart(featuredMainProduct); }} type="button">
-                          Agregar al carrito
-                        </button>
-                      </div>
-                    ) : null}
+                    <p className="eyebrow">Producto destacado</p>
+                    <h2>{featuredMainProduct?.nombre || "Colección Manarey"}</h2>
+                    {featuredMainProduct && (
+                      <>
+                        <p style={{ fontSize: "1.3rem", fontWeight: 800 }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
+                        <div className="showcase-overlay-actions" style={{ marginTop: 12 }}>
+                          <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
+                            Ver producto
+                          </button>
+                          <button className="ghost-button" onClick={() => addToCart(featuredMainProduct)} type="button">
+                            Al carrito
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             </section>
 
-            <section className="home-invite reveal-block" data-reveal>
-              <div className="invite-copy">
-                <p className="eyebrow">Categorias</p>
-                <h2>¿Que estas buscando?</h2>
-              </div>
-              <div className="category-highlight-grid">
-                {heroCategories.map((item) => (
-                  <button
-                    key={item}
-                    className="category-highlight-card"
-                    onClick={() => {
-                      setHomeCategory(item);
-                      setCategory(item);
-                      navigateTo("catalogo");
-                    }}
-                    type="button"
-                  >
-                    <span>{item}</span>
-                    <strong>Ver productos</strong>
-                  </button>
-                ))}
-              </div>
+            {/* ── Franja de confianza ─────────────────────────────────────── */}
+            <section className="trust-strip reveal-block" data-reveal>
+              {[
+                { icon: "🚚", title: "Envío a domicilio", desc: "Desde Longchamps o Glew, calculado por distancia." },
+                { icon: "💳", title: "Tarjeta o transferencia", desc: "Pagá con débito, crédito, MP o transferencia bancaria." },
+                { icon: "🏪", title: "5 sucursales", desc: "Retirá sin costo en cualquiera de nuestros locales." },
+                { icon: "💬", title: "Atención por WhatsApp", desc: "Respondemos rápido. Consultas, precios y stock." },
+              ].map((item) => (
+                <div className="trust-item" key={item.title}>
+                  <span className="trust-icon">{item.icon}</span>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
             </section>
 
-            {!catalogError ? (
+            {/* ── Destacados ──────────────────────────────────────────────── */}
+            {!catalogError && (
               <section className="showcase-section reveal-block" data-reveal>
                 <div className="showcase-heading">
                   <div>
                     <p className="eyebrow">Productos destacados</p>
-                    <h2>{homeCategory || "Lo mas vendido"}</h2>
+                    <h2>{homeCategory || "Selección Manarey"}</h2>
                   </div>
                   <div className="showcase-top">
-                    {categories
-                      .filter((item) => item !== "todas")
-                      .slice(0, 9)
-                      .map((item) => (
-                        <button
-                          key={item}
-                          className={homeCategory === item ? "showcase-tab active" : "showcase-tab"}
-                          onClick={() => setHomeCategory(item)}
-                          type="button"
-                        >
-                          {item}
-                        </button>
-                      ))}
+                    {homeCategory && (
+                      <button
+                        className="showcase-tab active"
+                        onClick={() => setHomeCategory("")}
+                        type="button"
+                      >
+                        ✕ Limpiar filtro
+                      </button>
+                    )}
+                    {categories.filter((c) => c !== "todas").slice(0, 9).map((item) => (
+                      <button
+                        key={item}
+                        className={homeCategory === item ? "showcase-tab active" : "showcase-tab"}
+                        onClick={() => setHomeCategory(homeCategory === item ? "" : item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -747,29 +742,21 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <article className="showcase-main-card">
                     <div className="showcase-main-visual">
                       {featuredMainProduct?.imageData ? (
-                        <img
-                          alt={featuredMainProduct.nombre}
-                          className="product-image"
-                          src={featuredMainProduct.imageData}
-                        />
+                        <img alt={featuredMainProduct.nombre} className="product-image" src={featuredMainProduct.imageData} />
                       ) : (
                         <ProductPlaceholder title={homeCategory || "Destacado"} />
                       )}
                       <div className="showcase-overlay">
-                        <h3>{featuredMainProduct?.nombre || homeCategory || "Destacado"}</h3>
-                        {featuredMainProduct ? (
+                        <h3>{featuredMainProduct?.nombre || "Destacado"}</h3>
+                        {featuredMainProduct && (
                           <p style={{ fontWeight: 700, fontSize: "1.2rem" }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
-                        ) : null}
+                        )}
                         <div className="showcase-overlay-actions">
-                          {featuredMainProduct ? (
-                            <button
-                              className="primary-button"
-                              onClick={() => openProductDetail(featuredMainProduct)}
-                              type="button"
-                            >
+                          {featuredMainProduct && (
+                            <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
                               Ver producto
                             </button>
-                          ) : null}
+                          )}
                           <button className="ghost-button" onClick={() => { setCategory(homeCategory || "todas"); navigateTo("catalogo"); }} type="button">
                             Ver todos
                           </button>
@@ -780,12 +767,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
                   <div className="showcase-side-grid">
                     {featuredSideProducts.map((product) => (
-                      <button
-                        className="showcase-mini-card"
-                        key={product.productKey}
-                        onClick={() => openProductDetail(product)}
-                        type="button"
-                      >
+                      <button className="showcase-mini-card" key={product.productKey} onClick={() => openProductDetail(product)} type="button">
                         <div className="showcase-mini-visual">
                           {product.imageData ? (
                             <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
@@ -795,51 +777,63 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         </div>
                         <div className="showcase-mini-copy">
                           <h4>{product.nombre}</h4>
-                          <p style={{ fontWeight: 700, color: "var(--gold-strong)" }}>{currencyFormatter.format(product.precioVenta)}</p>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                            <p style={{ fontWeight: 700, color: "var(--gold-strong)" }}>{currencyFormatter.format(product.precioVenta)}</p>
+                            {!product.isSoldOut && <span style={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600 }}>En stock</span>}
+                          </div>
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
               </section>
-            ) : null}
+            )}
 
-            <section className="showcase-section reveal-block" data-reveal>
-              <div className="showcase-heading">
-                <div>
-                  <p className="eyebrow">Nuestras sucursales</p>
-                  <h2>Veni a conocer nuestros showrooms.</h2>
+            {/* ── Categorías ──────────────────────────────────────────────── */}
+            {heroCategories.length > 0 && (
+              <section className="home-invite reveal-block" data-reveal>
+                <div className="invite-copy">
+                  <p className="eyebrow">Categorías</p>
+                  <h2>¿Qué estás buscando?</h2>
                 </div>
-              </div>
-
-              <div className="showcase-grid">
-                <article className="showcase-main-card" style={{ cursor: "default" }}>
-                  <div className="showcase-main-visual">
-                    <ProductPlaceholder title="" />
-                    <div className="showcase-overlay">
-                      <h3>Retirar en local o recibir en casa</h3>
-                      <p>Tenemos {storeBranches.length} sucursales. Podés retirar tu compra sin costo adicional o coordinar el envio.</p>
-                      <div className="showcase-overlay-actions">
-                        <button className="primary-button" onClick={() => navigateTo("sobre-nosotros")} type="button">
-                          Ver direcciones
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-
-                <div className="showcase-side-grid">
-                  {storeBranches.slice(0, 4).map((branch) => (
-                    <article className="showcase-mini-card" key={branch.id}>
-                      <div className="showcase-mini-visual">
-                        <ProductPlaceholder compact title="" />
-                      </div>
-                      <div className="showcase-mini-copy">
-                        <p>{branch.address}</p>
-                      </div>
-                    </article>
+                <div className="category-highlight-grid">
+                  {heroCategories.map((item) => (
+                    <button
+                      key={item}
+                      className="category-highlight-card"
+                      onClick={() => { setHomeCategory(item); setCategory(item); navigateTo("catalogo"); }}
+                      type="button"
+                    >
+                      <span className="cat-card-name">{item}</span>
+                      <strong className="cat-card-cta">Ver productos →</strong>
+                    </button>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* ── Sucursales ──────────────────────────────────────────────── */}
+            <section className="home-branches reveal-block" data-reveal>
+              <div className="home-branches-header">
+                <div>
+                  <p className="eyebrow">Nuestras sucursales</p>
+                  <h2>Vení a conocer los showrooms.</h2>
+                  <p className="home-branches-sub">Zona sur del Gran Buenos Aires. También hacemos envíos.</p>
+                </div>
+                <button className="ghost-button" onClick={() => navigateTo("sobre-nosotros")} type="button">
+                  Ver todas →
+                </button>
+              </div>
+              <div className="home-branches-grid">
+                {storeBranches.map((branch) => (
+                  <div className="home-branch-card" key={branch.id}>
+                    <span className="home-branch-icon">📍</span>
+                    <div>
+                      <strong>{branch.name === "Longchamps" ? "Central — Longchamps" : branch.name}</strong>
+                      <p>{branch.address}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           </>
