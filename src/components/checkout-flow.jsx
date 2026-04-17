@@ -16,10 +16,12 @@ function calcSubtotal(items = []) {
   return items.reduce((sum, i) => sum + i.quantity * (i.precioVenta + i.accessoryPrice), 0);
 }
 
-function calcShipping(mode, distanceKm = 0) {
+function calcShipping(mode, distanceKm = 0, shippingRates = null) {
   if (mode !== "delivery") return 0;
   const km = Math.max(0, Number(distanceKm) || 0);
-  return storeSettings.shippingBaseCost + km * storeSettings.shippingCostPerKm;
+  const baseCost = shippingRates?.shippingBaseCost ?? storeSettings.shippingBaseCost;
+  const perKm = shippingRates?.shippingCostPerKm ?? storeSettings.shippingCostPerKm;
+  return baseCost + km * perKm;
 }
 
 // Sucursales legibles (mismo orden que storeBranches)
@@ -182,9 +184,9 @@ function TransferInfo({ total, order, onWhatsApp }) {
 
 // ─── Resumen del Carrito ──────────────────────────────────────────────────────
 
-function CartSummary({ items, shippingMode, distanceKm, selectedBranch }) {
+function CartSummary({ items, shippingMode, distanceKm, selectedBranch, shippingRates }) {
   const subtotal = calcSubtotal(items);
-  const shippingCost = calcShipping(shippingMode, distanceKm);
+  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
   const total = subtotal + shippingCost;
 
   return (
@@ -269,6 +271,9 @@ export function CheckoutFlow({ initialCustomer }) {
   const [transferSubMethod, setTransferSubMethod] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
+  // Shipping rates (fetched from DB, fallback to env vars)
+  const [shippingRates, setShippingRates] = useState(null);
+
   // Step tracking
   const [step, setStep] = useState(initialCustomer ? "shipping" : "auth");
 
@@ -293,6 +298,14 @@ export function CheckoutFlow({ initialCustomer }) {
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Fetch shipping rates from DB
+  useEffect(() => {
+    fetch("/api/shipping/settings")
+      .then((r) => r.json())
+      .then((data) => setShippingRates(data))
+      .catch(() => {}); // keep null → uses env var defaults
   }, []);
 
   // Pre-fill personal data from customer
@@ -610,7 +623,7 @@ export function CheckoutFlow({ initialCustomer }) {
   }
 
   const subtotal = calcSubtotal(cart);
-  const shippingCost = calcShipping(shippingMode, distanceKm);
+  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
   const total = subtotal + shippingCost;
 
   // ── Empty cart ────────────────────────────────────────────────────────────
@@ -898,7 +911,7 @@ export function CheckoutFlow({ initialCustomer }) {
                   {shippingError && <p className="cf-error">{shippingError}</p>}
                   {distanceKm && !shippingQuoting && !shippingFallback && (
                     <p className="cf-muted">
-                      {distanceKm} km desde la sucursal más cercana → Envío estimado: {currencyFmt.format(calcShipping("delivery", distanceKm))}
+                      {distanceKm} km desde la sucursal más cercana → Envío estimado: {currencyFmt.format(calcShipping("delivery", distanceKm, shippingRates))}
                     </p>
                   )}
                   {distanceKm && !shippingQuoting && shippingFallback && (
@@ -912,7 +925,7 @@ export function CheckoutFlow({ initialCustomer }) {
                         </p>
                         <p className="cf-shipping-fallback-sub">
                           Se cotizó el punto más lejano de <strong>{deliveryAddress.city}</strong>:{" "}
-                          {distanceKm} km → {currencyFmt.format(calcShipping("delivery", distanceKm))}.
+                          {distanceKm} km → {currencyFmt.format(calcShipping("delivery", distanceKm, shippingRates))}.
                           El envío sale desde Longchamps o Glew, lo que quede más cerca.
                           Si tu domicilio está más cerca, podemos ajustarlo al coordinar la entrega.
                         </p>
@@ -1192,6 +1205,7 @@ export function CheckoutFlow({ initialCustomer }) {
             shippingMode={shippingMode}
             distanceKm={distanceKm}
             selectedBranch={selectedBranch}
+            shippingRates={shippingRates}
           />
         )}
       </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveShippingDistance } from "@/lib/geo";
 import { calculateShippingCost } from "@/lib/shipping";
+import { getShippingSettings } from "@/lib/settings-db";
 
 export async function POST(request) {
   try {
@@ -15,8 +16,11 @@ export async function POST(request) {
       );
     }
 
-    const resolved = await resolveShippingDistance(address, city);
-    const shipping = calculateShippingCost("delivery", resolved.distanceKm);
+    const [resolved, rates] = await Promise.all([
+      resolveShippingDistance(address, city),
+      getShippingSettings(),
+    ]);
+    const shipping = calculateShippingCost("delivery", resolved.distanceKm, rates);
 
     return NextResponse.json({
       distanceKm: resolved.distanceKm,

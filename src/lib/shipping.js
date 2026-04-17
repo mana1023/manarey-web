@@ -1,4 +1,5 @@
 import { getShippingModeById, shippingModes, storeSettings } from "@/lib/store-config";
+import { getShippingSettings } from "@/lib/settings-db";
 
 export function sanitizeCheckoutItems(items = []) {
   return items
@@ -26,15 +27,16 @@ function normalizeDistanceKm(distanceKm) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
-export function calculateShippingCost(modeId, distanceKm = 0) {
+export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings = null) {
   const mode = getShippingModeById(modeId);
 
   if (mode.id === "pickup") {
     return { ...mode, distanceKm: 0, cost: 0, waived: true };
   }
 
+  const settings = overrideSettings || storeSettings;
   const normalizedDistanceKm = normalizeDistanceKm(distanceKm);
-  const cost = storeSettings.shippingBaseCost + normalizedDistanceKm * storeSettings.shippingCostPerKm;
+  const cost = settings.shippingBaseCost + normalizedDistanceKm * settings.shippingCostPerKm;
 
   return {
     ...mode,
@@ -44,10 +46,19 @@ export function calculateShippingCost(modeId, distanceKm = 0) {
   };
 }
 
-export function buildCheckoutSummary({ items, shippingModeId, distanceKm }) {
+export async function buildCheckoutSummary({ items, shippingModeId, distanceKm }) {
   const normalizedItems = sanitizeCheckoutItems(items);
   const subtotal = calculateItemsSubtotal(normalizedItems);
-  const shipping = calculateShippingCost(shippingModeId, distanceKm);
+
+  // Leer precios de envío desde la DB (con fallback a env vars)
+  let settings = storeSettings;
+  try {
+    settings = await getShippingSettings();
+  } catch {
+    // usar defaults
+  }
+
+  const shipping = calculateShippingCost(shippingModeId, distanceKm, settings);
   const total = subtotal + shipping.cost;
 
   return {

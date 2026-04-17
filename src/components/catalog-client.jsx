@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { buildCheckoutSummary } from "@/lib/shipping";
+import { calculateItemsSubtotal } from "@/lib/shipping";
 import { storeBranches, storeSettings } from "@/lib/store-config";
 
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
@@ -93,6 +93,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [adminEditorOpen, setAdminEditorOpen] = useState(false); // modal del editor admin
   const [adminPhotoFilter, setAdminPhotoFilter] = useState("todos"); // "todos" | "sin-foto" | "con-foto"
   const [adminBranchFilter, setAdminBranchFilter] = useState(""); // "" | branch name
+  const [shippingSettingsOpen, setShippingSettingsOpen] = useState(false);
+  const [shippingForm, setShippingForm] = useState({ baseCost: "", perKm: "" });
+  const [shippingFormBusy, setShippingFormBusy] = useState(false);
+  const [shippingFormMsg, setShippingFormMsg] = useState("");
   const [branchStockCache, setBranchStockCache] = useState({}); // { [productKey]: [{ local, stock }] }
   const [stockUpdating, setStockUpdating] = useState({}); // { [productKey+local]: true }
   const [selectedVariants, setSelectedVariants] = useState({}); // { [variantGroupKey]: productKey }
@@ -284,7 +288,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   );
 
   const checkoutSummary = useMemo(
-    () => buildCheckoutSummary({ items: cart, shippingModeId: "pickup", distanceKm: "" }),
+    () => ({ subtotal: calculateItemsSubtotal(cart) }),
     [cart],
   );
 
@@ -877,6 +881,28 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
                 {session.isAdmin ? (
                   <div className="admin-filter-bar">
+                    <div className="admin-filter-group">
+                      <button
+                        className="admin-filter-pill"
+                        type="button"
+                        onClick={async () => {
+                          setShippingFormMsg("");
+                          try {
+                            const res = await fetch("/api/admin/settings");
+                            const data = await res.json();
+                            setShippingForm({
+                              baseCost: String(data.shippingBaseCost ?? ""),
+                              perKm: String(data.shippingCostPerKm ?? ""),
+                            });
+                          } catch {
+                            setShippingForm({ baseCost: "", perKm: "" });
+                          }
+                          setShippingSettingsOpen(true);
+                        }}
+                      >
+                        ⚙️ Precios de envío
+                      </button>
+                    </div>
                     <div className="admin-filter-group">
                       <span className="admin-filter-label">Foto:</span>
                       {["todos", "sin-foto", "con-foto"].map((f) => (
@@ -1655,6 +1681,94 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           </aside>
         </div>
       ) : null}
+
+      {/* Modal configuración de envío */}
+      {shippingSettingsOpen && (
+        <div className="modal-backdrop" onClick={() => setShippingSettingsOpen(false)}>
+          <div className="admin-editor-modal" style={{ maxWidth: 420 }} onClick={(e) => e.stopPropagation()}>
+            <div className="admin-editor-header">
+              <h3 className="admin-editor-title">⚙️ Precios de envío</h3>
+              <button className="admin-editor-close" onClick={() => setShippingSettingsOpen(false)} type="button">✕</button>
+            </div>
+            <div className="admin-editor-body">
+              <p style={{ marginBottom: 4, color: "var(--text-muted)", fontSize: "0.88rem" }}>
+                El envío se calcula desde Longchamps o Glew (la más cercana al cliente).
+              </p>
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">Costo base ($)</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                  Se cobra siempre, independientemente de la distancia.
+                </p>
+                <input
+                  className="cf-input"
+                  type="number"
+                  min="0"
+                  step="500"
+                  placeholder="Ej: 10000"
+                  value={shippingForm.baseCost}
+                  onChange={(e) => setShippingForm((f) => ({ ...f, baseCost: e.target.value }))}
+                />
+              </div>
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">Costo por km ($)</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                  Se multiplica por los km desde la sucursal hasta el domicilio.
+                </p>
+                <input
+                  className="cf-input"
+                  type="number"
+                  min="0"
+                  step="100"
+                  placeholder="Ej: 1500"
+                  value={shippingForm.perKm}
+                  onChange={(e) => setShippingForm((f) => ({ ...f, perKm: e.target.value }))}
+                />
+              </div>
+              {shippingForm.baseCost && shippingForm.perKm && (
+                <p style={{ fontSize: "0.85rem", color: "var(--gold)", margin: "8px 0" }}>
+                  Ejemplo: 20 km → ${(Number(shippingForm.baseCost) + 20 * Number(shippingForm.perKm)).toLocaleString("es-AR")}
+                </p>
+              )}
+              {shippingFormMsg && (
+                <p style={{ color: shippingFormMsg.startsWith("✅") ? "var(--gold)" : "#c0392b", fontSize: "0.88rem" }}>
+                  {shippingFormMsg}
+                </p>
+              )}
+              <button
+                className="cf-btn-primary"
+                style={{ marginTop: 8 }}
+                disabled={shippingFormBusy}
+                type="button"
+                onClick={async () => {
+                  setShippingFormBusy(true);
+                  setShippingFormMsg("");
+                  try {
+                    const res = await fetch("/api/admin/settings", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        shippingBaseCost: Number(shippingForm.baseCost),
+                        shippingCostPerKm: Number(shippingForm.perKm),
+                      }),
+                    });
+                    if (!res.ok) {
+                      const data = await res.json().catch(() => ({}));
+                      throw new Error(data.error || "Error al guardar.");
+                    }
+                    setShippingFormMsg("✅ Precios actualizados correctamente.");
+                  } catch (err) {
+                    setShippingFormMsg(err.message || "Error al guardar.");
+                  } finally {
+                    setShippingFormBusy(false);
+                  }
+                }}
+              >
+                {shippingFormBusy ? "Guardando..." : "Guardar precios"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="site-footer">
         <div>

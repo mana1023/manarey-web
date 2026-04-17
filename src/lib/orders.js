@@ -79,9 +79,9 @@ function normalizeCustomer(payload = {}) {
   };
 }
 
-export function validateCheckoutPayload(payload = {}) {
+export async function validateCheckoutPayload(payload = {}) {
   const customer = normalizeCustomer(payload.customer);
-  const summary = buildCheckoutSummary({
+  const summary = await buildCheckoutSummary({
     items: payload.items,
     shippingModeId: payload.shippingModeId,
     distanceKm: customer.distanceKm,
@@ -100,7 +100,7 @@ export function validateCheckoutPayload(payload = {}) {
   }
 
   if (summary.shipping.id === "delivery" && summary.shipping.distanceKm <= 0) {
-    throw new Error("Ingresa los kilometros estimados desde Longchamps para calcular el envio.");
+    throw new Error("Ingresa los kilometros estimados para calcular el envio.");
   }
 
   return { customer, summary };
@@ -109,7 +109,7 @@ export function validateCheckoutPayload(payload = {}) {
 export async function createOrder({ paymentMethod, payload }) {
   await ensureOrdersTables();
 
-  const { customer, summary } = validateCheckoutPayload(payload);
+  const { customer, summary } = await validateCheckoutPayload(payload);
   const orderCode = buildOrderCode();
 
   const result = await query(
