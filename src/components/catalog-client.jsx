@@ -97,6 +97,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [shippingForm, setShippingForm] = useState({ baseCost: "", perKm: "" });
   const [shippingFormBusy, setShippingFormBusy] = useState(false);
   const [shippingFormMsg, setShippingFormMsg] = useState("");
+  const [featuredOpen, setFeaturedOpen] = useState(false);
+  const [featuredList, setFeaturedList] = useState([]); // [{productKey, nombre, ...}] en orden
+  const [featuredBusy, setFeaturedBusy] = useState(false);
   const [branchStockCache, setBranchStockCache] = useState({}); // { [productKey]: [{ local, stock }] }
   const [stockUpdating, setStockUpdating] = useState({}); // { [productKey+local]: true }
   const [selectedVariants, setSelectedVariants] = useState({}); // { [variantGroupKey]: productKey }
@@ -248,6 +251,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   }, [filteredProducts, adminBranchFilter, branchStockCache]);
 
   const homeProducts = useMemo(() => {
+    // Si hay productos marcados como destacados (y no hay filtro de categoría activo), priorizarlos
+    const manualFeatured = visibleProducts
+      .filter((p) => p.isFeatured)
+      .sort((a, b) => (a.featuredOrder ?? 999) - (b.featuredOrder ?? 999));
+
+    if (manualFeatured.length > 0 && !homeCategory) {
+      return manualFeatured.slice(0, 5);
+    }
+
+    // Fallback: primeros productos de la categoría elegida
     const selectedCategory = homeCategory || categories.find((item) => item !== "todas") || "todas";
     return visibleProducts
       .filter((product) =>
@@ -904,6 +917,18 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       >
                         ⚙️ Precios de envío
                       </button>
+                      <button
+                        className="admin-filter-pill"
+                        type="button"
+                        onClick={async () => {
+                          const res = await fetch("/api/admin/featured");
+                          const data = await res.json();
+                          setFeaturedList(data.featured || []);
+                          setFeaturedOpen(true);
+                        }}
+                      >
+                        ⭐ Gestionar destacados
+                      </button>
                     </div>
                     <div className="admin-filter-group">
                       <span className="admin-filter-label">Foto:</span>
@@ -1080,7 +1105,29 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           {session.isAdmin ? (
                             <div className="admin-panel">
                               <button className="secondary-button" onClick={() => openEditor(product)} type="button">
-                                ✏️ Editar producto
+                                ✏️ Editar
+                              </button>
+                              <button
+                                className={`admin-featured-btn${product.isFeatured ? " active" : ""}`}
+                                title={product.isFeatured ? "Quitar de destacados" : "Marcar como destacado"}
+                                type="button"
+                                onClick={async () => {
+                                  const newVal = !product.isFeatured;
+                                  await fetch("/api/admin/featured", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ productKey: product.productKey, isFeatured: newVal }),
+                                  });
+                                  setProducts((prev) =>
+                                    prev.map((p) =>
+                                      p.productKey === product.productKey
+                                        ? { ...p, isFeatured: newVal, featuredOrder: newVal ? 999 : null }
+                                        : p,
+                                    ),
+                                  );
+                                }}
+                              >
+                                {product.isFeatured ? "⭐ Destacado" : "☆ Destacar"}
                               </button>
                             </div>
                           ) : null}
@@ -1817,6 +1864,102 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           </aside>
         </div>
       ) : null}
+
+      {/* Modal gestión de destacados */}
+      {featuredOpen && (
+        <div className="modal-backdrop" onClick={() => setFeaturedOpen(false)}>
+          <div className="admin-editor-modal" style={{ maxWidth: 500 }} onClick={(e) => e.stopPropagation()}>
+            <div className="admin-editor-header">
+              <h3 className="admin-editor-title">⭐ Productos destacados</h3>
+              <button className="admin-editor-close" onClick={() => setFeaturedOpen(false)} type="button">✕</button>
+            </div>
+            <div className="admin-editor-body">
+              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: 12 }}>
+                Estos productos aparecen primero en la sección "Productos destacados" de la página de inicio.
+                Usá las flechas para cambiar el orden. Máximo 5 recomendado.
+              </p>
+
+              {featuredList.length === 0 ? (
+                <p style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+                  No hay productos destacados. Usá el botón ☆ en cada tarjeta para agregar.
+                </p>
+              ) : (
+                <div className="featured-list">
+                  {featuredList.map((p, idx) => (
+                    <div className="featured-list-item" key={p.productKey}>
+                      <div className="featured-list-order">#{idx + 1}</div>
+                      {p.imageData
+                        ? <img src={p.imageData} alt={p.nombre} className="featured-list-img" />
+                        : <div className="featured-list-img featured-list-img-placeholder">M</div>
+                      }
+                      <div className="featured-list-info">
+                        <strong>{p.nombre}</strong>
+                        <span>{p.categoria}</span>
+                      </div>
+                      <div className="featured-list-actions">
+                        <button
+                          className="featured-arrow-btn"
+                          disabled={idx === 0}
+                          type="button"
+                          title="Subir"
+                          onClick={async () => {
+                            const next = [...featuredList];
+                            [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+                            setFeaturedList(next);
+                            await fetch("/api/admin/featured", {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ orderedKeys: next.map((x) => x.productKey) }),
+                            });
+                          }}
+                        >▲</button>
+                        <button
+                          className="featured-arrow-btn"
+                          disabled={idx === featuredList.length - 1}
+                          type="button"
+                          title="Bajar"
+                          onClick={async () => {
+                            const next = [...featuredList];
+                            [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
+                            setFeaturedList(next);
+                            await fetch("/api/admin/featured", {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ orderedKeys: next.map((x) => x.productKey) }),
+                            });
+                          }}
+                        >▼</button>
+                        <button
+                          className="featured-remove-btn"
+                          type="button"
+                          title="Quitar de destacados"
+                          onClick={async () => {
+                            await fetch("/api/admin/featured", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ productKey: p.productKey, isFeatured: false }),
+                            });
+                            const next = featuredList.filter((x) => x.productKey !== p.productKey);
+                            setFeaturedList(next);
+                            setProducts((prev) =>
+                              prev.map((x) =>
+                                x.productKey === p.productKey ? { ...x, isFeatured: false, featuredOrder: null } : x,
+                              ),
+                            );
+                          }}
+                        >✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 14 }}>
+                Para agregar productos, cerrá este panel y usá el botón <strong>☆ Destacar</strong> en las tarjetas del catálogo.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal configuración de envío */}
       {shippingSettingsOpen && (

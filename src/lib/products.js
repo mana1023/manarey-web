@@ -33,6 +33,8 @@ async function ensureMetadataTable() {
         "alter table public.productos_web_metadata add column if not exists material text",
         "alter table public.productos_web_metadata add column if not exists capacidad text",
         "alter table public.productos_web_metadata add column if not exists precio_override numeric",
+        "alter table public.productos_web_metadata add column if not exists is_featured boolean default false",
+        "alter table public.productos_web_metadata add column if not exists featured_order integer",
       ];
       for (const sql of newCols) {
         await query(sql).catch(() => {});
@@ -82,6 +84,8 @@ function mapProduct(row) {
     voltaje: row.voltaje || null,
     material: row.material || null,
     capacidad: row.capacidad || null,
+    isFeatured: row.is_featured === true || row.is_featured === "true",
+    featuredOrder: row.featured_order !== null && row.featured_order !== undefined ? Number(row.featured_order) : null,
   };
 }
 
@@ -122,7 +126,9 @@ export async function getCatalogProducts() {
       meta.voltaje,
       meta.material,
       meta.capacidad,
-      meta.precio_override
+      meta.precio_override,
+      meta.is_featured,
+      meta.featured_order
     from grouped
     left join public.productos_web_metadata meta on meta.product_key = grouped.product_key
     order by
@@ -183,4 +189,51 @@ export async function updateProductMetadata(productKey, payload) {
   );
 
   return getCatalogProductByKey(productKey);
+}
+
+/**
+ * Marca o desmarca un producto como destacado.
+ * Si se marca, se asigna el siguiente número de orden disponible.
+ * Si se desmarca, se pone is_featured=false y featured_order=null.
+ */
+export async function setProductFeatured(productKey, isFeatured) {
+  await ensureMetadataTable();
+
+  if (!isFeatured) {
+    await query(
+      `INSERT INTO public.productos_web_metadata (product_key, is_featured, featured_order, updated_at)
+       VALUES ($1, false, null, now())
+       ON CONFLICT (product_key) DO UPDATE SET is_featured = false, featured_order = null, updated_at = now()`,
+      [productKey],
+    );
+    return;
+  }
+
+  // Calcular el próximo orden
+  const res = await query(
+    `SELECT COALESCE(MAX(featured_order), 0) + 1 AS next_order
+     FROM public.productos_web_metadata WHERE is_featured = true`,
+  );
+  const nextOrder = res.rows[0]?.next_order || 1;
+
+  await query(
+    `INSERT INTO public.productos_web_metadata (product_key, is_featured, featured_order, updated_at)
+     VALUES ($1, true, $2, now())
+     ON CONFLICT (product_key) DO UPDATE SET is_featured = true, featured_order = $2, updated_at = now()`,
+    [productKey, nextOrder],
+  );
+}
+
+/**
+ * Actualiza el orden de los destacados.
+ * Recibe un array de productKeys en el orden deseado.
+ */
+export async function reorderFeaturedProducts(orderedKeys) {
+  await ensureMetadataTable();
+  for (let i = 0; i < orderedKeys.length; i++) {
+    await query(
+      `UPDATE public.productos_web_metadata SET featured_order = $1, updated_at = now() WHERE product_key = $2`,
+      [i + 1, orderedKeys[i]],
+    );
+  }
 }

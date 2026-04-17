@@ -3548,3 +3548,120 @@ img {
   .contact-channel { padding: 14px 16px; gap: 12px; }
   .contact-channel-icon { width: 44px; height: 44px; }
 }
+
+/* ─── ADMIN FEATURED ─────────────────────────────────────────────────────── */
+.admin-panel {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.admin-featured-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.admin-featured-btn:hover { border-color: var(--gold); color: var(--gold-strong); }
+.admin-featured-btn.active {
+  background: #fffbf0;
+  border-color: var(--gold);
+  color: var(--gold-strong);
+}
+
+/* Modal destacados */
+.featured-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.featured-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.featured-list-order {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.featured-list-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.featured-list-img-placeholder {
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.featured-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.featured-list-info strong {
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.featured-list-info span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.featured-list-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.featured-arrow-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+.featured-arrow-btn:hover:not(:disabled) { background: var(--surface-strong); }
+.featured-arrow-btn:disabled { opacity: 0.3; cursor: default; }
+.featured-remove-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  background: #fff5f5;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+.featured-remove-btn:hover { background: #fee2e2; }
