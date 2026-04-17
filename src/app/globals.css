@@ -921,8 +921,111 @@ img {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+}
+
+.footer-contact-link {
+  color: rgba(248, 235, 203, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.footer-contact-link:hover { text-decoration: underline; }
+
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.footer-social-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(248, 235, 203, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+.footer-social-link:hover { color: var(--gold); }
+
+/* ── Sobre nosotros ─────────────────────────────── */
+.about-story {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  margin-top: 8px;
+}
+.about-story-text {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-story-text p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+.about-social-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.about-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.about-social-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.about-social-ig {
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #fff;
+}
+.about-social-fb {
+  background: #1877f2;
+  color: #fff;
+}
+.about-story-branches {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-story-branches .eyebrow {
+  margin-bottom: 2px;
+}
+.about-branch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.about-branch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.about-branch-row strong {
+  font-size: 0.88rem;
+  display: block;
+  margin-bottom: 2px;
+}
+.about-branch-row p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .modal-backdrop,
@@ -3228,4 +3331,25 @@ img {
 .branch-stock-banner-stat strong {
   font-size: 1.05rem;
   color: var(--text);
+}
+
+/* ─── RESPONSIVE: sobre nosotros y footer social ────────────────────────── */
+@media (max-width: 768px) {
+  .about-story {
+    grid-template-columns: 1fr;
+  }
+  .about-story-branches {
+    order: -1; /* sucursales arriba en mobile */
+  }
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-social-links {
+    flex-direction: column;
+  }
 }

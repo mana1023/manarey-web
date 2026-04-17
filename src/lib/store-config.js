@@ -18,6 +18,8 @@ export const storeSettings = {
     process.env.NEXT_PUBLIC_TRANSFER_DISCOUNT_TEXT || "Consulta descuentos por transferencia",
   shippingBaseCost: Number(process.env.NEXT_PUBLIC_SHIPPING_BASE_COST || 10000),
   shippingCostPerKm: Number(process.env.NEXT_PUBLIC_SHIPPING_COST_PER_KM || 1500),
+  instagramUrl: "https://www.instagram.com/manareymuebleria",
+  facebookUrl: "https://www.facebook.com/manarey.glew",
 };
 
 export const storeBranches = [
