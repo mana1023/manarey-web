@@ -3418,3 +3418,133 @@ img {
   transition: opacity 0.15s, transform 0.15s;
 }
 .footer-wsp-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ─── CONTACTO MEJORADO ──────────────────────────────────────────────────── */
+.contact-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 40px;
+  background: linear-gradient(135deg, var(--surface) 0%, #fffbf0 100%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.contact-hero-text h2 {
+  font-size: 2.4rem;
+  margin: 6px 0 8px;
+}
+.contact-hero-text p {
+  color: var(--text-secondary);
+  max-width: 420px;
+  margin: 0;
+}
+.contact-hero-wsp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: #25d366;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 50px;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.contact-hero-wsp:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(37,211,102,0.45); }
+
+/* Canales */
+.contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.contact-channel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.contact-channel:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+.contact-channel-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+.contact-channel-wsp { border-color: #25d366; }
+.contact-channel-wsp .contact-channel-icon { background: #25d366; }
+.contact-channel-wsp:hover { background: #f0fff6; }
+
+.contact-channel-ig { border-color: #e1306c; }
+.contact-channel-ig .contact-channel-icon { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.contact-channel-ig:hover { background: #fff5f8; }
+
+.contact-channel-fb { border-color: #1877f2; }
+.contact-channel-fb .contact-channel-icon { background: #1877f2; }
+.contact-channel-fb:hover { background: #f0f5ff; }
+
+.contact-channel-mail { border-color: var(--gold); }
+.contact-channel-mail .contact-channel-icon { background: var(--gold); }
+.contact-channel-mail:hover { background: #fffbf0; }
+
+.contact-channel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.contact-channel-body strong { font-size: 1rem; }
+.contact-channel-body span { font-size: 0.9rem; color: var(--text-secondary); }
+.contact-channel-body em { font-size: 0.8rem; color: var(--text-muted); font-style: normal; }
+.contact-channel-arrow { font-size: 1.6rem; color: var(--text-muted); line-height: 1; }
+
+/* Sucursales en contacto */
+.contact-branches {
+  margin-top: 8px;
+}
+.contact-branches h3 { margin: 4px 0 18px; }
+.contact-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.contact-branch-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.contact-branch-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+.contact-branch-card strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
+.contact-branch-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+@media (max-width: 600px) {
+  .contact-hero { padding: 22px 20px; }
+  .contact-hero-text h2 { font-size: 1.8rem; }
+  .contact-hero-wsp { width: 100%; justify-content: center; }
+  .contact-channel { padding: 14px 16px; gap: 12px; }
+  .contact-channel-icon { width: 44px; height: 44px; }
+}
