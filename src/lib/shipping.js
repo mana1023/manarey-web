@@ -1,5 +1,4 @@
 import { getShippingModeById, shippingModes, storeSettings } from "@/lib/store-config";
-import { getShippingSettings } from "@/lib/settings-db";
 
 export function sanitizeCheckoutItems(items = []) {
   return items
@@ -51,8 +50,10 @@ export async function buildCheckoutSummary({ items, shippingModeId, distanceKm }
   const subtotal = calculateItemsSubtotal(normalizedItems);
 
   // Leer precios de envío desde la DB (con fallback a env vars)
+  // Dynamic import para que pg/dns no llegue al bundle del browser
   let settings = storeSettings;
   try {
+    const { getShippingSettings } = await import("@/lib/settings-db");
     settings = await getShippingSettings();
   } catch {
     // usar defaults
