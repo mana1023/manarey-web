@@ -850,21 +850,29 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <>
                 <section className="catalog-tools">
                   <div className="catalog-toolbar">
-                    <input
-                      className="search-input"
-                      placeholder="Buscar por nombre, categoria, medida o descripcion"
-                      value={query}
-                      onChange={(event) => setQuery(event.target.value)}
-                    />
+                    <div className="search-wrapper">
+                      <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                      </svg>
+                      <input
+                        className="search-input"
+                        placeholder="Buscar producto, categoría, medida..."
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                      />
+                      {query && (
+                        <button className="search-clear" onClick={() => setQuery("")} type="button">✕</button>
+                      )}
+                    </div>
                     <select
                       className="sort-select"
                       value={sortBy}
                       onChange={(event) => setSortBy(event.target.value)}
                     >
-                      <option value="relevancia">Ordenar: destacados</option>
+                      <option value="relevancia">Destacados primero</option>
                       <option value="precio-asc">Precio: menor a mayor</option>
                       <option value="precio-desc">Precio: mayor a menor</option>
-                      <option value="nombre">Nombre</option>
+                      <option value="nombre">Nombre A–Z</option>
                     </select>
                   </div>
 
@@ -882,9 +890,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   </div>
 
                   <div className="catalog-summary">
-                    <span>{filteredGroups.length} resultados</span>
-                    <span>{inStockCount} disponibles</span>
-                    <span>{whatsappNumber ? "Compra por WhatsApp y tarjeta" : "Compra por tarjeta"}</span>
+                    <span><strong>{filteredGroups.length}</strong> productos</span>
+                    <span><strong>{inStockCount}</strong> disponibles</span>
+                    {query && <span className="catalog-summary-filter">Buscando: "{query}"</span>}
                   </div>
                 </section>
 
@@ -990,16 +998,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     const product = getActiveVariant(group.key, group.variants);
                     const measureMeta = getMeasureMeta(product.medida);
                     const editing = activeEditor?.productKey === product.productKey;
-                    const shortDescription = (product.description || "").trim().slice(0, 130);
+                    const shortDescription = (product.description || "").trim().slice(0, 110);
                     const hasVariants = group.variants.length > 1 && group.variants.some((v) => v.color);
                     const branchStock = adminBranchFilter ? branchStockCache[product.productKey] : null;
-                    const branchRow = branchStock ? branchStock.find((b) => b.local === adminBranchFilter) : null;
+                    const initial = (product.nombre || "M").charAt(0).toUpperCase();
 
                     return (
-                      <article className="product-card" key={group.key}>
+                      <article className={`product-card${product.isSoldOut ? " sold-out-card" : ""}`} key={group.key}>
+                        {/* Imagen */}
                         <button
                           className="image-frame image-frame-btn"
-                          style={{ position: "relative" }}
                           onClick={() => openProductDetail(product)}
                           type="button"
                           aria-label={`Ver detalle de ${product.nombre}`}
@@ -1007,25 +1015,34 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           {product.imageData ? (
                             <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                           ) : (
-                            <div className="image-placeholder">
-                              <BrandLogo compact />
+                            <div className="image-placeholder card-no-image">
+                              <span className="card-initial">{initial}</span>
                             </div>
                           )}
-                          {session.isAdmin && !product.imageData ? (
-                            <span className="admin-no-photo-badge">Sin foto</span>
-                          ) : null}
+
+                          {/* Badges sobre la imagen */}
+                          <div className="card-image-badges">
+                            {product.isFeatured && !product.isSoldOut && (
+                              <span className="card-badge card-badge-featured">⭐ Destacado</span>
+                            )}
+                            {product.isSoldOut && (
+                              <span className="card-badge card-badge-soldout">Sin stock</span>
+                            )}
+                            {session.isAdmin && !product.imageData && (
+                              <span className="card-badge card-badge-admin">Sin foto</span>
+                            )}
+                          </div>
                         </button>
 
-                        {hasVariants ? (
+                        {/* Variantes de color */}
+                        {hasVariants && (
                           <div className="color-swatches">
                             {group.variants.map((v) => (
                               <button
                                 key={v.productKey}
                                 className={`color-swatch${product.productKey === v.productKey ? " active" : ""}`}
                                 title={v.color || ""}
-                                onClick={() =>
-                                  setSelectedVariants((prev) => ({ ...prev, [group.key]: v.productKey }))
-                                }
+                                onClick={() => setSelectedVariants((prev) => ({ ...prev, [group.key]: v.productKey }))}
                                 type="button"
                               >
                                 <span className="color-swatch-dot" />
@@ -1033,61 +1050,60 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                               </button>
                             ))}
                           </div>
-                        ) : null}
+                        )}
 
                         <div className="product-copy">
-                          <div className="product-header">
-                            <div>
-                              <p className="product-category">{product.categoria || "Sin categoria"}</p>
-                              <h2>{product.nombre}</h2>
-                            </div>
-                            <span className={product.isSoldOut ? "stock-pill sold-out" : "stock-pill in-stock"}>
-                              {product.isSoldOut ? "Agotado" : "Disponible"}
-                            </span>
+                          {/* Categoría + nombre */}
+                          <div>
+                            {product.categoria && (
+                              <p className="product-category">{product.categoria}</p>
+                            )}
+                            <h2 className="product-name" onClick={() => openProductDetail(product)} style={{ cursor: "pointer" }}>
+                              {product.nombre}
+                            </h2>
                           </div>
 
-                          {measureMeta ? (
+                          {/* Medida */}
+                          {measureMeta && (
                             <p className="meta-line">
                               <strong>{measureMeta.label}:</strong> {measureMeta.value}
                             </p>
-                          ) : null}
+                          )}
 
+                          {/* Descripción corta */}
+                          {shortDescription && (
+                            <p className="product-desc-preview">{shortDescription}{product.description.length > 110 ? "…" : ""}</p>
+                          )}
+
+                          {/* Precio */}
                           <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
 
-                          {session.isAdmin && adminBranchFilter ? (
+                          {/* Stock por sucursal (admin) */}
+                          {session.isAdmin && adminBranchFilter && (
                             <div className="branch-stock-row">
                               <span className="branch-stock-label">{adminBranchFilter}:</span>
                               {branchStockCache[product.productKey] ? (
                                 <>
-                                  <button
-                                    className="stock-btn"
-                                    disabled={stockUpdating[`${product.productKey}::${adminBranchFilter}`]}
-                                    onClick={() => updateBranchStock(product.productKey, adminBranchFilter, -1)}
-                                    type="button"
-                                  >−</button>
+                                  <button className="stock-btn" disabled={stockUpdating[`${product.productKey}::${adminBranchFilter}`]} onClick={() => updateBranchStock(product.productKey, adminBranchFilter, -1)} type="button">−</button>
                                   <span className="branch-stock-count">
                                     {branchStockCache[product.productKey].find((b) => b.local === adminBranchFilter)?.stock ?? 0}
                                   </span>
-                                  <button
-                                    className="stock-btn"
-                                    disabled={stockUpdating[`${product.productKey}::${adminBranchFilter}`]}
-                                    onClick={() => updateBranchStock(product.productKey, adminBranchFilter, 1)}
-                                    type="button"
-                                  >+</button>
+                                  <button className="stock-btn" disabled={stockUpdating[`${product.productKey}::${adminBranchFilter}`]} onClick={() => updateBranchStock(product.productKey, adminBranchFilter, 1)} type="button">+</button>
                                 </>
                               ) : (
                                 <span className="branch-stock-loading">···</span>
                               )}
                             </div>
-                          ) : null}
+                          )}
 
+                          {/* Acciones */}
                           <div className="card-actions">
                             <button className="ghost-button" onClick={() => openProductDetail(product)} type="button">
                               Ver detalle
                             </button>
                             {product.isSoldOut ? (
                               <a className="primary-button" href={buildWhatsAppLink(product)} target="_blank" rel="noreferrer">
-                                Consultar
+                                💬 Consultar
                               </a>
                             ) : (
                               <button className="primary-button" onClick={() => addToCart(product)} type="button">

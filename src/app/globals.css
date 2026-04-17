@@ -3754,3 +3754,240 @@ img {
   .trust-strip { grid-template-columns: 1fr; border-radius: 14px; }
   .trust-item { padding: 14px 16px; }
 }
+
+/* =============================================
+   CATÁLOGO — MEJORAS
+   ============================================= */
+
+/* Barra de búsqueda con ícono */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 220px;
+}
+.search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1rem;
+  pointer-events: none;
+  color: var(--muted);
+  line-height: 1;
+}
+.search-wrapper input {
+  padding-left: 38px;
+  padding-right: 36px;
+  width: 100%;
+}
+.search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+.search-clear:hover {
+  color: var(--text);
+  background: var(--gold-soft);
+}
+
+/* Resumen de búsqueda / filtros activos */
+.catalog-summary-filter {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 4px 0;
+  font-style: italic;
+}
+
+/* Tarjeta producto — nombre */
+.product-name {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px 0;
+  line-height: 1.3;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  transition: color 0.15s;
+}
+.product-name:hover { color: var(--gold-strong); }
+
+/* Descripción corta en la tarjeta */
+.product-desc-preview {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 4px 0 6px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Placeholder cuando no hay imagen — letra inicial */
+.card-no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, var(--gold-soft) 0%, rgba(210,162,62,0.06) 100%);
+  border-radius: 10px;
+}
+.card-initial {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  opacity: 0.55;
+  line-height: 1;
+  user-select: none;
+  text-transform: uppercase;
+}
+
+/* Badges sobre la imagen */
+.card-image-badges {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+.card-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.card-badge-featured {
+  background: linear-gradient(90deg, #d4a017, #e8c547);
+  color: #4a2e00;
+}
+.card-badge-soldout {
+  background: rgba(60, 40, 20, 0.75);
+  color: #f5e8d0;
+}
+.card-badge-admin {
+  background: rgba(171, 84, 67, 0.85);
+  color: #fff;
+}
+
+/* Tarjeta sin stock — apagada */
+.sold-out-card {
+  opacity: 0.62;
+}
+.sold-out-card .image-frame {
+  filter: grayscale(40%);
+}
+
+/* Asegurar posición relativa en el frame de imagen para los badges */
+.image-frame {
+  position: relative;
+}
+
+/* =============================================
+   GESTIÓN DE DESTACADOS (Admin)
+   ============================================= */
+.admin-featured-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.88);
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.15s, transform 0.12s;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+}
+.admin-featured-btn:hover {
+  background: var(--gold-soft);
+  transform: scale(1.1);
+}
+.admin-featured-btn.active {
+  background: linear-gradient(135deg, #f5d060, #d4a017);
+  border-color: #b8860b;
+}
+
+/* Lista de destacados en el modal */
+.featured-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.featured-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.featured-list-item span {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.featured-list-item .feat-order {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 22px;
+}
+.featured-reorder-btn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.featured-reorder-btn:hover { background: var(--gold-soft); }
+.featured-reorder-btn:disabled { opacity: 0.3; cursor: default; }
+.featured-remove-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+.featured-remove-btn:hover { background: rgba(171,84,67,0.1); }
+
+@media (max-width: 600px) {
+  .card-initial { font-size: 2.4rem; }
+  .card-badge { font-size: 0.65rem; padding: 2px 7px; }
+  .product-desc-preview { font-size: 0.75rem; }
+}
