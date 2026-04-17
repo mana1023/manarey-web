@@ -4,6 +4,9 @@ import Script from "next/script";
 
 export const metadata = {
   metadataBase: new URL("https://www.manarey.com.ar"),
+  verification: {
+    google: "j5aX1E1eVmoZ2lK5bnpCYBYZSLcgwBMYZAKcIdjahfI",
+  },
   title: {
     default: "Manarey | Muebles y articulos del hogar",
     template: "%s | Manarey",
