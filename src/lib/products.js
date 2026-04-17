@@ -32,6 +32,7 @@ async function ensureMetadataTable() {
         "alter table public.productos_web_metadata add column if not exists voltaje text",
         "alter table public.productos_web_metadata add column if not exists material text",
         "alter table public.productos_web_metadata add column if not exists capacidad text",
+        "alter table public.productos_web_metadata add column if not exists precio_override numeric",
       ];
       for (const sql of newCols) {
         await query(sql).catch(() => {});
@@ -48,20 +49,25 @@ function mapProduct(row) {
   const nombre = row.nombre || "";
   const categoria = row.categoria || "";
   const medida = row.medida || "";
-  const precioVenta = Number(row.precio_venta || 0);
+  const precioOriginal = Number(row.precio_venta || 0);
+  // Si hay un precio override configurado por el admin, se usa ese
+  const precioVenta = row.precio_override !== null && row.precio_override !== undefined
+    ? Number(row.precio_override)
+    : precioOriginal;
   return {
     productKey: row.product_key,
     variantGroupKey: [
       nombre.toLowerCase().trim(),
       categoria.toLowerCase().trim(),
       medida.toLowerCase().trim(),
-      String(precioVenta),
+      String(precioOriginal), // clave basada en precio original para no romper el sistema
     ].join("|"),
     nombre,
     categoria: row.categoria,
     medida: row.medida,
     color: row.color,
     precioVenta,
+    precioOriginal,
     stockTotal: Number(row.stock_total || 0),
     isSoldOut: Number(row.stock_total || 0) <= 0,
     description: row.description || "",
@@ -115,7 +121,8 @@ export async function getCatalogProducts() {
       meta.peso_kg,
       meta.voltaje,
       meta.material,
-      meta.capacidad
+      meta.capacidad,
+      meta.precio_override
     from grouped
     left join public.productos_web_metadata meta on meta.product_key = grouped.product_key
     order by
@@ -149,11 +156,13 @@ export async function updateProductMetadata(productKey, payload) {
   const voltaje = (payload.voltaje || "").trim() || null;
   const material = (payload.material || "").trim() || null;
   const capacidad = (payload.capacidad || "").trim() || null;
+  // precio_override: null = usar precio del sistema, número = precio personalizado
+  const precioOverride = toNullableNumber(payload.precioVenta);
 
   await query(
     `
-      insert into public.productos_web_metadata (product_key, description, image_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, updated_at)
-      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,now())
+      insert into public.productos_web_metadata (product_key, description, image_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, precio_override, updated_at)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,now())
       on conflict (product_key) do update set
         description = excluded.description,
         image_data = excluded.image_data,
@@ -167,9 +176,10 @@ export async function updateProductMetadata(productKey, payload) {
         voltaje = excluded.voltaje,
         material = excluded.material,
         capacidad = excluded.capacidad,
+        precio_override = excluded.precio_override,
         updated_at = now()
     `,
-    [productKey, description || null, imageData, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad],
+    [productKey, description || null, imageData, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride],
   );
 
   return getCatalogProductByKey(productKey);

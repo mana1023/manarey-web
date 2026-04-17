@@ -491,6 +491,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     setActiveEditor({
       productKey: product.productKey,
       description: product.description || "",
+      precioVenta: String(product.precioVenta || ""),
+      precioOriginal: product.precioOriginal || product.precioVenta,
       altoCm: product.altoCm != null ? String(product.altoCm) : "",
       anchoCm: product.anchoCm != null ? String(product.anchoCm) : "",
       profundidadCm: product.profundidadCm != null ? String(product.profundidadCm) : "",
@@ -1406,6 +1408,25 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
                   </label>
                 )}
+              </div>
+
+              {/* Precio */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">💲 Precio de venta</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                  Precio del sistema: <strong>{currencyFormatter.format(activeEditor.precioOriginal || 0)}</strong>.
+                  Dejá en blanco para usar ese precio, o ingresá uno distinto.
+                </p>
+                <input
+                  className="editor-input"
+                  type="number"
+                  min="0"
+                  step="100"
+                  placeholder={String(activeEditor.precioOriginal || "")}
+                  value={activeEditor.precioVenta}
+                  onChange={(e) => handleEditorChange(activeEditor.productKey, "precioVenta", e.target.value)}
+                  style={{ maxWidth: 180 }}
+                />
               </div>
 
               {/* Descripcion */}
