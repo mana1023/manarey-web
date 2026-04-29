@@ -290,24 +290,18 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     };
   }, [adminEditorOpen, loginOpen, featuredOpen, shippingSettingsOpen, cartOpen]);
 
-  // Auto-cargar stock de sucursal cuando el admin elige un local
+  // Carga masiva de stock al entrar al modo admin (una sola consulta para todos los productos)
   useEffect(() => {
-    if (!session.isAdmin || !adminBranchFilter) return;
-    // Carga en paralelo el stock de todos los productos visibles que aún no están en caché
-    const toLoad = visibleProducts.filter((p) => !branchStockCache[p.productKey]);
-    if (!toLoad.length) return;
-    toLoad.forEach((p) => {
-      fetch(`/api/products/branch-stock?productKey=${p.productKey}&allBranches=true`)
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => {
-          if (data?.branches) {
-            setBranchStockCache((prev) => ({ ...prev, [p.productKey]: data.branches }));
-          }
-        })
-        .catch(() => {});
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adminBranchFilter, session.isAdmin]);
+    if (!session.isAdmin) return;
+    fetch("/api/products/branch-stock-all")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.cache && Object.keys(data.cache).length > 0) {
+          setBranchStockCache(data.cache);
+        }
+      })
+      .catch(() => {});
+  }, [session.isAdmin]);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
