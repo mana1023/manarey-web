@@ -42,7 +42,9 @@ export async function POST(request) {
       description: `Compra Manarey ${order.orderCode}`,
       installments: Number(installments || 1),
       payment_method_id: paymentMethodId,
-      payer: { email: customer.email || "cliente@manarey.com" },
+      // Si el cliente no tiene email, usamos un genérico que NO sea el del vendedor
+      // para evitar CPT01 (self-payment). El email del vendedor es leandromanavella2016@gmail.com.
+      payer: { email: customer.email || "comprador@manarey.com.ar" },
       external_reference: order.orderCode,
       statement_descriptor: storeSettings.brandName.slice(0, 16),
       metadata: {

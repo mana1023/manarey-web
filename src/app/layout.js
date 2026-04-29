@@ -37,9 +37,43 @@ export const metadata = {
 // ID de Google Analytics 4 — configurar en Vercel como NEXT_PUBLIC_GA_ID (ej: G-XXXXXXXXXX)
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "FurnitureStore",
+  name: "Manarey",
+  url: "https://www.manarey.com.ar",
+  description: "Mueblería familiar con más de 8 años de trayectoria. Muebles y artículos del hogar con envío a domicilio o retiro en sucursales en el sur del Gran Buenos Aires.",
+  telephone: "+5491164282270",
+  priceRange: "$$",
+  servesCuisine: undefined,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Av. Hipólito Yrigoyen 19.051",
+    addressLocality: "Longchamps",
+    addressRegion: "Buenos Aires",
+    addressCountry: "AR",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: -34.8727,
+    longitude: -58.4058,
+  },
+  openingHours: "Mo-Sa 09:00-19:00",
+  sameAs: [
+    "https://www.instagram.com/manareymuebleria",
+    "https://www.facebook.com/manarey.glew",
+  ],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body>
         {children}
 

@@ -4,8 +4,7 @@ export const storeSettings = {
   supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || "",
   whatsappNumber: (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, ""),
   siteUrl: (() => {
-    const raw = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
-    // Si está en localhost (variable mal configurada en Vercel), usar el dominio real
+    const raw = (process.env.NEXT_PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");
     if (!raw || raw.includes("localhost") || raw.includes("127.0.0.1")) {
       return "https://www.manarey.com.ar";
     }
@@ -25,35 +24,43 @@ export const storeSettings = {
 export const storeBranches = [
   {
     id: "cane",
-    name: "Cane",
+    name: "En el barrio Kanmar",
+    shortName: "Kanmar",
     city: "Buenos Aires",
-    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_1 || "Miguel Cane 508 esquina San Ignacio",
+    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_1 || "Miguel Cane 508 esquina San Ignacio, Glew",
+    mapsUrl: "https://maps.google.com/?q=Miguel+Cane+508+Glew+Buenos+Aires",
   },
   {
     id: "longchamps",
-    name: "Longchamps",
+    name: "Central — al lado del vivero Kan Sei",
+    shortName: "Central",
     city: "Buenos Aires",
-    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_2 || "Av. Hipolito Yrigoyen 19.051 esquina Los Stud",
+    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_2 || "Av. Hipolito Yrigoyen 19.051, Longchamps",
+    mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19051+Longchamps+Buenos+Aires",
   },
   {
     id: "glew",
-    name: "Glew",
+    name: "Frente a las canchas Corta la Bocha",
+    shortName: "Corta la Bocha",
     city: "Buenos Aires",
-    address:
-      process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 ||
-      "Av. Hipolito Yrigoyen 19.861 entre Constantino Gaito y Julian Aguirre",
+    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 || "Av. Hipolito Yrigoyen 19.861, Glew",
+    mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires",
   },
   {
     id: "vidriera",
-    name: "Vidriera",
+    name: "En la entrada de la UOCRA",
+    shortName: "UOCRA",
     city: "Buenos Aires",
-    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_4 || "Av. Hipolito Yrigoyen 21.890 esquina Monroe",
+    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_4 || "Av. Hipolito Yrigoyen 21.890 esquina Monroe, Glew",
+    mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+21890+Glew+Buenos+Aires",
   },
   {
     id: "estacion",
-    name: "Estacion",
+    name: "En la estación de Glew",
+    shortName: "Estación",
     city: "Buenos Aires",
-    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_5 || "Almafuerte 45 entre Andrade y Obligado",
+    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_5 || "Almafuerte 45 entre Andrade y Obligado, Glew",
+    mapsUrl: "https://maps.google.com/?q=Almafuerte+45+Glew+Buenos+Aires",
   },
 ];
 

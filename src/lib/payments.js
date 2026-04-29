@@ -2,7 +2,7 @@ import { attachPaymentReference } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
 
 function getMercadoPagoToken() {
-  const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
+  const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim().replace(/\\n$/, "").trim();
 
   if (!token) {
     throw new Error("MERCADO_PAGO_ACCESS_TOKEN no esta configurado.");
@@ -44,9 +44,10 @@ export async function createMercadoPagoPreference({ order, customer }) {
           ]
         : []),
     ],
+    // No incluimos el email del comprador para evitar el error CPT01
+    // (MercadoPago rechaza cuando el email del comprador = email del vendedor)
     payer: {
-      name: customer.fullName,
-      email: customer.email,
+      name: customer.fullName || "Cliente",
     },
     external_reference: externalReference,
     statement_descriptor: storeSettings.brandName.slice(0, 16),
@@ -58,13 +59,16 @@ export async function createMercadoPagoPreference({ order, customer }) {
   };
 
   if (withRedirectUrls) {
+    // Siempre usar el dominio de producción limpio para back_urls —
+    // MercadoPago requiere URLs HTTPS válidas sin trailing slash ni espacios.
+    const baseUrl = storeSettings.siteUrl.trim().replace(/\/+$/, "");
     payload.back_urls = {
-      success: `${storeSettings.siteUrl}/checkout/success`,
-      failure: `${storeSettings.siteUrl}/checkout/failure`,
-      pending: `${storeSettings.siteUrl}/checkout/pending`,
+      success: `${baseUrl}/checkout/success`,
+      failure: `${baseUrl}/checkout/failure`,
+      pending: `${baseUrl}/checkout/pending`,
     };
     payload.auto_return = "approved";
-    payload.notification_url = `${storeSettings.siteUrl}/api/payments/webhook`;
+    payload.notification_url = `${baseUrl}/api/payments/webhook`;
   }
 
   const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
@@ -103,8 +107,11 @@ export async function fetchMercadoPagoPayment(paymentId) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`No se pudo consultar el pago: ${errorText}`);
+    console.error(`[fetchMercadoPagoPayment] HTTP ${response.status} para pago ${paymentId}:`, errorText);
+    throw new Error(`No se pudo consultar el pago (${response.status}): ${errorText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log(`[fetchMercadoPagoPayment] pago ${paymentId} status=${data.status} detail=${data.status_detail}`);
+  return data;
 }

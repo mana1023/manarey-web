@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { calculateItemsSubtotal } from "@/lib/shipping";
 import { storeBranches, storeSettings } from "@/lib/store-config";
@@ -60,13 +60,66 @@ function ProductPlaceholder({ title, compact = false }) {
   );
 }
 
+// Comprime imágenes en el navegador antes de enviarlas (max 1200px, JPEG 82%)
+// Esto reduce fotos de celular de 5-8MB a menos de 300KB
+async function compressImageFile(file) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 1200;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        if (width >= height) { height = Math.round(height * MAX / width); width = MAX; }
+        else { width = Math.round(width * MAX / height); height = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
 async function fileToDataUrl(file) {
+  if (file.type.startsWith("image/")) {
+    const compressed = await compressImageFile(file);
+    if (compressed) return compressed;
+  }
+  // Fallback para imágenes sin comprimir
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("No se pudo leer la imagen."));
+    reader.onerror = () => reject(new Error("No se pudo leer el archivo."));
     reader.readAsDataURL(file);
   });
+}
+
+// Sube un video a Vercel Blob y devuelve la URL pública.
+// Los videos no se pueden guardar como base64 (demasiado grandes para el body de la API).
+async function uploadVideoFile(file) {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch("/api/products/upload-media", { method: "POST", body: form });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "No se pudo subir el video.");
+  return data.url;
+}
+
+async function fileToUrl(file) {
+  // Videos e imágenes van a Vercel Blob para evitar el límite de 4.5MB del body de la API
+  if (file.type.startsWith("video/") || file.type.startsWith("image/")) {
+    return uploadVideoFile(file);
+  }
+  return fileToDataUrl(file);
+}
+
+async function filesToDataUrls(files) {
+  return Promise.all(Array.from(files).map(fileToUrl));
 }
 
 
@@ -91,6 +144,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [catalogCustomer, setCatalogCustomer] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
   const [adminEditorOpen, setAdminEditorOpen] = useState(false); // modal del editor admin
+  const [adminEditorError, setAdminEditorError] = useState("");
   const [adminPhotoFilter, setAdminPhotoFilter] = useState("todos"); // "todos" | "sin-foto" | "con-foto"
   const [adminBranchFilter, setAdminBranchFilter] = useState(""); // "" | branch name
   const [shippingSettingsOpen, setShippingSettingsOpen] = useState(false);
@@ -105,11 +159,46 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [selectedVariants, setSelectedVariants] = useState({}); // { [variantGroupKey]: productKey }
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [cartButtonPop, setCartButtonPop] = useState(false);
   const [activeView, setActiveView] = useState("inicio");
   const [homeCategory, setHomeCategory] = useState("");
   const [selectedProductKey, setSelectedProductKey] = useState("");
+  const [detailPhotoIndex, setDetailPhotoIndex] = useState(0);
+  const carouselTouchStartX = useRef(null);
   const [detailAccessorySelected, setDetailAccessorySelected] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [adminUploadBusy, setAdminUploadBusy] = useState(false);
+  const [adminUploadError, setAdminUploadError] = useState("");
   const [pending, startTransition] = useTransition();
+
+  // ── Nombres en pantalla (solo frontend, localStorage, no toca la BD) ──────
+  // El admin puede poner un "alias" para mostrar en la tienda sin cambiar el
+  // nombre real del sistema.  Se guarda en localStorage y solo afecta lo que
+  // ven los clientes en ESTA sesión del navegador admin.
+  const [displayNames, setDisplayNames] = useState(() => {
+    try {
+      const stored = typeof window !== "undefined" && window.localStorage.getItem("manarey-display-names");
+      return stored ? JSON.parse(stored) : {};
+    } catch { return {}; }
+  });
+
+  function setDisplayName(productKey, value) {
+    setDisplayNames((prev) => {
+      const next = { ...prev };
+      if (value.trim()) {
+        next[productKey] = value.trim();
+      } else {
+        delete next[productKey];
+      }
+      try { window.localStorage.setItem("manarey-display-names", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  // Devuelve el nombre a mostrar al cliente (alias si existe, sino el real)
+  function getDisplayName(productKey, nombreReal) {
+    return displayNames[productKey] || nombreReal;
+  }
 
   useRevealOnScroll(activeView);
 
@@ -175,6 +264,31 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   useEffect(() => {
     window.localStorage.setItem("manarey-cart", JSON.stringify(cart));
   }, [cart]);
+
+  // Bloquear scroll del body cuando cualquier modal está abierto
+  useEffect(() => {
+    const anyOpen = adminEditorOpen || loginOpen || featuredOpen || shippingSettingsOpen || cartOpen;
+    if (anyOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+    } else {
+      const top = document.body.style.top;
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      if (top) window.scrollTo(0, parseInt(top || "0") * -1);
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+    };
+  }, [adminEditorOpen, loginOpen, featuredOpen, shippingSettingsOpen, cartOpen]);
 
   // Auto-cargar stock de sucursal cuando el admin elige un local
   useEffect(() => {
@@ -405,6 +519,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   function openProductDetail(product) {
     setSelectedProductKey(product.productKey);
     setDetailAccessorySelected(false);
+    setDetailPhotoIndex(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -482,6 +597,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         },
       ];
     });
+    // Animación pop en el botón del carrito
+    setCartButtonPop(true);
+    setTimeout(() => setCartButtonPop(false), 400);
     setCartOpen(true);
   }
 
@@ -503,6 +621,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   function openEditor(product) {
     setActiveEditor({
       productKey: product.productKey,
+      nombre: product.nombre || "",
+      nombreOriginal: product.nombre || "",
+      medidaOriginal: product.medida || "",
       description: product.description || "",
       precioVenta: String(product.precioVenta || ""),
       precioOriginal: product.precioOriginal || product.precioVenta,
@@ -517,6 +638,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       material: product.material || "",
       capacidad: product.capacidad || "",
       imageData: product.imageData || "",
+      imagesData: product.imagesData && product.imagesData.length > 0
+        ? product.imagesData
+        : product.imageData ? [product.imageData] : [],
       removeImage: false,
     });
     loadBranchStock(product.productKey);
@@ -524,23 +648,78 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   }
 
   async function handleImageChange(event, productKey) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const imageData = await fileToDataUrl(file);
-    handleEditorChange(productKey, "imageData", imageData);
-    handleEditorChange(productKey, "removeImage", false);
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    setAdminUploadError("");
+    setAdminUploadBusy(true);
+    try {
+      const newUrls = await filesToDataUrls(files);
+      setActiveEditor((prev) => {
+        if (!prev || prev.productKey !== productKey) return prev;
+        const existing = prev.imagesData || [];
+        const merged = [...existing, ...newUrls];
+        return { ...prev, imagesData: merged, imageData: merged[0] || "", removeImage: false };
+      });
+    } catch (err) {
+      setAdminUploadError(err?.message || "No se pudo subir el archivo.");
+    } finally {
+      setAdminUploadBusy(false);
+      event.target.value = "";
+    }
+  }
+
+  function handleRemoveImage(productKey, index) {
+    setActiveEditor((prev) => {
+      if (!prev || prev.productKey !== productKey) return prev;
+      const updated = (prev.imagesData || []).filter((_, i) => i !== index);
+      return { ...prev, imagesData: updated, imageData: updated[0] || "", removeImage: updated.length === 0 };
+    });
+  }
+
+  function handleMoveImage(productKey, index, direction) {
+    setActiveEditor((prev) => {
+      if (!prev || prev.productKey !== productKey) return prev;
+      const arr = [...(prev.imagesData || [])];
+      const target = index + direction;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return { ...prev, imagesData: arr, imageData: arr[0] || "" };
+    });
   }
 
   async function handleSave(productKey) {
     if (!activeEditor || activeEditor.productKey !== productKey) return;
+    setAdminEditorError("");
+
+    const nameChanged =
+      (activeEditor.nombre || "").trim() !== (activeEditor.nombreOriginal || "").trim();
+
+    if (nameChanged) {
+      const ok = window.confirm(
+        `⚠️ ATENCIÓN: Estás por cambiar el nombre del producto directamente en la base de datos.\n\nNombre actual: "${activeEditor.nombreOriginal}"\nNombre nuevo: "${activeEditor.nombre.trim()}"\n\nEsta acción modifica la tabla de productos del sistema. ¿Confirmás el cambio?`,
+      );
+      if (!ok) return;
+    }
+
     startTransition(async () => {
+      const payloadBody = {
+        ...activeEditor,
+        nombre: nameChanged ? activeEditor.nombre.trim() : undefined,
+        imagesData: Array.isArray(activeEditor.imagesData)
+          ? activeEditor.imagesData
+          : activeEditor.imageData ? [activeEditor.imageData] : [],
+      };
       const response = await fetch(`/api/products/${productKey}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(activeEditor),
+        body: JSON.stringify(payloadBody),
       });
-      if (!response.ok) return;
       const payload = await response.json();
+      if (!response.ok) {
+        setAdminEditorError(payload?.error || "No se pudo guardar el producto.");
+        return;
+      }
+      const newKey = payload.newProductKey;
       setProducts((current) =>
         current.map((product) =>
           product.productKey === productKey ? payload.producto : product,
@@ -548,6 +727,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       );
       setActiveEditor(null);
       setAdminEditorOpen(false);
+      if (newKey) {
+        setBranchStockCache((prev) => {
+          const updated = { ...prev };
+          if (updated[productKey]) {
+            updated[newKey] = updated[productKey];
+            delete updated[productKey];
+          }
+          return updated;
+        });
+      }
     });
   }
 
@@ -563,7 +752,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         <nav className="main-nav">
           {[
             ["inicio", "Inicio"],
-            ["catalogo", "Catalogo"],
+            ["catalogo", "Catálogo"],
             ["sobre-nosotros", "Sobre nosotros"],
             ["contacto", "Contacto"],
           ].map(([view, label]) => (
@@ -579,33 +768,19 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         </nav>
 
         <div className="header-actions">
-          <a
-            className="header-link"
-            href={buildContactLink("Hola, quiero hacer una consulta sobre Manarey.", "Consulta Manarey")}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {whatsappNumber ? "WhatsApp" : "Correo"}
-          </a>
-
-          {/* Cuenta / sesión unificada */}
           {session.isAdmin ? (
-            <div className="customer-badge">
+            <div className="customer-badge desktop-only">
               <span className="customer-hello">👤 Admin</span>
-              <button className="customer-logout-btn" onClick={handleLogout} type="button">
-                Salir
-              </button>
+              <button className="customer-logout-btn" onClick={handleLogout} type="button">Salir</button>
             </div>
           ) : catalogCustomer ? (
-            <div className="customer-badge">
+            <div className="customer-badge desktop-only">
               <span className="customer-hello">Hola, {catalogCustomer.nombre}</span>
-              <button className="customer-logout-btn" onClick={handleCustomerLogout} type="button">
-                Salir
-              </button>
+              <button className="customer-logout-btn" onClick={handleCustomerLogout} type="button">Salir</button>
             </div>
           ) : (
             <button
-              className="customer-login-btn"
+              className="customer-login-btn desktop-only"
               onClick={() => { setLoginOpen(true); setLoginError(""); setLoginData({ username: "", password: "" }); }}
               type="button"
             >
@@ -614,22 +789,96 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
             </button>
           )}
 
-          <button className="cart-button" onClick={() => setCartOpen(true)} type="button">
-            Carrito <span>{cartCount}</span>
+          <button className={`cart-button${cartButtonPop ? " pop" : ""}`} onClick={() => setCartOpen(true)} type="button">
+            🛒 <span>{cartCount > 0 ? cartCount : ""}</span>
+          </button>
+
+          {/* Hamburger — solo mobile */}
+          <button
+            className="mobile-nav-toggle"
+            onClick={() => setMobileNavOpen(true)}
+            type="button"
+            aria-label="Abrir menú"
+          >
+            <span /><span /><span />
           </button>
         </div>
       </header>
 
+      {/* ── Mobile nav overlay ──────────────────────────────────────────────── */}
+      {mobileNavOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setMobileNavOpen(false)}>
+          <nav className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-nav-header">
+              <BrandLogo compact />
+              <button className="mobile-nav-close" onClick={() => setMobileNavOpen(false)} type="button" aria-label="Cerrar menú">✕</button>
+            </div>
+            <div className="mobile-nav-links">
+              {[["inicio","🏠  Inicio"],["catalogo","🛋️  Catálogo"],["sobre-nosotros","📖  Sobre nosotros"],["contacto","💬  Contacto"]].map(([v, l]) => (
+                <button
+                  key={v}
+                  className={`mobile-nav-link${activeView === v ? " active" : ""}`}
+                  onClick={() => { navigateTo(v); setMobileNavOpen(false); }}
+                  type="button"
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            <div className="mobile-nav-footer">
+              {!session.isAdmin && !catalogCustomer ? (
+                <button
+                  className="mobile-nav-login-btn"
+                  onClick={() => { setLoginOpen(true); setLoginError(""); setLoginData({ username: "", password: "" }); setMobileNavOpen(false); }}
+                  type="button"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  Iniciar sesión
+                </button>
+              ) : catalogCustomer ? (
+                <div className="mobile-nav-user">
+                  <span>Hola, {catalogCustomer.nombre}</span>
+                  <button onClick={() => { handleCustomerLogout(); setMobileNavOpen(false); }} type="button">Cerrar sesión</button>
+                </div>
+              ) : session.isAdmin ? (
+                <div className="mobile-nav-user mobile-nav-user--admin">
+                  <span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 5, verticalAlign: "middle" }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {session.username?.split("@")[0] || "Admin"}
+                  </span>
+                  <button onClick={() => { setMobileNavOpen(false); handleLogout(); }} type="button">Cerrar sesión</button>
+                </div>
+              ) : null}
+              <a
+                className="mobile-nav-wsp"
+                href={buildContactLink("Hola, quiero hacer una consulta.", "Consulta Manarey")}
+                target="_blank"
+                rel="noreferrer"
+              >
+                💬 Escribir por WhatsApp
+              </a>
+            </div>
+          </nav>
+        </div>
+      )}
+
       <section className="service-ribbon">
-        <div className="service-pill">
+        <button
+          className="service-pill service-pill-branches"
+          type="button"
+          onClick={() => {
+            navigateTo("inicio");
+            setTimeout(() => document.getElementById("home-branches")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+          }}
+        >
           <strong>🏠 {storeBranches.length} sucursales</strong>
           <span>Retiro en local o envio a domicilio</span>
-        </div>
-        <div className="service-pill">
+        </button>
+        <div className="service-pill service-pill-desktop">
           <strong>💳 Tarjeta, transferencia y QR</strong>
           <span>Paga como prefieras</span>
         </div>
-        <div className="service-pill">
+        <div className="service-pill service-pill-desktop">
           <strong>💬 WhatsApp</strong>
           <span>Atencion y cierre de venta personalizado</span>
         </div>
@@ -650,7 +899,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="hero-home-copy">
                 <p className="eyebrow">Empresa familiar desde 2017</p>
                 <h1>Tu hogar merece lo mejor.</h1>
-                <p className="hero-subtitle">Muebles y artículos del hogar con entrega a domicilio o retiro en nuestros 5 locales del sur del GBA.</p>
+                <p className="hero-subtitle">Muebles y artículos del hogar con entrega a domicilio o retiro en nuestros {storeBranches.length} locales del sur del GBA.</p>
                 <div className="hero-home-actions">
                   <button className="hero-buy-button" onClick={() => navigateTo("catalogo")} type="button">
                     Ver catálogo
@@ -658,6 +907,22 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <button className="ghost-button" onClick={() => navigateTo("contacto")} type="button">
                     Contactanos
                   </button>
+                </div>
+
+                {/* Métricas dinámicas */}
+                <div className="hero-metrics">
+                  <div className="metric-card">
+                    <strong>{inStockCount > 0 ? `+${inStockCount}` : visibleProducts.length}</strong>
+                    <span>productos disponibles</span>
+                  </div>
+                  <div className="metric-card">
+                    <strong>{storeBranches.length}</strong>
+                    <span>sucursales</span>
+                  </div>
+                  <div className="metric-card">
+                    <strong>+8 años</strong>
+                    <span>de trayectoria</span>
+                  </div>
                 </div>
               </div>
 
@@ -689,23 +954,6 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               </div>
             </section>
 
-            {/* ── Franja de confianza ─────────────────────────────────────── */}
-            <section className="trust-strip reveal-block" data-reveal>
-              {[
-                { icon: "🚚", title: "Envío a domicilio", desc: "Desde Longchamps o Glew, calculado por distancia." },
-                { icon: "💳", title: "Tarjeta o transferencia", desc: "Pagá con débito, crédito, MP o transferencia bancaria." },
-                { icon: "🏪", title: "5 sucursales", desc: "Retirá sin costo en cualquiera de nuestros locales." },
-                { icon: "💬", title: "Atención por WhatsApp", desc: "Respondemos rápido. Consultas, precios y stock." },
-              ].map((item) => (
-                <div className="trust-item" key={item.title}>
-                  <span className="trust-icon">{item.icon}</span>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <p>{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </section>
 
             {/* ── Destacados ──────────────────────────────────────────────── */}
             {!catalogError && (
@@ -747,7 +995,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         <ProductPlaceholder title={homeCategory || "Destacado"} />
                       )}
                       <div className="showcase-overlay">
-                        <h3>{featuredMainProduct?.nombre || "Destacado"}</h3>
+                        <h3>{featuredMainProduct ? getDisplayName(featuredMainProduct.productKey, featuredMainProduct.nombre) : "Destacado"}</h3>
                         {featuredMainProduct && (
                           <p style={{ fontWeight: 700, fontSize: "1.2rem" }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
                         )}
@@ -776,7 +1024,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           )}
                         </div>
                         <div className="showcase-mini-copy">
-                          <h4>{product.nombre}</h4>
+                          <h4>{getDisplayName(product.productKey, product.nombre)}</h4>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                             <p style={{ fontWeight: 700, color: "var(--gold-strong)" }}>{currencyFormatter.format(product.precioVenta)}</p>
                             {!product.isSoldOut && <span style={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600 }}>En stock</span>}
@@ -813,7 +1061,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
             )}
 
             {/* ── Sucursales ──────────────────────────────────────────────── */}
-            <section className="home-branches reveal-block" data-reveal>
+            <section className="home-branches reveal-block" id="home-branches" data-reveal>
               <div className="home-branches-header">
                 <div>
                   <p className="eyebrow">Nuestras sucursales</p>
@@ -829,8 +1077,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <div className="home-branch-card" key={branch.id}>
                     <span className="home-branch-icon">📍</span>
                     <div>
-                      <strong>{branch.name === "Longchamps" ? "Central — Longchamps" : branch.name}</strong>
+                      <strong>{branch.name}</strong>
                       <p>{branch.address}</p>
+                      <a className="branch-directions-btn" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
+                        🗺️ Cómo llegar
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -841,6 +1092,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
         {activeView === "catalogo" ? (
           <>
+            <button className="back-btn" onClick={() => navigateTo("inicio")} type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Inicio
+            </button>
             <section className="catalog-hero">
               <p className="eyebrow">Catalogo</p>
               <h2>Todos nuestros productos</h2>
@@ -1059,14 +1314,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                               <p className="product-category">{product.categoria}</p>
                             )}
                             <h2 className="product-name" onClick={() => openProductDetail(product)} style={{ cursor: "pointer" }}>
-                              {product.nombre}
+                              {getDisplayName(product.productKey, product.nombre)}
                             </h2>
                           </div>
 
-                          {/* Medida */}
-                          {measureMeta && (
-                            <p className="meta-line">
-                              <strong>{measureMeta.label}:</strong> {measureMeta.value}
+                          {/* Medida — solo visible para admin */}
+                          {session.isAdmin && measureMeta && (
+                            <p className="meta-line" style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                              <strong>{measureMeta.label} (DB):</strong> {measureMeta.value}
                             </p>
                           )}
 
@@ -1153,6 +1408,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
         {activeView === "sobre-nosotros" ? (
           <>
+            <button className="back-btn" onClick={() => navigateTo("inicio")} type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Inicio
+            </button>
             <section className="content-hero">
               <p className="eyebrow">Nuestra historia</p>
               <h2>Una empresa familiar con mas de 8 años de trayectoria.</h2>
@@ -1207,8 +1466,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <div className="about-branch-row" key={branch.id}>
                     <span className="about-branch-dot" />
                     <div>
-                      <strong>{branch.name === "Longchamps" ? "Central — Longchamps" : branch.name}</strong>
+                      <strong>{branch.name}</strong>
                       <p>{branch.address}</p>
+                      <a className="branch-directions-btn" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
+                        🗺️ Cómo llegar
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -1219,6 +1481,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
         {activeView === "contacto" ? (
           <>
+            <button className="back-btn" onClick={() => navigateTo("inicio")} type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Inicio
+            </button>
             {/* Hero */}
             <section className="contact-hero">
               <div className="contact-hero-text">
@@ -1381,17 +1647,101 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           <div className="detail-modal" onClick={(event) => event.stopPropagation()}>
             <div className="detail-grid">
               <div className="detail-media">
-                {selectedProduct.imageData ? (
-                  <img alt={selectedProduct.nombre} className="product-image" loading="lazy" src={selectedProduct.imageData} />
-                ) : (
-                  <div className="image-placeholder detail-placeholder">
-                    <BrandLogo />
-                  </div>
-                )}
+                {(() => {
+                  const photos = selectedProduct.imagesData && selectedProduct.imagesData.length > 0
+                    ? selectedProduct.imagesData
+                    : selectedProduct.imageData
+                      ? [selectedProduct.imageData]
+                      : [];
+                  const totalPhotos = photos.length;
+                  const safeIndex = totalPhotos > 0 ? Math.min(detailPhotoIndex, totalPhotos - 1) : 0;
+                  const currentPhoto = photos[safeIndex] || null;
+
+                  if (totalPhotos === 0) {
+                    return (
+                      <div className="image-placeholder detail-placeholder">
+                        <BrandLogo />
+                      </div>
+                    );
+                  }
+
+                  const isVideo = (src) => typeof src === "string" && (src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src));
+
+                  return (
+                    <div className="detail-carousel">
+                      <div
+                        className="detail-carousel-track"
+                        onTouchStart={(e) => {
+                          carouselTouchStartX.current = e.touches[0].clientX;
+                        }}
+                        onTouchEnd={(e) => {
+                          const startX = carouselTouchStartX.current;
+                          if (startX === null) return;
+                          const dx = e.changedTouches[0].clientX - startX;
+                          carouselTouchStartX.current = null;
+                          if (dx < -40 && safeIndex < totalPhotos - 1) setDetailPhotoIndex(safeIndex + 1);
+                          else if (dx > 40 && safeIndex > 0) setDetailPhotoIndex(safeIndex - 1);
+                        }}
+                      >
+                        {isVideo(currentPhoto) ? (
+                          <video
+                            className="product-image detail-carousel-img"
+                            controls
+                            key={safeIndex}
+                            src={currentPhoto}
+                            style={{ objectFit: "contain" }}
+                          />
+                        ) : (
+                          <img
+                            alt={`${selectedProduct.nombre} foto ${safeIndex + 1}`}
+                            className="product-image detail-carousel-img"
+                            key={safeIndex}
+                            loading="lazy"
+                            src={currentPhoto}
+                          />
+                        )}
+                      </div>
+
+                      {totalPhotos > 1 && (
+                        <>
+                          <button
+                            aria-label="Foto anterior"
+                            className="detail-carousel-arrow detail-carousel-prev"
+                            disabled={safeIndex === 0}
+                            onClick={() => setDetailPhotoIndex(safeIndex - 1)}
+                            type="button"
+                          >
+                            &#8249;
+                          </button>
+                          <button
+                            aria-label="Foto siguiente"
+                            className="detail-carousel-arrow detail-carousel-next"
+                            disabled={safeIndex === totalPhotos - 1}
+                            onClick={() => setDetailPhotoIndex(safeIndex + 1)}
+                            type="button"
+                          >
+                            &#8250;
+                          </button>
+                          <div className="detail-carousel-dots">
+                            {photos.map((_, i) => (
+                              <button
+                                aria-label={`Ir a foto ${i + 1}`}
+                                className={`detail-carousel-dot${i === safeIndex ? " active" : ""}`}
+                                key={i}
+                                onClick={() => setDetailPhotoIndex(i)}
+                                type="button"
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
               <div className="detail-copy">
                 <p className="eyebrow">{selectedProduct.categoria || "Producto"}</p>
-                <h2>{selectedProduct.nombre}</h2>
+                <h2>{getDisplayName(selectedProduct.productKey, selectedProduct.nombre)}</h2>
                 <div className="detail-topline">
                   <p className="detail-price">{currencyFormatter.format(detailTotal)}</p>
                   <span className={selectedProduct.isSoldOut ? "stock-pill sold-out" : "stock-pill in-stock"}>
@@ -1406,9 +1756,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 ) : null}
 
                 <div className="detail-specs">
-                  {getMeasureMeta(selectedProduct.medida) ? (
-                    <p className="meta-line">
-                      <strong>{getMeasureMeta(selectedProduct.medida).label}:</strong>{" "}
+                  {session.isAdmin && getMeasureMeta(selectedProduct.medida) ? (
+                    <p className="meta-line" style={{ fontSize: "0.82rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                      <strong>{getMeasureMeta(selectedProduct.medida).label} (DB):</strong>{" "}
                       {getMeasureMeta(selectedProduct.medida).value}
                     </p>
                   ) : null}
@@ -1536,7 +1886,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         )}
                       </div>
                       <div className="related-copy">
-                        <p>{product.nombre}</p>
+                        <p>{getDisplayName(product.productKey, product.nombre)}</p>
                         <strong>{currencyFormatter.format(product.precioVenta)}</strong>
                       </div>
                     </button>
@@ -1550,8 +1900,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
       {/* Modal editor admin — full screen en mobile */}
       {adminEditorOpen && activeEditor ? (
-        <div className="modal-backdrop" onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); }}>
-          <div className="admin-editor-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop">
+          <div className="admin-editor-modal">
             <div className="admin-editor-header">
               <h3 className="admin-editor-title">
                 ✏️ Editar producto
@@ -1559,26 +1909,115 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   ? ` — ${products.find(p => p.productKey === activeEditor.productKey).nombre}`
                   : ""}
               </h3>
-              <button className="admin-editor-close" onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); }} type="button">✕</button>
+              <button
+                className="admin-editor-close"
+                onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); setAdminEditorError(""); }}
+                type="button"
+                title="Cerrar sin guardar"
+              >✕</button>
             </div>
 
             <div className="admin-editor-body">
-              {/* Foto */}
+              {/* Nombre en pantalla — alias solo frontend, no toca la BD — va primero */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">📷 Foto del producto</p>
-                {activeEditor.imageData ? (
-                  <div className="admin-editor-preview">
-                    <img src={activeEditor.imageData} alt="Preview" className="admin-editor-img" />
-                    <button className="ghost-button" onClick={() => { handleEditorChange(activeEditor.productKey, "imageData", ""); handleEditorChange(activeEditor.productKey, "removeImage", true); }} type="button">
-                      Quitar foto
-                    </button>
+                <p className="admin-editor-section-title">🏪 Nombre en pantalla</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                  Lo que ven los clientes en la tienda. <strong>No cambia la base de datos.</strong> Dejá vacío para usar el nombre del sistema.
+                </p>
+                <input
+                  className="editor-input"
+                  type="text"
+                  placeholder={activeEditor.nombreOriginal || activeEditor.nombre || "Nombre en pantalla…"}
+                  value={displayNames[activeEditor.productKey] || ""}
+                  onChange={(e) => setDisplayName(activeEditor.productKey, e.target.value)}
+                  style={{ width: "100%" }}
+                />
+                {displayNames[activeEditor.productKey] && (
+                  <div style={{
+                    marginTop: 6,
+                    padding: "6px 12px",
+                    background: "rgba(69,103,79,0.1)",
+                    border: "1px solid rgba(69,103,79,0.22)",
+                    borderRadius: 6,
+                    fontSize: "0.82rem",
+                    color: "#45674f",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}>
+                    <span>✅ Activo: <strong>"{displayNames[activeEditor.productKey]}"</strong></span>
+                    <button
+                      type="button"
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: "0.8rem" }}
+                      onClick={() => setDisplayName(activeEditor.productKey, "")}
+                    >Quitar</button>
                   </div>
-                ) : (
-                  <label className="upload-button admin-upload-btn">
-                    📷 Subir foto
-                    <input accept="image/*" capture="environment" hidden type="file"
-                      onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
-                  </label>
+                )}
+              </div>
+
+              {/* Nombre en la BD — campo peligroso, va después */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">🏷️ Nombre en el sistema (base de datos)</p>
+                {activeEditor.medidaOriginal ? (
+                  <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                    Medida en sistema (DB): <strong>{activeEditor.medidaOriginal}</strong>
+                  </p>
+                ) : null}
+                <input
+                  className="editor-input"
+                  type="text"
+                  value={activeEditor.nombre}
+                  onChange={(e) => handleEditorChange(activeEditor.productKey, "nombre", e.target.value)}
+                  style={{ width: "100%" }}
+                />
+                {(activeEditor.nombre || "").trim() !== (activeEditor.nombreOriginal || "").trim() && (
+                  <div style={{
+                    marginTop: 8,
+                    padding: "8px 12px",
+                    background: "#fff3cd",
+                    border: "1px solid #ffc107",
+                    borderRadius: 6,
+                    fontSize: "0.82rem",
+                    color: "#856404",
+                  }}>
+                    ⚠️ <strong>Atención:</strong> Este cambio se guardará directamente en la base de datos del sistema y afectará a todos los registros con este nombre. Se te pedirá confirmación al guardar.
+                  </div>
+                )}
+              </div>
+
+              {/* Fotos */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">📷 Fotos / Video del producto</p>
+                {(activeEditor.imagesData || []).length > 0 && (
+                  <div className="admin-images-grid">
+                    {(activeEditor.imagesData || []).map((src, i) => (
+                      <div key={i} className="admin-image-thumb">
+                        {(src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src)) ? (
+                          <video src={src} className="admin-editor-img" muted playsInline />
+                        ) : (
+                          <img src={src} alt={`Foto ${i + 1}`} className="admin-editor-img" />
+                        )}
+                        <div className="admin-image-thumb-actions">
+                          {i > 0 && (
+                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, -1)} title="Mover izquierda">◀</button>
+                          )}
+                          {i < (activeEditor.imagesData.length - 1) && (
+                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, 1)} title="Mover derecha">▶</button>
+                          )}
+                          <button type="button" className="admin-img-remove" onClick={() => handleRemoveImage(activeEditor.productKey, i)} title="Quitar">✕</button>
+                        </div>
+                        {i === 0 && <span className="admin-img-main-badge">Principal</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <label className={`upload-button admin-upload-btn${adminUploadBusy ? " admin-upload-busy" : ""}`} style={{ marginTop: 8 }}>
+                  {adminUploadBusy ? "⏳ Subiendo..." : "📷 Agregar fotos o video"}
+                  <input accept="image/*,video/*" multiple hidden type="file" disabled={adminUploadBusy}
+                    onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
+                </label>
+                {adminUploadError && (
+                  <p style={{ color: "var(--danger, #e53e3e)", fontSize: "0.8rem", marginTop: 4 }}>{adminUploadError}</p>
                 )}
               </div>
 
@@ -1682,13 +2121,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               )}
             </div>
 
+            {adminEditorError ? (
+              <div className="admin-editor-error">{adminEditorError}</div>
+            ) : null}
             <div className="admin-editor-footer">
-              <button className="ghost-button" onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); }} type="button">
-                Cancelar
-              </button>
               <button className="primary-button" disabled={pending}
                 onClick={() => handleSave(activeEditor.productKey)} type="button">
-                {pending ? "Guardando..." : "💾 Guardar"}
+                {pending ? "Guardando..." : "Aplicar"}
               </button>
             </div>
           </div>
@@ -1821,53 +2260,69 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         <div className="cart-drawer-backdrop" onClick={() => setCartOpen(false)}>
           <aside className="cart-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="cart-header">
-              <div>
-                <p className="eyebrow">Carrito</p>
-                <h3>Tu seleccion</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: "1.4rem" }}>🛒</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Tu carrito</h3>
+                  {cart.length > 0 && (
+                    <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--muted)" }}>
+                      {cart.reduce((s, i) => s + i.quantity, 0)} producto{cart.reduce((s, i) => s + i.quantity, 0) !== 1 ? "s" : ""}
+                    </p>
+                  )}
+                </div>
               </div>
-              <button className="ghost-button" onClick={() => setCartOpen(false)} type="button">
-                Cerrar
-              </button>
+              <button className="cart-close-btn" onClick={() => setCartOpen(false)} type="button" aria-label="Cerrar carrito">✕</button>
             </div>
+
             {cart.length === 0 ? (
-              <p className="availability">Todavia no agregaste productos.</p>
+              <div className="cart-empty">
+                <span className="cart-empty-icon">🛋️</span>
+                <p>Tu carrito está vacío.</p>
+                <button className="ghost-button" onClick={() => { navigateTo("catalogo"); setCartOpen(false); }} type="button">
+                  Ver catálogo →
+                </button>
+              </div>
             ) : (
               <>
                 <div className="cart-list">
-                  {cart.map((item) => (
-                    <div className="cart-item" key={item.lineKey}>
-                      <div>
-                        <p className="cart-name">{item.nombre}</p>
-                        {item.accessoryLabel ? <p className="cart-extra">Con {item.accessoryLabel}</p> : null}
-                        <p className="cart-price">
-                          {currencyFormatter.format(item.precioVenta + (item.accessoryPrice || 0))} × {item.quantity}
-                        </p>
+                  {cart.map((item) => {
+                    const product = products.find((p) => p.productKey === item.productKey);
+                    return (
+                      <div className="cart-item" key={item.lineKey}>
+                        <div className="cart-item-thumb">
+                          {product?.imageData
+                            ? <img src={product.imageData} alt={item.nombre} />
+                            : <span>{item.nombre[0]}</span>}
+                        </div>
+                        <div className="cart-item-body">
+                          <p className="cart-name">{item.nombre}</p>
+                          {item.accessoryLabel ? <p className="cart-extra">+ {item.accessoryLabel}</p> : null}
+                          <p className="cart-line-total">
+                            {currencyFormatter.format((item.precioVenta + (item.accessoryPrice || 0)) * item.quantity)}
+                          </p>
+                        </div>
+                        <div className="cart-quantity">
+                          <button onClick={() => changeCartQuantity(item.lineKey, -1)} type="button">−</button>
+                          <span>{item.quantity}</span>
+                          <button onClick={() => changeCartQuantity(item.lineKey, 1)} type="button">+</button>
+                        </div>
                       </div>
-                      <div className="cart-quantity">
-                        <button onClick={() => changeCartQuantity(item.lineKey, -1)} type="button">
-                          −
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button onClick={() => changeCartQuantity(item.lineKey, 1)} type="button">
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
+
                 <div className="cart-footer">
-                  <div>
-                    <p className="eyebrow" style={{ marginBottom: 2 }}>Subtotal</p>
-                    <strong style={{ fontSize: "1.3rem" }}>{currencyFormatter.format(checkoutSummary.subtotal)}</strong>
+                  <div className="cart-total-row">
+                    <span>Subtotal</span>
+                    <strong>{currencyFormatter.format(checkoutSummary.subtotal)}</strong>
                   </div>
-                </div>
-                <div className="cart-checkout-actions">
-                  <a className="cart-checkout" href="/checkout">
+                  <p className="cart-footer-note">Envío y forma de pago se eligen en el siguiente paso.</p>
+                  <a className="primary-button cart-checkout-btn" href="/checkout">
                     Finalizar compra →
                   </a>
-                  <p className="availability" style={{ margin: 0, textAlign: "center", fontSize: "0.82rem" }}>
-                    Elegis envio, forma de pago y mas en el siguiente paso.
-                  </p>
+                  <button className="ghost-button" style={{ width: "100%", marginTop: 8, textAlign: "center" }} onClick={() => setCartOpen(false)} type="button">
+                    Seguir comprando
+                  </button>
                 </div>
               </>
             )}
@@ -2059,9 +2514,22 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         </div>
       )}
 
+
+      {/* ── Sticky cart bar — solo mobile, cuando hay items ───────────────── */}
+      {cart.length > 0 && !cartOpen && (
+        <div className="sticky-cart-bar">
+          <div className="sticky-cart-bar-total">
+            <small>{cartCount} producto{cartCount !== 1 ? "s" : ""}</small>
+            <strong>{currencyFormatter.format(checkoutSummary.subtotal)}</strong>
+          </div>
+          <a className="sticky-cart-bar-btn" href="/checkout">
+            Finalizar compra →
+          </a>
+        </div>
+      )}
+
       {/* ── Botón flotante WhatsApp ─────────────────────────────────────────── */}
-      {whatsappNumber && (
-        <a
+      {whatsappNumber && (        <a
           className="wsp-fab"
           href={buildContactLink("Hola, quiero consultar sobre un producto de Manarey.", "Consulta Manarey")}
           target="_blank"

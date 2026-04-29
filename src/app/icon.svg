@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a1a0a"/>
+      <stop offset="100%" stop-color="#110804"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c050"/>
+      <stop offset="100%" stop-color="#b8821a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo oscuro redondeado -->
+  <rect width="64" height="64" rx="13" fill="url(#bg)"/>
+
+  <!-- Corona real del logo (5 picos + joyas) escalada y centrada -->
+  <g transform="translate(-3.7, 11.5) scale(0.17)" fill="url(#gold)">
+    <!-- Joyas en las puntas -->
+    <circle cx="86"  cy="50" r="9"/>
+    <circle cx="148" cy="68" r="7"/>
+    <circle cx="210" cy="18" r="11"/>
+    <circle cx="272" cy="68" r="7"/>
+    <circle cx="334" cy="50" r="9"/>
+
+    <!-- Cuerpo de la corona -->
+    <path d="M80 205 L86 50 L118 125 L148 68 L179 108 L210 18 L241 108 L272 68 L302 125 L334 50 L340 205 Z"/>
+
+    <!-- Base de la corona -->
+    <rect x="76"  y="178" width="268" height="18" rx="3"/>
+    <rect x="80"  y="200" width="260" height="10" rx="2"/>
+  </g>
+</svg>

@@ -35,6 +35,7 @@ async function ensureMetadataTable() {
         "alter table public.productos_web_metadata add column if not exists precio_override numeric",
         "alter table public.productos_web_metadata add column if not exists is_featured boolean default false",
         "alter table public.productos_web_metadata add column if not exists featured_order integer",
+        "alter table public.productos_web_metadata add column if not exists images_data text",
       ];
       for (const sql of newCols) {
         await query(sql).catch(() => {});
@@ -73,7 +74,19 @@ function mapProduct(row) {
     stockTotal: Number(row.stock_total || 0),
     isSoldOut: Number(row.stock_total || 0) <= 0,
     description: row.description || "",
-    imageData: row.image_data || "",
+    imagesData: (() => {
+      try { return row.images_data ? JSON.parse(row.images_data) : []; }
+      catch { return []; }
+    })(),
+    imageData: (() => {
+      if (row.image_data) return row.image_data;
+      try {
+        const images = row.images_data ? JSON.parse(row.images_data) : [];
+        return Array.isArray(images) && images.length > 0 ? images[0] : "";
+      } catch {
+        return "";
+      }
+    })(),
     altoCm: row.alto_cm === null ? null : Number(row.alto_cm),
     anchoCm: row.ancho_cm === null ? null : Number(row.ancho_cm),
     profundidadCm: row.profundidad_cm === null ? null : Number(row.profundidad_cm),
@@ -128,7 +141,8 @@ export async function getCatalogProducts() {
       meta.capacidad,
       meta.precio_override,
       meta.is_featured,
-      meta.featured_order
+      meta.featured_order,
+      meta.images_data
     from grouped
     left join public.productos_web_metadata meta on meta.product_key = grouped.product_key
     order by
@@ -147,11 +161,26 @@ export async function getCatalogProductByKey(productKey) {
 }
 
 export async function updateProductMetadata(productKey, payload) {
+  if (!productKey) throw new Error("productKey requerido para guardar el producto.");
   await ensureMetadataTable();
 
   const description = (payload.description || "").trim();
-  const imageData = payload.removeImage ? null : payload.imageData || null;
-  if (imageData && imageData.length > 3_500_000) throw new Error("La imagen es demasiado pesada para guardarla.");
+  const imagesArr = (() => {
+    if (Array.isArray(payload.imagesData)) return payload.imagesData.filter(Boolean);
+    if (typeof payload.imagesData === "string") {
+      try {
+        const parsed = JSON.parse(payload.imagesData);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean);
+      } catch {
+        return [payload.imagesData].filter(Boolean);
+      }
+    }
+    return [];
+  })();
+
+  const fallbackImage = typeof payload.imageData === "string" && payload.imageData ? payload.imageData : null;
+  const imageData = payload.removeImage ? null : (imagesArr[0] || fallbackImage);
+  const imagesDataJson = imageData ? JSON.stringify(imagesArr.length > 0 ? imagesArr : [imageData]) : null;
   const altoCm = toNullableNumber(payload.altoCm);
   const anchoCm = toNullableNumber(payload.anchoCm);
   const profundidadCm = toNullableNumber(payload.profundidadCm);
@@ -167,11 +196,12 @@ export async function updateProductMetadata(productKey, payload) {
 
   await query(
     `
-      insert into public.productos_web_metadata (product_key, description, image_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, precio_override, updated_at)
-      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,now())
+      insert into public.productos_web_metadata (product_key, description, image_data, images_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, precio_override, updated_at)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now())
       on conflict (product_key) do update set
         description = excluded.description,
         image_data = excluded.image_data,
+        images_data = excluded.images_data,
         alto_cm = excluded.alto_cm,
         ancho_cm = excluded.ancho_cm,
         profundidad_cm = excluded.profundidad_cm,
@@ -185,10 +215,59 @@ export async function updateProductMetadata(productKey, payload) {
         precio_override = excluded.precio_override,
         updated_at = now()
     `,
-    [productKey, description || null, imageData, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride],
+    [productKey, description || null, imageData, imagesDataJson, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride],
   );
 
   return getCatalogProductByKey(productKey);
+}
+
+export async function renameProduct(productKey, newName) {
+  await ensureMetadataTable();
+
+  // Obtener los atributos actuales del producto para recalcular la clave
+  const existing = await query(
+    `SELECT min(categoria) as categoria, min(medida) as medida, precio_venta, min(color) as color
+     FROM public.productos
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $1
+     GROUP BY precio_venta LIMIT 1`,
+    [productKey],
+  );
+  if (!existing.rows.length) throw new Error("Producto no encontrado.");
+
+  const { categoria, medida, precio_venta, color } = existing.rows[0];
+
+  // Actualizar el nombre en todos los registros que coincidan
+  await query(
+    `UPDATE public.productos SET nombre = $1
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $2`,
+    [newName, productKey],
+  );
+
+  // Calcular el nuevo product_key desde las filas ya actualizadas
+  const newKeyResult = await query(
+    `SELECT md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as new_key
+     FROM public.productos
+     WHERE lower(trim(nombre)) = lower(trim($1))
+       AND lower(coalesce(trim(categoria), '')) = lower(trim(coalesce($2, '')))
+       AND lower(coalesce(trim(medida), '')) = lower(trim(coalesce($3, '')))
+       AND coalesce(precio_venta::text, '') = coalesce($4::text, '')
+       AND lower(coalesce(trim(color), '')) = lower(trim(coalesce($5, '')))
+     LIMIT 1`,
+    [newName, categoria, medida, precio_venta, color],
+  );
+
+  const newProductKey = newKeyResult.rows[0]?.new_key;
+
+  // Migrar la metadata al nuevo product_key si cambió
+  if (newProductKey && newProductKey !== productKey) {
+    await query(
+      `UPDATE public.productos_web_metadata SET product_key = $1, updated_at = now()
+       WHERE product_key = $2`,
+      [newProductKey, productKey],
+    );
+  }
+
+  return newProductKey || productKey;
 }
 
 /**

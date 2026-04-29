@@ -51,7 +51,8 @@ export async function GET(request) {
       telefono: customer.telefono,
     });
 
-    const response = NextResponse.redirect(`${storeSettings.siteUrl}/checkout`);
+    // Redirigir al catálogo (inicio) en lugar de checkout para no confundir al usuario
+    const response = NextResponse.redirect(`${storeSettings.siteUrl}/`);
     response.cookies.set(CUSTOMER_SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: "lax",
@@ -61,6 +62,6 @@ export async function GET(request) {
     });
     return response;
   } catch {
-    return NextResponse.redirect(`${storeSettings.siteUrl}/checkout?auth_error=fallo_google`);
+    return NextResponse.redirect(`${storeSettings.siteUrl}/?auth_error=fallo_google`);
   }
 }

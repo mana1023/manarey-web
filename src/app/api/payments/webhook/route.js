@@ -40,7 +40,14 @@ export async function POST(request) {
   }
 
   try {
-    const payment = await fetchMercadoPagoPayment(paymentId);
+    let payment;
+    try {
+      payment = await fetchMercadoPagoPayment(paymentId);
+    } catch (fetchErr) {
+      console.error("[webhook] No se pudo obtener el pago MP:", paymentId, fetchErr?.message || fetchErr);
+      // Si el token es inválido o el pago no existe, igualmente respondemos 200 para que MP no reintente
+      return NextResponse.json({ ok: true, ignored: true, reason: "fetch_failed" });
+    }
     const mapped = mapMercadoPagoStatus(payment.status);
 
     await markOrderPayment({
@@ -71,7 +78,8 @@ export async function POST(request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (err) {
+    console.error("[webhook] Error inesperado:", err?.message || err);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

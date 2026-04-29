@@ -11,7 +11,7 @@ export async function PATCH(request, context) {
     const { local, delta } = await request.json();
     if (!local || typeof delta !== "number") return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
 
-    const productKey = context.params.productKey;
+    const { productKey } = await context.params;
 
     // Find rows matching this product_key and local, update cantidad
     const existing = await query(

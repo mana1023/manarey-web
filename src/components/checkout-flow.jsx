@@ -124,60 +124,69 @@ function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
 
 // ─── Formulario de Transferencia ─────────────────────────────────────────────
 
-function TransferInfo({ total, order, onWhatsApp }) {
-  const cbu = process.env.NEXT_PUBLIC_TRANSFER_CBU || "";
-  const alias = process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "";
+function TransferInfo({ total, order, onWhatsApp, showMpFallbackNote }) {
+  const cbu = process.env.NEXT_PUBLIC_TRANSFER_CBU || "0000003100041574114890";
+  const alias = process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "muebleria.manarey.mp";
   const cuentaDni = process.env.NEXT_PUBLIC_TRANSFER_CUENTA_DNI || "";
 
   return (
     <div className="cf-transfer-panel">
-      <p className="cf-transfer-title">Transferi el importe a cualquiera de estas opciones:</p>
-      <div className="cf-transfer-grid">
-        <div className="cf-transfer-method">
-          <span className="cf-transfer-icon">🏦</span>
-          <div>
-            <strong>Transferencia bancaria (CBU / CVU)</strong>
-            <p>Desde cualquier banco: BBVA, Santander, Galicia, Naranja, MODO, etc.</p>
-            {cbu ? (
-              <code className="cf-transfer-code">{cbu}</code>
-            ) : (
-              <p className="cf-transfer-note">Pedinos el CBU por WhatsApp</p>
-            )}
-            {alias && <p className="cf-transfer-alias">Alias: <strong>{alias}</strong></p>}
-          </div>
+      {showMpFallbackNote && (
+        <div className="cf-transfer-fallback-note">
+          <span>ℹ️</span>
+          <p>El link de MercadoPago no está disponible en este momento. Podés pagar directamente con tu banco usando los datos de abajo.</p>
         </div>
+      )}
 
-        <div className="cf-transfer-method">
-          <span className="cf-transfer-icon">📱</span>
-          <div>
-            <strong>Cuenta DNI (Banco Provincia)</strong>
-            <p>Abrí la app Cuenta DNI y transferí al alias o CBU indicado arriba.</p>
-            {cuentaDni && <code className="cf-transfer-code">{cuentaDni}</code>}
-          </div>
-        </div>
+      <p className="cf-transfer-title">Transferí el importe a cualquiera de estas opciones:</p>
 
-        <div className="cf-transfer-method">
-          <span className="cf-transfer-icon">💙</span>
-          <div>
-            <strong>Mercado Pago</strong>
-            <p>Transferí desde tu billetera de MP al mismo alias o CBU.</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="cf-transfer-total">
+      <div className="cf-transfer-total cf-transfer-total-top">
         <span>Total a transferir:</span>
         <strong>{currencyFmt.format(total)}</strong>
       </div>
 
-      <div className="cf-transfer-confirm-note">
-        <span>✅</span>
-        <p>Una vez que realices la transferencia, la app detectará el pago automáticamente. No necesitás enviar comprobante.</p>
+      <div className="cf-transfer-grid">
+        <div className="cf-transfer-method">
+          <span className="cf-transfer-icon">💙</span>
+          <div>
+            <strong>MercadoPago / CBU / CVU</strong>
+            <p>Desde cualquier banco, MODO, Cuenta DNI, o la app de MercadoPago.</p>
+            {alias ? (
+              <p className="cf-transfer-alias">Alias: <code className="cf-transfer-code">{alias}</code></p>
+            ) : null}
+            {cbu ? (
+              <p className="cf-transfer-alias">CBU/CVU: <code className="cf-transfer-code">{cbu}</code></p>
+            ) : (
+              <p className="cf-transfer-note">Pedinos el CBU por WhatsApp</p>
+            )}
+          </div>
+        </div>
+
+        {cuentaDni ? (
+          <div className="cf-transfer-method">
+            <span className="cf-transfer-icon">📱</span>
+            <div>
+              <strong>Cuenta DNI (Banco Provincia)</strong>
+              <p>Abrí la app y transferí al alias o CBU indicado arriba.</p>
+              <code className="cf-transfer-code">{cuentaDni}</code>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {order && (
         <p className="cf-transfer-order">Código de pedido: <strong>{order}</strong></p>
       )}
+
+      <div className="cf-transfer-confirm-section">
+        <p className="cf-transfer-confirm-title">✅ ¿Ya transferiste?</p>
+        <p className="cf-transfer-confirm-sub">
+          Envianos el comprobante por WhatsApp con el código <strong>{order}</strong> y confirmamos tu pedido de inmediato.
+        </p>
+        <button className="cf-whatsapp-btn cf-whatsapp-btn-primary" type="button" onClick={onWhatsApp}>
+          💬 Enviar comprobante por WhatsApp
+        </button>
+      </div>
     </div>
   );
 }
@@ -240,7 +249,7 @@ export function CheckoutFlow({ initialCustomer }) {
   const [authError, setAuthError] = useState("");
 
   // Personal data (editable after login)
-  const [personalData, setPersonalData] = useState({ nombre: "", apellido: "", telefono: "" });
+  const [personalData, setPersonalData] = useState({ nombre: "", apellido: "", telefono: "", email: "" });
   const [personalEdited, setPersonalEdited] = useState(false);
 
   // Shipping
@@ -315,6 +324,7 @@ export function CheckoutFlow({ initialCustomer }) {
         nombre: customer.nombre || "",
         apellido: customer.apellido || "",
         telefono: customer.telefono || "",
+        email: customer.email || "",
       });
     }
   }, [customer, personalEdited]);
@@ -507,7 +517,7 @@ export function CheckoutFlow({ initialCustomer }) {
       nombre: personalData.nombre,
       apellido: personalData.apellido,
       fullName: `${personalData.nombre} ${personalData.apellido}`.trim(),
-      email: customer?.email || "",
+      email: personalData.email || customer?.email || "",
       telefono: personalData.telefono,
       phone: personalData.telefono,
       address: fullAddress,
@@ -613,10 +623,11 @@ export function CheckoutFlow({ initialCustomer }) {
   }
 
   function handleTransferWhatsApp() {
-    if (!storeSettings.whatsappNumber || !completedOrder) return;
-    const msg = `Hola Manarey, realicé la transferencia para el pedido ${completedOrder}. Adjunto el comprobante.`;
+    const phone = storeSettings.whatsappNumber || "5491164282270";
+    const order = completedOrder || "";
+    const msg = `Hola Manarey! Realicé la transferencia para el pedido ${order}. Adjunto el comprobante. Total: ${currencyFmt.format(total)}`;
     window.open(
-      `https://wa.me/${storeSettings.whatsappNumber}?text=${encodeURIComponent(msg)}`,
+      `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
       "_blank",
       "noopener,noreferrer",
     );
@@ -681,7 +692,7 @@ export function CheckoutFlow({ initialCustomer }) {
                 Continuar con Google
               </a>
 
-              <div className="cf-divider"><span>o con tu cuenta</span></div>
+              <div className="cf-divider"><span>ingresá con tu cuenta</span></div>
 
               {/* Tabs */}
               <div className="cf-auth-tabs">
@@ -807,6 +818,18 @@ export function CheckoutFlow({ initialCustomer }) {
                     onChange={(e) => handlePersonalChange("telefono", e.target.value)}
                   />
                 </div>
+                {customer?.isGuest && (
+                  <div className="cf-input-group">
+                    <label>Correo electrónico (opcional)</label>
+                    <input
+                      className="cf-input"
+                      type="email"
+                      placeholder="para recibir confirmación del pedido"
+                      value={personalData.email}
+                      onChange={(e) => handlePersonalChange("email", e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Shipping mode */}
@@ -953,6 +976,12 @@ export function CheckoutFlow({ initialCustomer }) {
               <p className="cf-eyebrow">Paso 3 de 3</p>
               <h1 className="cf-heading">Elegí cómo pagar</h1>
 
+              {/* Total siempre visible — especialmente útil en mobile */}
+              <div className="cf-total-bar">
+                <span>Total a pagar</span>
+                <strong>{currencyFmt.format(total)}</strong>
+              </div>
+
               <button
                 className="cf-back-btn"
                 onClick={() => { setPaymentMethod(""); setStep("shipping"); }}
@@ -975,18 +1004,33 @@ export function CheckoutFlow({ initialCustomer }) {
                       <span>Formulario seguro con Mercado Pago. Todas las tarjetas.</span>
                     </div>
                   </button>
-                  <button
-                    className="cf-payment-btn"
-                    onClick={() => setPaymentMethod("transfer")}
-                    type="button"
-                    disabled={paymentBusy}
-                  >
-                    <span className="cf-payment-icon">🏦</span>
-                    <div>
-                      <strong>Transferencia bancaria</strong>
-                      <span>MercadoPago, Cuenta DNI, CBU / CVU, cualquier banco.</span>
-                    </div>
-                  </button>
+                  {isMobile ? (
+                    <button
+                      className="cf-payment-btn"
+                      onClick={() => setPaymentMethod("transfer")}
+                      type="button"
+                      disabled={paymentBusy}
+                    >
+                      <span className="cf-payment-icon">🏦</span>
+                      <div>
+                        <strong>Transferencia bancaria</strong>
+                        <span>MercadoPago, Cuenta DNI, CBU / CVU, cualquier banco.</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      className="cf-payment-btn"
+                      onClick={() => { setPaymentMethod("transfer"); handleTransferOrder("mp"); }}
+                      type="button"
+                      disabled={paymentBusy}
+                    >
+                      <span className="cf-payment-icon">📱</span>
+                      <div>
+                        <strong>QR</strong>
+                        <span>Escaneá el QR con MercadoPago, Cuenta DNI o cualquier billetera.</span>
+                      </div>
+                    </button>
+                  )}
                   {storeSettings.whatsappNumber && (
                     <button
                       className="cf-payment-btn"
@@ -1035,7 +1079,7 @@ export function CheckoutFlow({ initialCustomer }) {
               {paymentMethod === "transfer" && (
                 <div className="cf-card">
                   <div className="cf-card-header">
-                    <p className="cf-card-title">Transferencia bancaria</p>
+                    <p className="cf-card-title">{!isMobile && transferSubMethod === "mp" ? "Pago con QR" : "Transferencia bancaria"}</p>
                     {!pollingActive && (
                       <button
                         className="cf-link-btn"
@@ -1091,11 +1135,10 @@ export function CheckoutFlow({ initialCustomer }) {
                   {/* PASO B: UI según sub-método elegido */}
                   {completedOrder && !paymentBusy && (
                     <>
-                      {/* Sub-método: MercadoPago */}
+                      {/* Sub-método: MercadoPago CON link */}
                       {transferSubMethod === "mp" && transferInitPoint && (
                         <div className="cf-mp-pay-panel">
                           {isMobile ? (
-                            /* MÓVIL: botón grande para abrir la app */
                             <div className="cf-mp-mobile">
                               <p className="cf-mp-instruction">
                                 Tocá el botón para abrir MercadoPago y completar el pago de{" "}
@@ -1114,7 +1157,6 @@ export function CheckoutFlow({ initialCustomer }) {
                               </p>
                             </div>
                           ) : (
-                            /* ESCRITORIO: QR para escanear con el celular */
                             <div className="cf-mp-desktop">
                               <p className="cf-mp-instruction">
                                 Escaneá el QR con la cámara o la app de MercadoPago para pagar{" "}
@@ -1145,12 +1187,13 @@ export function CheckoutFlow({ initialCustomer }) {
                         </div>
                       )}
 
-                      {/* Sub-método: banco manual */}
-                      {transferSubMethod === "bank" && (
+                      {/* Sub-método: MercadoPago SIN link (fallback a banco) o banco manual */}
+                      {(transferSubMethod === "bank" || (transferSubMethod === "mp" && !transferInitPoint)) && (
                         <TransferInfo
                           total={total}
                           order={completedOrder}
                           onWhatsApp={handleTransferWhatsApp}
+                          showMpFallbackNote={transferSubMethod === "mp" && !transferInitPoint}
                         />
                       )}
 

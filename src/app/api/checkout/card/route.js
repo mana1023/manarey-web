@@ -7,10 +7,7 @@ export async function POST(request) {
   try {
     const payload = await request.json();
     const order = await createOrder({ paymentMethod: "card", payload });
-    const preference = await createMercadoPagoPreference({
-      order,
-      customer: order.customer,
-    });
+    const preference = await createMercadoPagoPreference({ order, customer: order.customer });
 
     // Enviar email de confirmación (no bloquea si falla)
     if (order.customer.email) {

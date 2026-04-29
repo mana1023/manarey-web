@@ -8,10 +8,19 @@ export async function POST(request) {
   try {
     const payload = await request.json();
     const order = await createOrder({ paymentMethod: "transfer", payload });
-    const preference = await createMercadoPagoPreference({
-      order,
-      customer: order.customer,
-    });
+
+    // MercadoPago es opcional para transferencia — si no está configurado o falla, igual se crea el pedido
+    let preferenceId = null;
+    let initPoint = null;
+    let sandboxInitPoint = null;
+    try {
+      const preference = await createMercadoPagoPreference({ order, customer: order.customer });
+      preferenceId = preference.id;
+      initPoint = preference.init_point;
+      sandboxInitPoint = preference.sandbox_init_point;
+    } catch (mpErr) {
+      console.error("[transfer] MP preference error:", mpErr?.message || mpErr);
+    }
 
     const phone = order.customer.phone;
     if (phone) {
@@ -25,7 +34,6 @@ export async function POST(request) {
       );
     }
 
-    // Enviar email de confirmación con datos de transferencia (no bloquea si falla)
     if (order.customer.email) {
       const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "transfer" });
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
@@ -33,9 +41,9 @@ export async function POST(request) {
 
     return NextResponse.json({
       orderCode: order.orderCode,
-      preferenceId: preference.id,
-      initPoint: preference.init_point,
-      sandboxInitPoint: preference.sandbox_init_point,
+      preferenceId,
+      initPoint,
+      sandboxInitPoint,
     });
   } catch (error) {
     return NextResponse.json(
