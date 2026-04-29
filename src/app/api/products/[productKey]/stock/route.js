@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
 import { query } from "@/lib/db";
+import { storeBranches } from "@/lib/store-config";
 
 export async function PATCH(request, context) {
   const session = await getSessionFromCookies(await cookies());
@@ -11,15 +12,18 @@ export async function PATCH(request, context) {
     const { local, delta } = await request.json();
     if (!local || typeof delta !== "number") return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
 
+    // Translate display name → DB name
+    const branch = storeBranches.find((b) => b.name === local);
+    const dbLocal = branch?.dbName ?? local;
+
     const { productKey } = await context.params;
 
-    // Find rows matching this product_key and local, update cantidad
     const existing = await query(
       `select id, cantidad from public.productos
        where md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria),'')), lower(coalesce(trim(medida),'')), coalesce(precio_venta::text,''), lower(coalesce(trim(color),'')))) = $1
-       and lower(trim(local)) = lower(trim($2))
+       and trim(local) = $2
        limit 1`,
-      [productKey, local],
+      [productKey, dbLocal],
     );
 
     if (existing.rows.length === 0) {

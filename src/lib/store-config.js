@@ -24,6 +24,7 @@ export const storeSettings = {
 export const storeBranches = [
   {
     id: "cane",
+    dbName: "Cane",
     name: "En el barrio Kanmar",
     shortName: "Kanmar",
     city: "Buenos Aires",
@@ -32,6 +33,7 @@ export const storeBranches = [
   },
   {
     id: "longchamps",
+    dbName: "Longchamps",
     name: "Central — al lado del vivero Kan Sei",
     shortName: "Central",
     city: "Buenos Aires",
@@ -40,6 +42,7 @@ export const storeBranches = [
   },
   {
     id: "glew",
+    dbName: "Glew",
     name: "Frente a las canchas Corta la Bocha",
     shortName: "Corta la Bocha",
     city: "Buenos Aires",
@@ -48,6 +51,7 @@ export const storeBranches = [
   },
   {
     id: "vidriera",
+    dbName: "Vidriera",
     name: "En la entrada de la UOCRA",
     shortName: "UOCRA",
     city: "Buenos Aires",
@@ -56,6 +60,7 @@ export const storeBranches = [
   },
   {
     id: "estacion",
+    dbName: "Estacion",
     name: "En la estación de Glew",
     shortName: "Estación",
     city: "Buenos Aires",

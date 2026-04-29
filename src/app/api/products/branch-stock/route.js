@@ -11,7 +11,7 @@ export async function GET(request) {
 
   try {
     const result = await query(
-      `select local, sum(coalesce(cantidad, 0)) as stock
+      `select trim(local) as local, sum(coalesce(cantidad, 0)) as stock
        from public.productos
        where md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria),'')), lower(coalesce(trim(medida),'')), coalesce(precio_venta::text,''), lower(coalesce(trim(color),'')))) = $1
        group by local
@@ -19,17 +19,19 @@ export async function GET(request) {
       [productKey],
     );
 
-    const stockByLocal = {};
+    // Map DB name → stock
+    const stockByDbName = {};
     for (const row of result.rows) {
-      stockByLocal[row.local] = Number(row.stock);
+      stockByDbName[row.local] = Number(row.stock);
     }
 
     let branches;
     if (allBranches) {
-      // Return all configured branches, even those with 0 stock
-      branches = storeBranches.map((b) => ({ local: b.name, stock: stockByLocal[b.name] || 0 }));
+      branches = storeBranches.map((b) => ({ local: b.name, stock: stockByDbName[b.dbName] ?? 0 }));
     } else {
-      branches = result.rows.filter((r) => Number(r.stock) > 0).map((r) => ({ local: r.local, stock: Number(r.stock) }));
+      branches = storeBranches
+        .filter((b) => (stockByDbName[b.dbName] ?? 0) > 0)
+        .map((b) => ({ local: b.name, stock: stockByDbName[b.dbName] }));
     }
 
     return NextResponse.json({ branches });

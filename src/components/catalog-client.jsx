@@ -11,6 +11,8 @@ const currencyFormatter = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 0,
 });
 
+const PAGE_SIZE = 24;
+
 function getMeasureMeta(rawMeasure) {
   if (!rawMeasure) return null;
   const medida = rawMeasure.trim();
@@ -156,6 +158,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [featuredBusy, setFeaturedBusy] = useState(false);
   const [branchStockCache, setBranchStockCache] = useState({}); // { [productKey]: [{ local, stock }] }
   const [stockUpdating, setStockUpdating] = useState({}); // { [productKey+local]: true }
+  const [catalogPage, setCatalogPage] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({}); // { [variantGroupKey]: productKey }
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -357,6 +360,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
     return groups;
   }, [filteredProducts, adminBranchFilter, branchStockCache]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCatalogPage(1);
+  }, [filteredProducts, adminBranchFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredGroups.length / PAGE_SIZE));
+  const pagedGroups = filteredGroups.slice((catalogPage - 1) * PAGE_SIZE, catalogPage * PAGE_SIZE);
 
   const homeProducts = useMemo(() => {
     // Si hay productos marcados como destacados (y no hay filtro de categoría activo), priorizarlos
@@ -1243,7 +1254,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     </article>
                   ) : null}
 
-                  {filteredGroups.map((group) => {
+                  {pagedGroups.map((group) => {
                     const product = getActiveVariant(group.key, group.variants);
                     const measureMeta = getMeasureMeta(product.medida);
                     const editing = activeEditor?.productKey === product.productKey;
@@ -1395,6 +1406,53 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     );
                   })}
                 </section>
+
+                {totalPages > 1 && (
+                  <nav className="catalog-pagination" aria-label="Paginado del catálogo">
+                    <button
+                      className="catalog-page-btn catalog-page-prev"
+                      onClick={() => { setCatalogPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      disabled={catalogPage === 1}
+                      type="button"
+                      aria-label="Página anterior"
+                    >
+                      ‹
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((n) => n === 1 || n === totalPages || Math.abs(n - catalogPage) <= 1)
+                      .reduce((acc, n, idx, arr) => {
+                        if (idx > 0 && n - arr[idx - 1] > 1) acc.push("...");
+                        acc.push(n);
+                        return acc;
+                      }, [])
+                      .map((item, idx) =>
+                        item === "..." ? (
+                          <span key={`ellipsis-${idx}`} className="catalog-page-ellipsis">…</span>
+                        ) : (
+                          <button
+                            key={item}
+                            className={`catalog-page-btn${item === catalogPage ? " active" : ""}`}
+                            onClick={() => { setCatalogPage(item); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                            type="button"
+                            aria-current={item === catalogPage ? "page" : undefined}
+                          >
+                            {item}
+                          </button>
+                        )
+                      )}
+
+                    <button
+                      className="catalog-page-btn catalog-page-next"
+                      onClick={() => { setCatalogPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      disabled={catalogPage === totalPages}
+                      type="button"
+                      aria-label="Página siguiente"
+                    >
+                      ›
+                    </button>
+                  </nav>
+                )}
               </>
             ) : null}
           </>

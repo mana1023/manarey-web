@@ -3722,6 +3722,58 @@ img {
   color: var(--text);
 }
 
+/* ── Paginado del catálogo ──────────────────────────────────────────────── */
+.catalog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 2rem 1rem 1rem;
+  flex-wrap: wrap;
+}
+.catalog-page-btn {
+  min-width: 2.4rem;
+  height: 2.4rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border, #d4b896);
+  background: #fff;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  line-height: 1;
+}
+.catalog-page-btn:hover:not(:disabled):not(.active) {
+  background: var(--surface, #fdf6ec);
+  border-color: var(--primary, #8b5c2a);
+  color: var(--primary, #8b5c2a);
+}
+.catalog-page-btn.active {
+  background: var(--primary, #8b5c2a);
+  border-color: var(--primary, #8b5c2a);
+  color: #fff;
+  font-weight: 700;
+  transform: scale(1.08);
+}
+.catalog-page-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.catalog-page-prev,
+.catalog-page-next {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1;
+}
+.catalog-page-ellipsis {
+  padding: 0 0.3rem;
+  color: var(--text-muted, #999);
+  font-size: 1rem;
+  line-height: 2.4rem;
+}
+
 /* ─── RESPONSIVE: sobre nosotros y footer social ────────────────────────── */
 @media (max-width: 768px) {
   .about-story {
