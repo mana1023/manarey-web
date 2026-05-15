@@ -2452,13 +2452,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           </p>
                         </div>
                         <div className="cart-quantity">
-                          <button
-                            onClick={() => changeCartQuantity(item.lineKey, -1)}
-                            type="button"
-                            disabled={/silla/i.test(item.nombre) && !/pino/i.test(item.nombre)}
-                          >−</button>
-                          <span>{item.quantity}</span>
-                          <button onClick={() => changeCartQuantity(item.lineKey, 1)} type="button">+</button>
+                          {(() => {
+                            const step = /silla/i.test(item.nombre) && !/pino/i.test(item.nombre) ? 6 : 1;
+                            return (
+                              <>
+                                <button onClick={() => changeCartQuantity(item.lineKey, -step)} type="button">−</button>
+                                <span>{item.quantity}</span>
+                                <button onClick={() => changeCartQuantity(item.lineKey, step)} type="button">+</button>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     );
