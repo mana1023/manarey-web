@@ -63,6 +63,11 @@ function ProductPlaceholder({ title, compact = false }) {
   );
 }
 
+const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov|avi|mkv|m4v|wmv|3gp)(\?|$)/i;
+function isVideoSrc(src) {
+  return typeof src === "string" && (src.startsWith("data:video") || VIDEO_EXT_RE.test(src));
+}
+
 // Comprime imágenes en el navegador antes de enviarlas (max 1200px, JPEG 82%)
 // Esto reduce fotos de celular de 5-8MB a menos de 300KB
 async function compressImageFile(file) {
@@ -232,7 +237,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     () => {
       const base = products.filter((item) => item.categoria?.toLowerCase() !== "accesorios");
       if (session.isAdmin) return base;
-      return base.filter((item) => Boolean(item.imageData));
+      return base.filter((item) => Boolean(item.imageData) || item.imagesData?.length > 0);
     },
     [products, session.isAdmin],
   );
@@ -946,7 +951,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
               <div className="hero-home-brand">
                 <div className="brand-panel editorial">
-                  {featuredMainProduct?.imageData ? (
+                  {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
                     <img alt={featuredMainProduct.nombre} className="product-image" loading="lazy" src={featuredMainProduct.imageData} />
                   ) : (
                     <ProductPlaceholder title="Seleccion destacada" />
@@ -1007,7 +1012,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 <div className="showcase-grid">
                   <article className="showcase-main-card">
                     <div className="showcase-main-visual">
-                      {featuredMainProduct?.imageData ? (
+                      {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
                         <img alt={featuredMainProduct.nombre} className="product-image" src={featuredMainProduct.imageData} />
                       ) : (
                         <ProductPlaceholder title={homeCategory || "Destacado"} />
@@ -1035,7 +1040,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     {featuredSideProducts.map((product) => (
                       <button className="showcase-mini-card" key={product.productKey} onClick={() => openProductDetail(product)} type="button">
                         <div className="showcase-mini-visual">
-                          {product.imageData ? (
+                          {product.imageData && !isVideoSrc(product.imageData) ? (
                             <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                           ) : (
                             <ProductPlaceholder compact title={product.nombre} />
@@ -1285,7 +1290,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           type="button"
                           aria-label={`Ver detalle de ${product.nombre}`}
                         >
-                          {product.imageData ? (
+                          {product.imageData && !isVideoSrc(product.imageData) ? (
                             <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                           ) : (
                             <div className="image-placeholder card-no-image">
@@ -1730,7 +1735,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     );
                   }
 
-                  const isVideo = (src) => typeof src === "string" && (src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src));
+                  const isVideo = isVideoSrc;
 
                   return (
                     <div className="detail-carousel">
@@ -1944,7 +1949,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       type="button"
                     >
                       <div className="related-visual">
-                        {product.imageData ? (
+                        {product.imageData && !isVideoSrc(product.imageData) ? (
                           <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
                         ) : (
                           <ProductPlaceholder compact title={product.nombre} />
@@ -2057,7 +2062,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <div className="admin-images-grid">
                     {(activeEditor.imagesData || []).map((src, i) => (
                       <div key={i} className="admin-image-thumb">
-                        {(src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src)) ? (
+                        {isVideoSrc(src) ? (
                           <video src={src} className="admin-editor-img" muted playsInline />
                         ) : (
                           <img src={src} alt={`Foto ${i + 1}`} className="admin-editor-img" />
@@ -2355,7 +2360,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     return (
                       <div className="cart-item" key={item.lineKey}>
                         <div className="cart-item-thumb">
-                          {product?.imageData
+                          {product?.imageData && !isVideoSrc(product.imageData)
                             ? <img src={product.imageData} alt={item.nombre} />
                             : <span>{item.nombre[0]}</span>}
                         </div>
@@ -2418,7 +2423,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   {featuredList.map((p, idx) => (
                     <div className="featured-list-item" key={p.productKey}>
                       <div className="featured-list-order">#{idx + 1}</div>
-                      {p.imageData
+                      {p.imageData && !isVideoSrc(p.imageData)
                         ? <img src={p.imageData} alt={p.nombre} className="featured-list-img" />
                         : <div className="featured-list-img featured-list-img-placeholder">M</div>
                       }
