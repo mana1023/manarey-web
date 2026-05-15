@@ -1962,9 +1962,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   {!selectedProduct.isSoldOut ? (
                     <button
                       className="primary-button"
-                      onClick={() =>
-                        addToCart(selectedProduct, { accessorySelected: detailAccessorySelected })
-                      }
+                      onClick={() => {
+                        addToCart(selectedProduct, { accessorySelected: detailAccessorySelected });
+                        setSelectedProductKey("");
+                      }}
                       type="button"
                     >
                       Agregar al carrito
