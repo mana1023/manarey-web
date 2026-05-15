@@ -101,21 +101,25 @@ async function fileToDataUrl(file) {
   });
 }
 
-// Sube un video a Vercel Blob y devuelve la URL pública.
-// Los videos no se pueden guardar como base64 (demasiado grandes para el body de la API).
-async function uploadVideoFile(file) {
+// Sube una imagen a Vercel Blob y devuelve la URL pública.
+async function uploadImageFile(file) {
   const form = new FormData();
   form.append("file", file);
   const res = await fetch("/api/products/upload-media", { method: "POST", body: form });
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || "No se pudo subir el video.");
+  if (!res.ok) throw new Error(data?.error || "No se pudo subir la imagen.");
   return data.url;
 }
 
 async function fileToUrl(file) {
-  // Videos e imágenes van a Vercel Blob para evitar el límite de 4.5MB del body de la API
-  if (file.type.startsWith("video/") || file.type.startsWith("image/")) {
-    return uploadVideoFile(file);
+  if (file.type.startsWith("image/")) {
+    // Fotos van a Vercel Blob; su URL se guarda en la BD
+    return uploadImageFile(file);
+  }
+  if (file.type.startsWith("video/")) {
+    // Videos se muestran localmente (blob: URL) sin subir ni guardar en BD.
+    // El prefijo "blobvideo||" permite identificarlos y excluirlos al guardar.
+    return "blobvideo||" + URL.createObjectURL(file);
   }
   return fileToDataUrl(file);
 }
@@ -711,7 +715,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         ...activeEditor,
         nombre: nameChanged ? activeEditor.nombre.trim() : undefined,
         imagesData: Array.isArray(activeEditor.imagesData)
-          ? activeEditor.imagesData
+          ? activeEditor.imagesData.filter((src) => !src.startsWith("blobvideo||"))
           : activeEditor.imageData ? [activeEditor.imageData] : [],
       };
       const response = await fetch(`/api/products/${productKey}`, {
@@ -1717,7 +1721,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     );
                   }
 
-                  const isVideo = (src) => typeof src === "string" && (src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src));
+                  const isVideo = (src) => typeof src === "string" && (
+                    src.startsWith("data:video") ||
+                    src.startsWith("blobvideo||") ||
+                    /\.(mp4|webm|ogg)(\?|$)/i.test(src)
+                  );
 
                   return (
                     <div className="detail-carousel">
@@ -1740,7 +1748,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             className="product-image detail-carousel-img"
                             controls
                             key={safeIndex}
-                            src={currentPhoto}
+                            src={currentPhoto.startsWith("blobvideo||") ? currentPhoto.slice(11) : currentPhoto}
                             style={{ objectFit: "contain" }}
                           />
                         ) : (
@@ -2044,8 +2052,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <div className="admin-images-grid">
                     {(activeEditor.imagesData || []).map((src, i) => (
                       <div key={i} className="admin-image-thumb">
-                        {(src.startsWith("data:video") || /\.(mp4|webm|ogg)(\?|$)/i.test(src)) ? (
-                          <video src={src} className="admin-editor-img" muted playsInline />
+                        {(src.startsWith("data:video") || src.startsWith("blobvideo||") || /\.(mp4|webm|ogg)(\?|$)/i.test(src)) ? (
+                          <video src={src.startsWith("blobvideo||") ? src.slice(11) : src} className="admin-editor-img" muted playsInline />
                         ) : (
                           <img src={src} alt={`Foto ${i + 1}`} className="admin-editor-img" />
                         )}
