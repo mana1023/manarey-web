@@ -188,12 +188,12 @@ const PAYMENT_METHODS = [
     name: "Mercado Pago",
     icon: (
       <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#00AEEF"/>
-        <circle cx="26" cy="13" r="8" fill="#FFE600"/>
-        <circle cx="23" cy="12" r="1.4" fill="#00AEEF"/>
-        <circle cx="29" cy="12" r="1.4" fill="#00AEEF"/>
-        <path d="M22 15.5 Q26 18.5 30 15.5" stroke="#00AEEF" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-        <text x="26" y="28" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="7.5" fontWeight="700" letterSpacing="0.5">Mercado Pago</text>
+        <rect width="52" height="32" rx="5" fill="#009EE3"/>
+        <circle cx="26" cy="13" r="9.5" fill="#FFE600"/>
+        <circle cx="22.5" cy="11.5" r="1.6" fill="#009EE3"/>
+        <circle cx="29.5" cy="11.5" r="1.6" fill="#009EE3"/>
+        <path d="M21.5 15.2 Q26 19.2 30.5 15.2" stroke="#009EE3" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <text x="26" y="29" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="6.5" fontWeight="800" letterSpacing="0.3">mercadopago</text>
       </svg>
     ),
   },
@@ -237,12 +237,14 @@ const PAYMENT_METHODS = [
     name: "Transferencia",
     icon: (
       <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#1B5E20"/>
-        <rect x="8" y="14" width="36" height="2.5" rx="1" fill="rgba(255,255,255,0.5)"/>
-        <path d="M40 10 L48 15.25 L40 20.5Z" fill="rgba(255,255,255,0.85)"/>
-        <path d="M12 10 L4 15.25 L12 20.5Z" fill="rgba(255,255,255,0.85)"/>
-        <rect x="14" y="22" width="24" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
-        <rect x="18" y="7" width="16" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+        <rect width="52" height="32" rx="5" fill="#003087"/>
+        <polygon points="8,14 26,5 44,14" fill="rgba(255,255,255,0.9)"/>
+        <rect x="10" y="14" width="32" height="12" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8"/>
+        <rect x="13" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
+        <rect x="20" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
+        <rect x="27" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
+        <rect x="34" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
+        <rect x="8" y="26" width="36" height="2.5" rx="0.5" fill="rgba(255,255,255,0.8)"/>
       </svg>
     ),
   },
@@ -263,10 +265,11 @@ const PAYMENT_METHODS = [
     name: "Cuenta DNI",
     icon: (
       <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#4527A0"/>
-        <rect x="0" y="0" width="52" height="16" rx="5" fill="#6A1B9A" opacity="0.5"/>
-        <text x="26" y="14" textAnchor="middle" fill="rgba(255,255,255,0.85)" fontFamily="Arial,sans-serif" fontSize="8" fontWeight="600" letterSpacing="0.3">Cuenta</text>
-        <text x="26" y="26" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="11" fontWeight="900" letterSpacing="1">DNI</text>
+        <rect width="52" height="32" rx="5" fill="#ffffff"/>
+        <rect x="0" y="0" width="52" height="13" rx="5" fill="#003DA5"/>
+        <rect x="0" y="8" width="52" height="5" fill="#003DA5"/>
+        <text x="26" y="10" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="6.5" fontWeight="700" letterSpacing="0.5">CUENTA</text>
+        <text x="26" y="26" textAnchor="middle" fill="#003DA5" fontFamily="Arial,sans-serif" fontSize="14" fontWeight="900" letterSpacing="1.5">DNI</text>
       </svg>
     ),
   },

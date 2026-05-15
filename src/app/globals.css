@@ -5491,10 +5491,12 @@ img {
 }
 .payment-marquee-track {
   display: flex;
-  gap: 8px;
   width: max-content;
   animation: payment-scroll 36s linear infinite;
   padding: 4px 0;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .payment-marquee-outer:hover .payment-marquee-track {
   animation-play-state: paused;
@@ -5509,6 +5511,7 @@ img {
   align-items: center;
   gap: 5px;
   padding: 6px 10px 7px;
+  margin-right: 10px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 10px;
