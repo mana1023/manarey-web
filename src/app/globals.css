@@ -942,6 +942,7 @@ img {
   padding: 28px 30px;
   border: 1px solid var(--line);
   border-radius: 30px;
+  overflow: hidden;
   background: linear-gradient(160deg, #1b120b, #2f2014);
   color: #f8ebcb;
   box-shadow: var(--shadow);
@@ -5468,28 +5469,32 @@ img {
 
 /* Payment methods marquee strip */
 .payment-strip {
-  padding: 20px 0 4px;
+  min-width: 0;
+  padding: 20px 0 6px;
   border-top: 1px solid rgba(248,235,203,0.12);
   margin-top: 8px;
 }
 .payment-strip-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.4;
+  letter-spacing: 0.1em;
+  opacity: 0.38;
   margin: 0 0 12px;
   text-align: center;
 }
 .payment-marquee-outer {
   overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  margin: 0 -30px;
+  padding: 0 30px;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 .payment-marquee-track {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   width: max-content;
-  animation: payment-scroll 32s linear infinite;
+  animation: payment-scroll 36s linear infinite;
+  padding: 4px 0;
 }
 .payment-marquee-outer:hover .payment-marquee-track {
   animation-play-state: paused;
@@ -5500,18 +5505,26 @@ img {
 }
 .payment-badge {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px 6px 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  gap: 5px;
+  padding: 6px 10px 7px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
   white-space: nowrap;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  color: rgba(248,235,203,0.85);
+  letter-spacing: 0.02em;
+  color: rgba(248,235,203,0.7);
   user-select: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.payment-badge:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.18);
 }
 .payment-badge svg {
   flex-shrink: 0;
+  border-radius: 4px;
 }
