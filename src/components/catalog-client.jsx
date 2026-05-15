@@ -297,6 +297,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     }
   }, [activeView, category]);
 
+  // Resetear scroll del modal de detalle al abrir un producto
+  useEffect(() => {
+    if (selectedProductKey) {
+      const grid = document.querySelector(".detail-grid");
+      if (grid) grid.scrollTop = 0;
+    }
+  }, [selectedProductKey]);
+
   // Cargar sesión del cliente al montar
   useEffect(() => {
     fetch("/api/auth/customer/me")

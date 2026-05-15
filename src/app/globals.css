@@ -2006,6 +2006,11 @@ img {
     min-height: 50px;
   }
 
+  /* Miniaturas de productos relacionados: mantener 4 columnas en mobile */
+  .related-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   /* Checkout flow mobile */
   .cf-input-row {
     grid-template-columns: 1fr;
