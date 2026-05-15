@@ -1401,7 +1401,15 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                               <p className="price-tag" style={{ margin: 0 }}>{currencyFormatter.format(product.precioVenta * 6)}</p>
                             </div>
                           ) : (
-                            <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
+                            <>
+                              <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
+                              {isSilla(product) && (
+                                <div className="pack-notice">
+                                  <span className="pack-badge">Pack x6</span>
+                                  <span className="pack-total">{currencyFormatter.format(product.precioVenta * 6)}</span>
+                                </div>
+                              )}
+                            </>
                           )}
 
                           {/* Stock por sucursal (admin) */}
@@ -1882,6 +1890,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 {isSillaPack(selectedProduct) && (
                   <div className="pack-notice pack-notice--detail">
                     <span className="pack-badge">Venta por pack de 6 · precio unitario {currencyFormatter.format(selectedProduct.precioVenta)}</span>
+                  </div>
+                )}
+                {isSilla(selectedProduct) && !isSillaPack(selectedProduct) && (
+                  <div className="pack-notice pack-notice--detail">
+                    <span className="pack-badge">Pack x6: {currencyFormatter.format(selectedProduct.precioVenta * 6)}</span>
                   </div>
                 )}
 
