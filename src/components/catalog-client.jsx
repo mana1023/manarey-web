@@ -30,7 +30,7 @@ function isSilla(product) {
 
 // Sillas que se venden en pack de 6 (todas menos las de pino)
 function isSillaPack(product) {
-  return isSilla(product) && !/pino/i.test(product.nombre);
+  return isSilla(product) && !/pino/i.test(`${product.nombre} ${product.material || ""}`);
 }
 
 function supportsAccessory(product) {
@@ -654,6 +654,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           lineKey,
           productKey: product.productKey,
           nombre: product.nombre,
+          material: product.material || "",
           precioVenta: product.precioVenta,
           accessoryPrice,
           accessoryLabel: accessorySelected ? accessoryProduct?.nombre || "Manijas" : "",
@@ -2453,7 +2454,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         </div>
                         <div className="cart-quantity">
                           {(() => {
-                            const step = /silla/i.test(item.nombre) && !/pino/i.test(item.nombre) ? 6 : 1;
+                            const step = /silla/i.test(item.nombre) && !/pino/i.test(`${item.nombre} ${item.material || ""}`) ? 6 : 1;
                             return (
                               <>
                                 <button onClick={() => changeCartQuantity(item.lineKey, -step)} type="button">−</button>
