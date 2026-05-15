@@ -1738,12 +1738,15 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       {selectedProduct ? (
         <div className="modal-backdrop" onClick={() => setSelectedProductKey("")}>
           <div className="detail-modal" onClick={(event) => event.stopPropagation()}>
-            <button
-              className="detail-modal-close"
-              onClick={() => setSelectedProductKey("")}
-              type="button"
-              aria-label="Cerrar"
-            >✕</button>
+            <div className="detail-modal-header">
+              <span className="detail-modal-handle" aria-hidden="true" />
+              <button
+                className="detail-modal-close"
+                onClick={() => setSelectedProductKey("")}
+                type="button"
+                aria-label="Cerrar"
+              >✕</button>
+            </div>
             <div className="detail-grid">
               <div className="detail-media">
                 {(() => {

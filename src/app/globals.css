@@ -1294,10 +1294,16 @@ img {
   position: relative;
 }
 
+.detail-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 0 8px;
+  /* handle oculto en desktop */
+}
+.detail-modal-handle { display: none; }
+
 .detail-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -1311,7 +1317,7 @@ img {
   align-items: center;
   justify-content: center;
   transition: background 0.15s, transform 0.1s;
-  z-index: 10;
+  flex-shrink: 0;
 }
 .detail-modal-close:hover {
   background: var(--line, #ddd);
@@ -1874,19 +1880,121 @@ img {
     margin: 0;
   }
 
-  /* Detail modal full screen */
+  /* ── Detail modal mobile: sheet style ── */
   .detail-modal {
     width: 100vw !important;
     max-width: 100vw !important;
     max-height: 100dvh !important;
+    height: 100dvh;
     border-radius: 0 !important;
-    padding: 16px !important;
+    padding: 0 !important;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
   }
 
+  /* Header sticky con handle y X */
+  .detail-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 8px;
+    background: var(--bg, #faf7f2);
+    border-bottom: 1px solid var(--line, #e8e0d4);
+    flex-shrink: 0;
+  }
+
+  /* Pill de arrastre visual */
+  .detail-modal-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line, #d4c9b8);
+    margin: 0 auto;
+    flex: 1;
+  }
+
+  .detail-modal-close {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+    background: var(--surface, #f0ebe1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  /* Área scrollable */
   .detail-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 0;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 100px; /* espacio para la barra sticky de abajo */
+  }
+
+  /* Imagen: aspect ratio en lugar de min-height fija */
+  .detail-media,
+  .detail-placeholder {
+    min-height: unset;
+    aspect-ratio: 4 / 3;
+    border-radius: 0;
+    background: #f5f0eb;
+  }
+
+  .detail-carousel {
+    min-height: unset;
+    aspect-ratio: 4 / 3;
+    border-radius: 0;
+  }
+
+  .detail-carousel-track {
+    min-height: unset;
+  }
+
+  .detail-carousel-img {
+    max-height: unset;
+  }
+
+  /* Info del producto con padding correcto */
+  .detail-copy {
+    padding: 20px 18px 12px;
+    gap: 14px;
+  }
+
+  /* Barra de acciones sticky al fondo */
+  .detail-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: var(--bg, #faf7f2);
+    border-top: 1px solid var(--line, #e8e0d4);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    flex-direction: column;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  /* Ocultar botón "Cerrar" en mobile (redundante con la X) */
+  .detail-actions .ghost-button:first-child {
+    display: none;
+  }
+
+  /* Botones full-width en mobile */
+  .detail-actions a,
+  .detail-actions button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 14px;
   }
 
   /* Checkout flow mobile */
