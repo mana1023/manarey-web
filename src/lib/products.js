@@ -176,12 +176,7 @@ export async function updateProductMetadata(productKey, payload) {
       }
     }
     return [];
-  })().filter(
-    (entry) =>
-      !entry.startsWith("blobvideo||") &&
-      !entry.startsWith("data:video") &&
-      !/\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(entry),
-  );
+  })();
 
   const fallbackImage = typeof payload.imageData === "string" && payload.imageData ? payload.imageData : null;
   const imageData = payload.removeImage ? null : (imagesArr[0] || fallbackImage);

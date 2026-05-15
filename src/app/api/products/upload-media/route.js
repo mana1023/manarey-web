@@ -1,19 +1,45 @@
 import { NextResponse } from "next/server";
+import { handleUpload } from "@vercel/blob/client";
 import { put } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-// Vercel Blob no usa el body de la request — recibe el stream directamente
 export const maxDuration = 60;
 
 export async function POST(request) {
-  // Solo admins pueden subir archivos
   const session = await getSessionFromCookies(await cookies());
   if (!session.isAdmin) {
     return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 
+  const contentType = request.headers.get("content-type") || "";
+
+  // Client-side upload: el browser sube el video directo a Vercel Blob.
+  // Aquí solo se genera/valida el token; el archivo nunca pasa por esta función.
+  if (contentType.includes("application/json")) {
+    try {
+      const body = await request.json();
+      const jsonResponse = await handleUpload({
+        body,
+        request,
+        onBeforeGenerateToken: async (pathname) => {
+          return {
+            allowedContentTypes: ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/*"],
+            maximumSizeInBytes: 500 * 1024 * 1024, // 500MB
+            addRandomSuffix: true,
+          };
+        },
+        onUploadCompleted: async () => {},
+      });
+      return NextResponse.json(jsonResponse);
+    } catch (err) {
+      console.error("[upload-media] Error generando token:", err?.message || err);
+      return NextResponse.json({ error: err?.message || "No se pudo iniciar la subida." }, { status: 400 });
+    }
+  }
+
+  // Upload directo vía FormData para imágenes (tamaño menor al límite de Vercel)
   try {
     const formData = await request.formData();
     const file = formData.get("file");
@@ -22,26 +48,17 @@ export async function POST(request) {
       return NextResponse.json({ error: "No se recibió ningún archivo." }, { status: 400 });
     }
 
-    // Validar tipo — imágenes y videos
     const isImage = file.type.startsWith("image/");
-    const isVideo = file.type.startsWith("video/");
-    if (!isImage && !isVideo) {
-      return NextResponse.json({ error: "Solo se aceptan imágenes o videos." }, { status: 400 });
+    if (!isImage) {
+      return NextResponse.json({ error: "Solo se aceptan imágenes por este método." }, { status: 400 });
     }
 
-    // Validar tamaño — 20MB para imágenes, 200MB para videos
-    const maxSize = isVideo ? 200 * 1024 * 1024 : 20 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: isVideo ? "El video no puede superar 200MB." : "La imagen no puede superar 20MB." },
-        { status: 400 },
-      );
+    if (file.size > 20 * 1024 * 1024) {
+      return NextResponse.json({ error: "La imagen no puede superar 20MB." }, { status: 400 });
     }
 
-    // Nombre de archivo seguro con timestamp
-    const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg");
-    const folder = isVideo ? "productos/video" : "productos/foto";
-    const filename = `${folder}-${Date.now()}.${ext}`;
+    const ext = file.name.split(".").pop() || "jpg";
+    const filename = `productos/foto-${Date.now()}.${ext}`;
 
     const blob = await put(filename, file, {
       access: "public",
