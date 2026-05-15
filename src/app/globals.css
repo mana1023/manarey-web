@@ -5465,3 +5465,53 @@ img {
     padding: 10px 0 0;
   }
 }
+
+/* Payment methods marquee strip */
+.payment-strip {
+  padding: 20px 0 4px;
+  border-top: 1px solid rgba(248,235,203,0.12);
+  margin-top: 8px;
+}
+.payment-strip-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.4;
+  margin: 0 0 12px;
+  text-align: center;
+}
+.payment-marquee-outer {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+.payment-marquee-track {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+  animation: payment-scroll 32s linear infinite;
+}
+.payment-marquee-outer:hover .payment-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes payment-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.payment-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(248,235,203,0.85);
+  user-select: none;
+}
+.payment-badge svg {
+  flex-shrink: 0;
+}

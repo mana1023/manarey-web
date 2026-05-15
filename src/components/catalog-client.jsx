@@ -152,6 +152,112 @@ async function filesToDataUrls(files) {
 }
 
 
+const PAYMENT_METHODS = [
+  {
+    name: "Visa",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#1A1F71"/>
+        <text x="22" y="20" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="14" fontWeight="bold" fontStyle="italic">VISA</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Mastercard",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#1a1a1a"/>
+        <circle cx="17" cy="14" r="9" fill="#EB001B"/>
+        <circle cx="27" cy="14" r="9" fill="#F79E1B"/>
+        <path d="M22 7.2a9 9 0 0 1 0 13.6A9 9 0 0 1 22 7.2z" fill="#FF5F00"/>
+      </svg>
+    ),
+  },
+  {
+    name: "American Express",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#2E77BC"/>
+        <text x="22" y="17" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="8" fontWeight="bold" letterSpacing="0.5">AMERICAN</text>
+        <text x="22" y="24" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="8" fontWeight="bold" letterSpacing="0.5">EXPRESS</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Mercado Pago",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#009EE3"/>
+        <text x="22" y="19" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="13" fontWeight="bold">MP</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Naranja X",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#F77F00"/>
+        <text x="22" y="19" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="11" fontWeight="bold">Naranja</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Cabal",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#E31837"/>
+        <text x="22" y="19" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="12" fontWeight="bold">CABAL</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Débito",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#1b3a5c"/>
+        <rect x="6" y="9" width="32" height="4" rx="1" fill="rgba(255,255,255,0.35)"/>
+        <rect x="6" y="17" width="10" height="3" rx="1" fill="rgba(255,255,255,0.6)"/>
+        <rect x="20" y="17" width="6" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+        <text x="22" y="27" textAnchor="middle" fill="rgba(255,255,255,0.55)" fontFamily="Arial,sans-serif" fontSize="5">DÉBITO</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Transferencia",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#2d6a4f"/>
+        <rect x="8" y="18" width="28" height="3" rx="1" fill="rgba(255,255,255,0.5)"/>
+        <rect x="14" y="10" width="4" height="9" rx="1" fill="rgba(255,255,255,0.7)"/>
+        <rect x="20" y="8" width="4" height="11" rx="1" fill="rgba(255,255,255,0.7)"/>
+        <rect x="26" y="12" width="4" height="7" rx="1" fill="rgba(255,255,255,0.7)"/>
+        <polygon points="22,3 8,10 36,10" fill="rgba(255,255,255,0.6)"/>
+      </svg>
+    ),
+  },
+  {
+    name: "Efectivo",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#386641"/>
+        <rect x="4" y="6" width="36" height="16" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+        <circle cx="22" cy="14" r="5" fill="rgba(255,255,255,0.22)" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+        <text x="22" y="17" textAnchor="middle" fill="rgba(255,255,255,0.85)" fontFamily="Arial,sans-serif" fontSize="7" fontWeight="bold">$</text>
+      </svg>
+    ),
+  },
+  {
+    name: "Cuenta DNI",
+    icon: (
+      <svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true">
+        <rect width="44" height="28" rx="5" fill="#6246EA"/>
+        <text x="22" y="17" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="9" fontWeight="bold">Cuenta</text>
+        <text x="22" y="25" textAnchor="middle" fill="rgba(255,255,255,0.75)" fontFamily="Arial,sans-serif" fontSize="7" fontWeight="bold">DNI</text>
+      </svg>
+    ),
+  },
+];
+
 export function CatalogClient({ initialProducts, session, catalogError }) {
   const whatsappNumber = storeSettings.whatsappNumber;
   const contactEmail = storeSettings.supportEmail;
@@ -2799,6 +2905,20 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </svg>
                 Manarey Glew
               </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="payment-strip">
+          <p className="payment-strip-label">Medios de pago aceptados</p>
+          <div className="payment-marquee-outer">
+            <div className="payment-marquee-track">
+              {[...PAYMENT_METHODS, ...PAYMENT_METHODS].map((p, i) => (
+                <div className="payment-badge" key={i}>
+                  {p.icon}
+                  <span>{p.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
