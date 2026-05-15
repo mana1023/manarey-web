@@ -682,7 +682,7 @@ export function CheckoutFlow({ initialCustomer }) {
               <h1 className="cf-heading">Ingresá para continuar</h1>
 
               {/* Google */}
-              <a href="/api/auth/google" className="cf-google-btn">
+              <a href="/api/auth/google?returnTo=/checkout" className="cf-google-btn">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M19.6 10.23c0-.68-.06-1.36-.17-2H10v3.79h5.39a4.61 4.61 0 01-2 3.03v2.52h3.24c1.9-1.75 3-4.32 3-7.34z" fill="#4285F4"/>
                   <path d="M10 20c2.7 0 4.96-.9 6.62-2.43l-3.24-2.52c-.9.6-2.04.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H1.07v2.6A10 10 0 0010 20z" fill="#34A853"/>

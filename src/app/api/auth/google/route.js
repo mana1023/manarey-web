@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { storeSettings } from "@/lib/store-config";
 
-export async function GET() {
+export async function GET(request) {
   const clientId = (process.env.GOOGLE_CLIENT_ID || "").trim();
   if (!clientId) {
     return NextResponse.json(
@@ -9,6 +9,14 @@ export async function GET() {
       { status: 500 },
     );
   }
+
+  // Tomar el returnTo de la query (ej. /checkout) y codificarlo en el state de OAuth.
+  // Google devuelve el state sin modificar en el callback, lo que permite redirigir
+  // al usuario al lugar correcto después del login.
+  const url = new URL(request.url);
+  const returnTo = url.searchParams.get("returnTo") || "/";
+  // Solo permitir rutas relativas para evitar open-redirect
+  const safeReturn = returnTo.startsWith("/") ? returnTo : "/";
 
   const redirectUri = `${storeSettings.siteUrl}/api/auth/google/callback`;
   const params = new URLSearchParams({
@@ -18,6 +26,7 @@ export async function GET() {
     scope: "openid email profile",
     access_type: "online",
     prompt: "select_account",
+    state: safeReturn,
   });
 
   return NextResponse.redirect(

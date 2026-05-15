@@ -6,9 +6,12 @@ import { storeSettings } from "@/lib/store-config";
 export async function GET(request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
+  // state contiene la ruta de retorno enviada desde /api/auth/google
+  const stateReturn = url.searchParams.get("state") || "/";
+  const safeReturn = stateReturn.startsWith("/") ? stateReturn : "/";
 
   if (!code) {
-    return NextResponse.redirect(`${storeSettings.siteUrl}/checkout?auth_error=sin_codigo`);
+    return NextResponse.redirect(`${storeSettings.siteUrl}${safeReturn}?auth_error=sin_codigo`);
   }
 
   try {
@@ -51,8 +54,7 @@ export async function GET(request) {
       telefono: customer.telefono,
     });
 
-    // Redirigir al catálogo (inicio) en lugar de checkout para no confundir al usuario
-    const response = NextResponse.redirect(`${storeSettings.siteUrl}/`);
+    const response = NextResponse.redirect(`${storeSettings.siteUrl}${safeReturn}`);
     response.cookies.set(CUSTOMER_SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: "lax",
@@ -62,6 +64,6 @@ export async function GET(request) {
     });
     return response;
   } catch {
-    return NextResponse.redirect(`${storeSettings.siteUrl}/?auth_error=fallo_google`);
+    return NextResponse.redirect(`${storeSettings.siteUrl}${safeReturn}?auth_error=fallo_google`);
   }
 }
