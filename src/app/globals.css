@@ -1880,9 +1880,44 @@ img {
     margin: 0;
   }
 
-  /* Miniaturas de productos relacionados: mantener 4 columnas en mobile */
+  /* Modal de detalle: colores de la página y mejoras mobile */
+  .detail-modal {
+    background: var(--surface-strong) !important;
+  }
+
+  .detail-modal-header {
+    padding-bottom: 4px;
+  }
+
+  /* Productos relacionados: 2 columnas en mobile para que se vean más grandes */
   .related-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .related-card {
+    border-radius: 16px;
+  }
+
+  .related-visual {
+    aspect-ratio: 4 / 3;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .related-copy {
+    padding: 10px 12px 12px;
+  }
+
+  .related-copy p {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .related-copy strong {
+    font-size: 0.9rem;
+    color: var(--gold-strong);
   }
 
   /* Checkout flow mobile */
