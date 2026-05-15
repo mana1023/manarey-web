@@ -24,6 +24,10 @@ function getMeasureMeta(rawMeasure) {
   return { label: "Medida", value: medida };
 }
 
+function isSilla(product) {
+  return /silla/i.test(`${product.nombre} ${product.categoria || ""}`);
+}
+
 function supportsAccessory(product) {
   const name = `${product.nombre} ${product.categoria || ""}`.toLowerCase();
   return /(placard|placares|placar|cajonera|comodon|comoda|ropero|biblioteca|modular|despensero|alacena|mesa de luz|vanitory)/i.test(
@@ -1386,6 +1390,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
                           {/* Precio */}
                           <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
+                          {isSilla(product) && (
+                            <div className="pack-notice">
+                              <span className="pack-badge">Pack x6</span>
+                              <span className="pack-total">Total: {currencyFormatter.format(product.precioVenta * 6)}</span>
+                            </div>
+                          )}
 
                           {/* Stock por sucursal (admin) */}
                           {session.isAdmin && adminBranchFilter && (
@@ -1858,6 +1868,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     {selectedProduct.isSoldOut ? "Sin stock" : "Listo para consultar"}
                   </span>
                 </div>
+                {isSilla(selectedProduct) && (
+                  <div className="pack-notice pack-notice--detail">
+                    <span className="pack-badge">Venta por pack de 6</span>
+                    <span className="pack-total">Total x6: {currencyFormatter.format(selectedProduct.precioVenta * 6)}</span>
+                  </div>
+                )}
 
                 {selectedProduct.description ? (
                   <p className="description">{selectedProduct.description}</p>

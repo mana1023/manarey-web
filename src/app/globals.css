@@ -1466,6 +1466,54 @@ img {
   margin-top: 3px;
 }
 
+.pack-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.pack-badge {
+  display: inline-block;
+  background: var(--gold-soft);
+  color: var(--gold-strong);
+  border: 1px solid rgba(169, 115, 30, 0.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.pack-total {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pack-notice--detail {
+  background: var(--gold-soft);
+  border: 1px solid rgba(169, 115, 30, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 4px;
+}
+
+.pack-notice--detail .pack-badge {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+}
+
+.pack-notice--detail .pack-total {
+  font-size: 1rem;
+  color: var(--gold-strong);
+  font-weight: 700;
+}
+
 .related-section {
   margin-top: 24px;
 }
