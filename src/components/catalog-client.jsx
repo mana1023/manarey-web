@@ -28,6 +28,11 @@ function isSilla(product) {
   return /silla/i.test(`${product.nombre} ${product.categoria || ""}`);
 }
 
+// Sillas que se venden en pack de 6 (todas menos las de pino)
+function isSillaPack(product) {
+  return isSilla(product) && !/pino/i.test(product.nombre);
+}
+
 function supportsAccessory(product) {
   const name = `${product.nombre} ${product.categoria || ""}`.toLowerCase();
   return /(placard|placares|placar|cajonera|comodon|comoda|ropero|biblioteca|modular|despensero|alacena|mesa de luz|vanitory)/i.test(
@@ -635,11 +640,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     const accessorySelected = Boolean(options.accessorySelected);
     const accessoryPrice = accessorySelected && accessoryProduct ? accessoryProduct.precioVenta : 0;
     const lineKey = accessorySelected ? `${product.productKey}:accessory` : product.productKey;
+    const qty = options.quantity || 1;
     setCart((current) => {
       const existing = current.find((item) => item.lineKey === lineKey);
       if (existing) {
         return current.map((item) =>
-          item.lineKey === lineKey ? { ...item, quantity: item.quantity + 1 } : item,
+          item.lineKey === lineKey ? { ...item, quantity: item.quantity + qty } : item,
         );
       }
       return [
@@ -651,7 +657,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           precioVenta: product.precioVenta,
           accessoryPrice,
           accessoryLabel: accessorySelected ? accessoryProduct?.nombre || "Manijas" : "",
-          quantity: 1,
+          quantity: qty,
         },
       ];
     });
@@ -1389,12 +1395,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           )}
 
                           {/* Precio */}
-                          <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
-                          {isSilla(product) && (
-                            <div className="pack-notice">
+                          {isSillaPack(product) ? (
+                            <div className="pack-notice pack-notice--card">
                               <span className="pack-badge">Pack x6</span>
-                              <span className="pack-total">Total: {currencyFormatter.format(product.precioVenta * 6)}</span>
+                              <p className="price-tag" style={{ margin: 0 }}>{currencyFormatter.format(product.precioVenta * 6)}</p>
                             </div>
+                          ) : (
+                            <p className="price-tag">{currencyFormatter.format(product.precioVenta)}</p>
                           )}
 
                           {/* Stock por sucursal (admin) */}
@@ -1425,7 +1432,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                                 💬 Consultar
                               </a>
                             ) : (
-                              <button className="primary-button" onClick={() => addToCart(product)} type="button">
+                              <button className="primary-button" onClick={() => addToCart(product, { quantity: isSillaPack(product) ? 6 : 1 })} type="button">
                                 Agregar al carrito
                               </button>
                             )}
@@ -1863,15 +1870,18 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 <p className="eyebrow">{selectedProduct.categoria || "Producto"}</p>
                 <h2>{getDisplayName(selectedProduct.productKey, selectedProduct.nombre)}</h2>
                 <div className="detail-topline">
-                  <p className="detail-price">{currencyFormatter.format(detailTotal)}</p>
+                  <p className="detail-price">
+                    {isSillaPack(selectedProduct)
+                      ? currencyFormatter.format(selectedProduct.precioVenta * 6)
+                      : currencyFormatter.format(detailTotal)}
+                  </p>
                   <span className={selectedProduct.isSoldOut ? "stock-pill sold-out" : "stock-pill in-stock"}>
                     {selectedProduct.isSoldOut ? "Sin stock" : "Listo para consultar"}
                   </span>
                 </div>
-                {isSilla(selectedProduct) && (
+                {isSillaPack(selectedProduct) && (
                   <div className="pack-notice pack-notice--detail">
-                    <span className="pack-badge">Venta por pack de 6</span>
-                    <span className="pack-total">Total x6: {currencyFormatter.format(selectedProduct.precioVenta * 6)}</span>
+                    <span className="pack-badge">Venta por pack de 6 · precio unitario {currencyFormatter.format(selectedProduct.precioVenta)}</span>
                   </div>
                 )}
 
@@ -1979,7 +1989,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     <button
                       className="primary-button"
                       onClick={() => {
-                        addToCart(selectedProduct, { accessorySelected: detailAccessorySelected });
+                        addToCart(selectedProduct, {
+                          accessorySelected: detailAccessorySelected,
+                          quantity: isSillaPack(selectedProduct) ? 6 : 1,
+                        });
                         setSelectedProductKey("");
                       }}
                       type="button"
