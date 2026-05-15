@@ -182,6 +182,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [shippingFormMsg, setShippingFormMsg] = useState("");
   const [featuredOpen, setFeaturedOpen] = useState(false);
   const [featuredList, setFeaturedList] = useState([]); // [{productKey, nombre, ...}] en orden
+  const [migratingImages, setMigratingImages] = useState(false);
+  const [migrateResult, setMigrateResult] = useState(null);
   const [featuredBusy, setFeaturedBusy] = useState(false);
   const [branchStockCache, setBranchStockCache] = useState({}); // { [productKey]: [{ local, stock }] }
   const [stockUpdating, setStockUpdating] = useState({}); // { [productKey+local]: true }
@@ -1251,6 +1253,34 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       >
                         ⭐ Gestionar destacados
                       </button>
+                      <button
+                        className="admin-filter-pill"
+                        type="button"
+                        disabled={migratingImages}
+                        onClick={async () => {
+                          if (!confirm("¿Migrar imágenes de la BD a Vercel Blob? Solo es necesario hacerlo una vez.")) return;
+                          setMigratingImages(true);
+                          setMigrateResult(null);
+                          try {
+                            const res = await fetch("/api/admin/migrate-images", { method: "POST" });
+                            const data = await res.json();
+                            setMigrateResult(data);
+                          } catch {
+                            setMigrateResult({ error: "Error de red" });
+                          } finally {
+                            setMigratingImages(false);
+                          }
+                        }}
+                      >
+                        {migratingImages ? "Migrando..." : "🖼️ Migrar fotos a Blob"}
+                      </button>
+                      {migrateResult && (
+                        <span style={{ fontSize: "0.8rem", color: migrateResult.error ? "var(--error, red)" : "var(--gold-strong)" }}>
+                          {migrateResult.error
+                            ? `Error: ${migrateResult.error}`
+                            : `✓ ${migrateResult.migrated} de ${migrateResult.total} fotos migradas`}
+                        </span>
+                      )}
                     </div>
                     <div className="admin-filter-group">
                       <span className="admin-filter-label">Foto:</span>
