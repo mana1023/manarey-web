@@ -639,6 +639,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
   function addToCart(product, options = {}) {
     if (product.isSoldOut) return;
+    const stock = product.stockTotal || 0;
+    if (stock <= 0) return;
     const accessorySelected = Boolean(options.accessorySelected);
     const accessoryPrice = accessorySelected && accessoryProduct ? accessoryProduct.precioVenta : 0;
     const lineKey = accessorySelected ? `${product.productKey}:accessory` : product.productKey;
@@ -646,8 +648,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     setCart((current) => {
       const existing = current.find((item) => item.lineKey === lineKey);
       if (existing) {
+        const newQty = Math.min(existing.quantity + qty, stock);
+        if (newQty === existing.quantity) return current;
         return current.map((item) =>
-          item.lineKey === lineKey ? { ...item, quantity: item.quantity + qty } : item,
+          item.lineKey === lineKey ? { ...item, quantity: newQty } : item,
         );
       }
       return [
@@ -660,7 +664,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           precioVenta: product.precioVenta,
           accessoryPrice,
           accessoryLabel: accessorySelected ? accessoryProduct?.nombre || "Manijas" : "",
-          quantity: qty,
+          quantity: Math.min(qty, stock),
         },
       ];
     });
@@ -673,7 +677,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   function changeCartQuantity(lineKey, delta) {
     setCart((current) =>
       current
-        .map((item) => (item.lineKey === lineKey ? { ...item, quantity: item.quantity + delta } : item))
+        .map((item) => {
+          if (item.lineKey !== lineKey) return item;
+          const prod = products.find((p) => p.productKey === item.productKey);
+          const stock = prod?.stockTotal ?? Infinity;
+          const newQty = Math.max(0, Math.min(item.quantity + delta, stock));
+          return { ...item, quantity: newQty };
+        })
         .filter((item) => item.quantity > 0),
     );
   }
@@ -2485,11 +2495,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         <div className="cart-quantity">
                           {(() => {
                             const step = /silla/i.test(item.nombre) && !/pino/i.test(`${item.nombre} ${item.material || ""}`) ? 6 : 1;
+                            const stock = product?.stockTotal ?? Infinity;
+                            const atMax = item.quantity >= stock;
                             return (
                               <>
                                 <button onClick={() => changeCartQuantity(item.lineKey, -step)} type="button">−</button>
-                                <span>{item.quantity}</span>
-                                <button onClick={() => changeCartQuantity(item.lineKey, step)} type="button">+</button>
+                                <span>{item.quantity}{atMax && stock !== Infinity ? <span className="cart-qty-max" title={`Stock disponible: ${stock}`}> /{stock}</span> : null}</span>
+                                <button onClick={() => changeCartQuantity(item.lineKey, step)} type="button" disabled={atMax} title={atMax ? `Stock máximo: ${stock}` : undefined}>+</button>
                               </>
                             );
                           })()}

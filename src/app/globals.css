@@ -5115,12 +5115,19 @@ img {
   justify-content: center;
   transition: all 0.15s;
 }
-.cart-quantity button:hover { background: rgba(210,162,62,0.12); border-color: var(--gold); }
+.cart-quantity button:hover:not(:disabled) { background: rgba(210,162,62,0.12); border-color: var(--gold); }
+.cart-quantity button:disabled { opacity: 0.35; cursor: not-allowed; }
 .cart-quantity span {
-  width: 26px;
+  min-width: 26px;
   text-align: center;
   font-size: 0.92rem;
   font-weight: 600;
+}
+.cart-qty-max {
+  font-size: 0.72rem;
+  font-weight: 400;
+  opacity: 0.55;
+  letter-spacing: 0;
 }
 .cart-footer {
   padding: 16px 18px 20px;
