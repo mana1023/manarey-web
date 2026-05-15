@@ -210,11 +210,22 @@ img {
 .category-rail,
 .product-badges,
 .product-meta-row,
-.detail-topline,
-.detail-actions {
+.detail-topline {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.detail-actions > * {
+  flex: 1 1 0;
+  text-align: center;
+  justify-content: center;
 }
 
 .main-nav {

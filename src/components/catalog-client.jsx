@@ -1951,10 +1951,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 ) : null}
 
                 <div className="detail-actions">
-                  <button className="ghost-button" onClick={() => setSelectedProductKey("")} type="button">
-                    Cerrar
-                  </button>
-                  <a
+                  <
                     className="ghost-button"
                     href={buildWhatsAppLink(selectedProduct, detailAccessorySelected)}
                     target="_blank"
