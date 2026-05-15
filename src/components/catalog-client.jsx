@@ -274,6 +274,29 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     }
   }, []);
 
+  // Leer hash de la URL al montar para restaurar vista y categoría tras un refresh
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const [view, cat] = hash.split("/");
+    const validViews = ["inicio", "catalogo", "sobre-nosotros", "contacto"];
+    if (validViews.includes(view)) {
+      setActiveView(view);
+      if (view === "catalogo" && cat) setCategory(decodeURIComponent(cat));
+    }
+  }, []);
+
+  // Sincronizar hash con la vista y categoría activa
+  useEffect(() => {
+    if (activeView === "inicio") {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    } else if (activeView === "catalogo" && category && category !== "todas") {
+      history.replaceState(null, "", `#catalogo/${encodeURIComponent(category)}`);
+    } else {
+      history.replaceState(null, "", `#${activeView}`);
+    }
+  }, [activeView, category]);
+
   // Cargar sesión del cliente al montar
   useEffect(() => {
     fetch("/api/auth/customer/me")
