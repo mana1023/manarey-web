@@ -1951,7 +1951,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 ) : null}
 
                 <div className="detail-actions">
-                  <
+                  <a
                     className="ghost-button"
                     href={buildWhatsAppLink(selectedProduct, detailAccessorySelected)}
                     target="_blank"
