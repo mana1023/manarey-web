@@ -154,122 +154,139 @@ async function filesToDataUrls(files) {
 
 const PAYMENT_METHODS = [
   {
+    /* Visa — path real de Simple Icons (wordmark vectorizado) */
     name: "Visa",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#1A1F71"/>
-        <text x="26" y="23" textAnchor="middle" fill="white" fontFamily="Arial,Helvetica,sans-serif" fontSize="18" fontWeight="900" fontStyle="italic" letterSpacing="1.5">VISA</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#1A1F71"/>
+        <svg x="4" y="4" width="48" height="28" viewBox="0 7 24 10" preserveAspectRatio="xMidYMid meet">
+          <path fill="white" d="M9.112 8.262L5.97 15.758H3.92L2.374 9.775c-.094-.368-.175-.503-.461-.658C1.447 8.864.677 8.627 0 8.479l.046-.217h3.3a.904.904 0 01.894.764l.817 4.338 2.018-5.102zm8.033 5.049c.008-1.979-2.736-2.088-2.717-2.972.006-.269.262-.555.822-.628a3.66 3.66 0 011.913.336l.34-1.59a5.207 5.207 0 00-1.814-.333c-1.917 0-3.266 1.02-3.278 2.479-.012 1.079.963 1.68 1.698 2.04.756.367 1.01.603 1.006.931-.005.504-.602.725-1.16.734-.975.015-1.54-.263-1.992-.473l-.351 1.642c.453.208 1.289.39 2.156.398 2.037 0 3.37-1.006 3.377-2.564m5.061 2.447H24l-1.565-7.496h-1.656a.883.883 0 00-.826.55l-2.909 6.946h2.036l.405-1.12h2.488zm-2.163-2.656l1.02-2.815.588 2.815zm-8.16-4.84l-1.603 7.496H8.34l1.605-7.496z"/>
+        </svg>
       </svg>
     ),
   },
   {
+    /* Mastercard — 3 paths separados del logo real de Simple Icons, coloreados */
     name: "Mastercard",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#252525"/>
-        <circle cx="20" cy="16" r="11" fill="#EB001B"/>
-        <circle cx="32" cy="16" r="11" fill="#F79E1B"/>
-        <path d="M26 6.8a11.1 11.1 0 0 1 0 18.4A11.1 11.1 0 0 1 26 6.8z" fill="#FF5F00"/>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#252525"/>
+        <svg x="4" y="4" width="48" height="28" viewBox="0 4 24 16" preserveAspectRatio="xMidYMid meet">
+          <path fill="#EB001B" d="M11.343 18.031c.058.049.12.098.181.146-1.177.783-2.59 1.238-4.107 1.238C3.32 19.416 0 16.096 0 12c0-4.095 3.32-7.416 7.416-7.416 1.518 0 2.931.456 4.105 1.238-.06.051-.12.098-.165.15C9.6 7.489 8.595 9.688 8.595 12c0 2.311 1.001 4.51 2.748 6.031z"/>
+          <path fill="#F79E1B" d="M16.584 4.584c-1.52 0-2.931.456-4.105 1.238.06.051.12.098.165.15C14.4 7.489 15.405 9.688 15.405 12c0 2.31-1.001 4.507-2.748 6.031-.058.049-.12.098-.181.146 1.177.783 2.588 1.238 4.107 1.238C20.68 19.416 24 16.096 24 12c0-4.094-3.32-7.416-7.416-7.416z"/>
+          <path fill="#FF5F00" d="M12 6.174c-.096.075-.189.15-.28.231C10.156 7.764 9.169 9.765 9.169 12c0 2.236.987 4.236 2.551 5.595.09.08.185.158.28.232.096-.074.189-.152.28-.232 1.563-1.359 2.551-3.359 2.551-5.595 0-2.235-.987-4.236-2.551-5.595-.09-.08-.184-.156-.28-.231z"/>
+        </svg>
       </svg>
     ),
   },
   {
+    /* American Express — path real de Simple Icons (diseño de tarjeta vectorizado) */
     name: "Amex",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#007BC1"/>
-        <rect width="52" height="32" rx="5" fill="url(#amex-g)" opacity="0.3"/>
-        <text x="26" y="14" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="7" fontWeight="700" letterSpacing="1">AMERICAN</text>
-        <text x="26" y="24" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="7" fontWeight="700" letterSpacing="1">EXPRESS</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#007BC1"/>
+        <svg x="2" y="2" width="52" height="32" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
+          <path fill="white" d="M16.015 14.378c0-.32-.135-.496-.344-.622-.21-.12-.464-.135-.81-.135h-1.543v2.82h.675v-1.027h.72c.24 0 .39.024.478.125.12.13.104.38.104.55v.35h.66v-.555c-.002-.25-.017-.376-.108-.516-.06-.08-.18-.18-.33-.234l.02-.008c.18-.072.48-.297.48-.747zm-.87.407l-.028-.002c-.09.053-.195.058-.33.058h-.81v-.63h.824c.12 0 .24 0 .33.05.098.048.156.147.15.255 0 .12-.045.215-.134.27zM20.297 15.837H19v.6h1.304c.676 0 1.05-.278 1.05-.884 0-.28-.066-.448-.187-.582-.153-.133-.392-.193-.73-.207l-.376-.015c-.104 0-.18 0-.255-.03-.09-.03-.15-.105-.15-.21 0-.09.017-.166.09-.21.083-.046.177-.066.272-.06h1.23v-.602h-1.35c-.704 0-.958.437-.958.84 0 .9.776.855 1.407.87.104 0 .18.015.225.06.046.03.082.106.082.18 0 .077-.035.15-.08.18-.06.053-.15.07-.277.07zM0 0v10.096L.81 8.22h1.75l.225.464V8.22h2.043l.45 1.02.437-1.013h6.502c.295 0 .56.057.756.236v-.23h1.787v.23c.307-.17.686-.23 1.12-.23h2.606l.24.466v-.466h1.918l.254.465v-.466h1.858v3.948H20.87l-.36-.6v.585h-2.353l-.256-.63h-.583l-.27.614h-1.213c-.48 0-.84-.104-1.08-.24v.24h-2.89v-.884c0-.12-.03-.12-.105-.135h-.105v1.036H6.067v-.48l-.21.48H4.69l-.202-.48v.465H2.235l-.256-.624H1.4l-.256.624H0V24h23.786v-7.108c-.27.135-.613.18-.973.18H21.09v-.255c-.21.165-.57.255-.914.255H14.71v-.9c0-.12-.018-.12-.12-.12h-.075v1.022h-1.8v-1.066c-.298.136-.643.15-.928.136h-.214v.915h-2.18l-.54-.617-.57.6H4.742v-3.93h3.61l.518.602.554-.6h2.412c.28 0 .74.03.942.225v-.24h2.177c.202 0 .644.045.903.225v-.24h3.265v.24c.163-.164.508-.24.803-.24h1.89v.24c.194-.15.464-.24.84-.24h1.176V0H0zM23.865 15.03v-.005c-.03-.025-.046-.048-.075-.07-.15-.153-.39-.215-.764-.225l-.36-.012c-.12 0-.194-.007-.27-.03-.09-.03-.15-.105-.15-.21 0-.09.03-.16.09-.204.076-.045.15-.05.27-.05h1.223v-.588h-1.283c-.69 0-.96.437-.96.84 0 .9.78.855 1.41.87.104 0 .18.015.224.06.046.03.076.106.076.18 0 .07-.034.138-.09.18-.045.056-.136.07-.27.07h-1.288v.605h1.287c.42 0 .734-.118.9-.36h.03c.09-.134.135-.3.135-.523 0-.24-.045-.39-.135-.526zM18.597 14.208v-.583h-2.235V16.458h2.235v-.585h-1.57v-.57h1.533v-.584h-1.532v-.51zM13.51 8.787h.685V11.6h-.684zM13.126 9.543c0-.314-.13-.5-.34-.624-.217-.125-.47-.135-.81-.135H10.43v2.82h.674v-1.034h.72c.24 0 .39.03.487.12.122.136.107.378.107.548v.354h.677v-.553c0-.25-.016-.375-.11-.516-.09-.107-.202-.19-.33-.237.172-.07.472-.3.472-.75zm-.855.396c-.09.054-.195.056-.33.056H11.1v-.623h.825c.12 0 .24.004.33.05.09.04.15.128.15.25s-.047.22-.134.266zM15.92 9.373h.632v-.6h-.644c-.464 0-.804.105-1.02.33-.286.3-.362.69-.362 1.11 0 .512.123.833.36 1.074.232.238.645.31.97.31h.78l.255-.627h1.39l.262.627h1.36v-2.11l1.272 2.11h.95V8.786h-.684v1.963l-1.18-1.96h-1.02V11.4L18.11 8.744h-1.004l-.943 2.22h-.3c-.177 0-.362-.03-.468-.134-.125-.15-.186-.36-.186-.662 0-.285.08-.51.194-.63.133-.135.272-.165.516-.165zm1.668-.108l.464 1.118h-.93l.466-1.12zM2.38 10.97l.254.628H4V9.393l.972 2.205h.584l.973-2.202.015 2.202h.69v-2.81H6.118l-.807 1.904-.876-1.905H3.343v2.663L2.205 8.787h-.997L.01 11.597h.72l.26-.626h1.39zm-.688-1.705l.46 1.118h-.915l.457-1.12zM11.856 13.62H9.714l-.85.923-.825-.922H5.346v2.82H8l.855-.932.824.93h1.302v-.94h.838c.6 0 1.17-.164 1.17-.945c0-.78-.598-.93-1.128-.93zM7.67 15.853H6.02v-.557h1.47v-.574H6.02v-.51H7.7l.733.82-.764.824zm2.642.33l-1.03-1.147 1.03-1.108v2.253zm1.553-1.258h-.885v-.717h.885c.24 0 .42.098.42.344 0 .243-.15.372-.42.372zM9.967 9.373v-.586H7.73V11.6h2.237v-.58H8.4v-.564h1.527V9.88H8.4v-.507z"/>
+        </svg>
       </svg>
     ),
   },
   {
+    /* Mercado Pago — path real de Simple Icons (logo oval de la marca) */
     name: "Mercado Pago",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#009EE3"/>
-        <circle cx="26" cy="13" r="9.5" fill="#FFE600"/>
-        <circle cx="22.5" cy="11.5" r="1.6" fill="#009EE3"/>
-        <circle cx="29.5" cy="11.5" r="1.6" fill="#009EE3"/>
-        <path d="M21.5 15.2 Q26 19.2 30.5 15.2" stroke="#009EE3" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        <text x="26" y="29" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="6.5" fontWeight="800" letterSpacing="0.3">mercadopago</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#009EE3"/>
+        <svg x="2" y="2" width="52" height="32" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
+          <path fill="white" d="M11.115 16.479a.93.927 0 0 1-.939-.886c-.002-.042-.006-.155-.103-.155-.04 0-.074.023-.113.059-.112.103-.254.206-.46.206a.816.814 0 0 1-.305-.066c-.535-.214-.542-.578-.521-.725.006-.038.007-.08-.02-.11l-.032-.03h-.034c-.027 0-.055.012-.093.039a.788.786 0 0 1-.454.16.7.699 0 0 1-.253-.05c-.708-.27-.65-.928-.617-1.126.005-.041-.005-.072-.03-.092l-.05-.04-.047.043a.728.726 0 0 1-.505.203.73.728 0 0 1-.732-.725c0-.4.328-.722.732-.722.364 0 .675.27.721.63l.026.195.11-.165c.01-.018.307-.46.852-.46.102 0 .21.016.316.05.434.13.508.52.519.68.008.094.075.1.09.1.037 0 .064-.024.083-.045a.746.744 0 0 1 .54-.225c.128 0 .263.03.402.09.69.293.379 1.158.374 1.167-.058.144-.061.207-.005.244l.027.013h.02c.03 0 .07-.014.134-.035.093-.032.235-.08.367-.08a.944.942 0 0 1 .94.93.936.934 0 0 1-.94.928zm7.302-4.171c-1.138-.98-3.768-3.24-4.481-3.77-.406-.302-.685-.462-.928-.533a1.559 1.554 0 0 0-.456-.07c-.182 0-.376.032-.58.095-.46.145-.918.505-1.362.854l-.023.018c-.414.324-.84.66-1.164.73a1.986 1.98 0 0 1-.43.049c-.362 0-.687-.104-.81-.258-.02-.025-.007-.066.04-.125l.008-.008 1-1.067c.783-.774 1.525-1.506 3.23-1.545h.085c1.062 0 2.12.469 2.24.524a7.03 7.03 0 0 0 3.056.724c1.076 0 2.188-.263 3.354-.795a9.135 9.11 0 0 0-.405-.317c-1.025.44-2.003.66-2.946.66-.962 0-1.925-.229-2.858-.68-.05-.022-1.22-.567-2.44-.57-.032 0-.065 0-.096.002-1.434.033-2.24.536-2.782.976-.528.013-.982.138-1.388.25-.361.1-.673.186-.979.185-.125 0-.35-.01-.37-.012-.35-.01-2.115-.437-3.518-.962-.143.1-.28.203-.415.31 1.466.593 3.25 1.053 3.812 1.089.157.01.323.027.491.027.372 0 .744-.103 1.104-.203.213-.059.446-.123.692-.17l-.196.194-1.017 1.087c-.08.08-.254.294-.14.557a.705.703 0 0 0 .268.292c.243.162.677.27 1.08.271.152 0 .297-.015.43-.044.427-.095.874-.448 1.349-.82.377-.296.913-.672 1.323-.782a1.494 1.49 0 0 1 .37-.05.611.61 0 0 1 .095.005c.27.034.533.125 1.003.472.835.62 4.531 3.815 4.566 3.846.002.002.238.203.22.537-.007.186-.11.352-.294.466a.902.9 0 0 1-.484.15.804.802 0 0 1-.428-.124c-.014-.01-1.28-1.157-1.746-1.543-.074-.06-.146-.115-.22-.115a.122.122 0 0 0-.096.045c-.073.09.01.212.105.294l1.48 1.47c.002 0 .184.17.204.395.012.244-.106.447-.35.606a.957.955 0 0 1-.526.171.766.764 0 0 1-.42-.127l-.214-.206a21.035 20.978 0 0 0-1.08-1.009c-.072-.058-.148-.112-.221-.112a.127.127 0 0 0-.094.038c-.033.037-.056.103.028.212a.698.696 0 0 0 .075.083l1.078 1.198c.01.01.222.26.024.511l-.038.048a1.18 1.178 0 0 1-.1.096c-.184.15-.43.164-.527.164a.8.798 0 0 1-.147-.012c-.106-.018-.178-.048-.212-.089l-.013-.013c-.06-.06-.602-.609-1.054-.98-.059-.05-.133-.11-.21-.11a.128.128 0 0 0-.096.042c-.09.096.044.24.1.293l.92 1.003a.204.204 0 0 1-.033.062c-.033.044-.144.155-.479.196a.91.907 0 0 1-.122.007c-.345 0-.712-.164-.902-.264a1.343 1.34 0 0 0 .13-.576 1.368 1.365 0 0 0-1.42-1.357c.024-.342-.025-.99-.697-1.274a1.455 1.452 0 0 0-.575-.125c-.146 0-.287.025-.42.075a1.153 1.15 0 0 0-.671-.564 1.52 1.515 0 0 0-.494-.085c-.28 0-.537.08-.767.242a1.168 1.165 0 0 0-.903-.43 1.173 1.17 0 0 0-.82.335c-.287-.217-1.425-.93-4.467-1.613a17.39 17.344 0 0 1-.692-.189 4.822 4.82 0 0 0-.077.494l.67.157c3.108.682 4.136 1.391 4.309 1.525a1.145 1.142 0 0 0-.09.442 1.16 1.158 0 0 0 1.378 1.132c.096.467.406.821.879 1.003a1.165 1.162 0 0 0 .415.08c.09 0 .179-.012.266-.034.086.22.282.493.722.668a1.233 1.23 0 0 0 .457.094c.122 0 .241-.022.355-.063a1.373 1.37 0 0 0 1.269.841c.37.002.726-.147.985-.41.221.121.688.341 1.163.341.06 0 .118-.002.175-.01.47-.059.689-.24.789-.382a.571.57 0 0 0 .048-.078c.11.032.234.058.373.058.255 0 .501-.086.75-.265.244-.174.418-.424.444-.637v-.01c.083.017.167.026.251.026.265 0 .527-.082.773-.242.48-.31.562-.715.554-.98a1.28 1.279 0 0 0 .978-.194 1.04 1.04 0 0 0 .502-.808 1.088 1.085 0 0 0-.16-.653c.804-.342 2.636-1.003 4.795-1.483a4.734 4.721 0 0 0-.067-.492 27.742 27.667 0 0 0-5.049 1.62zm5.123-.763c0 4.027-5.166 7.293-11.537 7.293-6.372 0-11.538-3.266-11.538-7.293 0-4.028 5.165-7.293 11.539-7.293 6.371 0 11.537 3.265 11.537 7.293zm.46.004c0-4.272-5.374-7.755-12-7.755S.002 7.277.002 11.55L0 12.004c0 4.533 4.695 8.203 11.999 8.203 7.347 0 12-3.67 12-8.204z"/>
+        </svg>
       </svg>
     ),
   },
   {
+    /* Naranja X — colores y tipografía de marca */
     name: "Naranja X",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#FF5A00"/>
-        <text x="26" y="14" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="9" fontWeight="700" letterSpacing="0.3">naranja</text>
-        <text x="26" y="27" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="14" fontWeight="900">X</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#FF5A00"/>
+        <text x="28" y="17" textAnchor="middle" fill="white" fontFamily="Arial,Helvetica,sans-serif" fontSize="11" fontWeight="700" letterSpacing="0.5">naranja</text>
+        <text x="28" y="30" textAnchor="middle" fill="white" fontFamily="Arial,Helvetica,sans-serif" fontSize="13" fontWeight="900" letterSpacing="1">X</text>
       </svg>
     ),
   },
   {
+    /* Cabal — azul y rojo, colores reales de la tarjeta */
     name: "Cabal",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#003087"/>
-        <rect x="0" y="20" width="52" height="12" rx="0" fill="#E31837"/>
-        <rect x="0" y="20" width="52" height="12" rx="0" fill="#E31837"/>
-        <path d="M0 20 L52 20 L52 32 Q52 32 26 32 Q0 32 0 32 Z" fill="#E31837"/>
-        <text x="26" y="18" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="11" fontWeight="900" letterSpacing="1">CABAL</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#003087"/>
+        <rect x="0" y="22" width="56" height="14" rx="0" fill="#E31837"/>
+        <path d="M0 22 L56 22 L56 36 Q56 36 28 36 Q0 36 0 36 Z" fill="#E31837"/>
+        <text x="28" y="17" textAnchor="middle" fill="white" fontFamily="Arial,Helvetica,sans-serif" fontSize="12" fontWeight="900" letterSpacing="2">CABAL</text>
+        <polyline points="6,26 3,29 6,32" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        <polyline points="50,26 53,29 50,32" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
   },
   {
+    /* Débito — diseño de tarjeta de débito con los círculos del logo Maestro */
     name: "Débito",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#0D47A1"/>
-        <rect x="4" y="9" width="44" height="5" rx="1" fill="rgba(255,255,255,0.25)"/>
-        <rect x="4" y="19" width="16" height="4" rx="2" fill="rgba(255,255,255,0.75)"/>
-        <rect x="24" y="19" width="10" height="4" rx="2" fill="rgba(255,255,255,0.35)"/>
-        <rect x="38" y="19" width="10" height="4" rx="2" fill="rgba(255,255,255,0.35)"/>
-        <circle cx="44" cy="7" r="4" fill="#FFD600" opacity="0.9"/>
-        <circle cx="40" cy="7" r="4" fill="#E53935" opacity="0.9"/>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#1565C0"/>
+        <rect x="4" y="10" width="48" height="6" rx="1" fill="rgba(255,255,255,0.22)"/>
+        <rect x="4" y="21" width="18" height="5" rx="2" fill="rgba(255,255,255,0.8)"/>
+        <circle cx="42" cy="12" r="6" fill="#EB001B" opacity="0.9"/>
+        <circle cx="50" cy="12" r="6" fill="#F79E1B" opacity="0.9"/>
+        <path d="M46 7.2a6.1 6.1 0 0 1 0 9.6A6.1 6.1 0 0 1 46 7.2z" fill="#FF5F00"/>
+        <text x="28" y="33" textAnchor="middle" fill="rgba(255,255,255,0.65)" fontFamily="Arial,sans-serif" fontSize="6" fontWeight="600" letterSpacing="0.5">DÉBITO</text>
       </svg>
     ),
   },
   {
+    /* Transferencia bancaria — ícono de banco clásico */
     name: "Transferencia",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#003087"/>
-        <polygon points="8,14 26,5 44,14" fill="rgba(255,255,255,0.9)"/>
-        <rect x="10" y="14" width="32" height="12" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8"/>
-        <rect x="13" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
-        <rect x="20" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
-        <rect x="27" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
-        <rect x="34" y="15" width="4" height="10" rx="0.5" fill="rgba(255,255,255,0.75)"/>
-        <rect x="8" y="26" width="36" height="2.5" rx="0.5" fill="rgba(255,255,255,0.8)"/>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#003087"/>
+        <polygon points="10,17 28,6 46,17" fill="rgba(255,255,255,0.95)"/>
+        <rect x="12" y="17" width="32" height="13" rx="1" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.45)" strokeWidth="0.8"/>
+        <rect x="15" y="18" width="5" height="11" rx="0.5" fill="rgba(255,255,255,0.8)"/>
+        <rect x="23" y="18" width="5" height="11" rx="0.5" fill="rgba(255,255,255,0.8)"/>
+        <rect x="31" y="18" width="5" height="11" rx="0.5" fill="rgba(255,255,255,0.8)"/>
+        <rect x="39" y="18" width="5" height="11" rx="0.5" fill="rgba(255,255,255,0.8)"/>
+        <rect x="10" y="30" width="36" height="2.5" rx="0.5" fill="rgba(255,255,255,0.9)"/>
       </svg>
     ),
   },
   {
+    /* Efectivo — billete estilizado */
     name: "Efectivo",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#2E7D32"/>
-        <rect x="4" y="7" width="44" height="18" rx="3" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
-        <circle cx="26" cy="16" r="7" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.35)" strokeWidth="1"/>
-        <text x="26" y="20.5" textAnchor="middle" fill="rgba(255,255,255,0.95)" fontFamily="Arial,sans-serif" fontSize="11" fontWeight="900">$</text>
-        <circle cx="9" cy="16" r="4" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
-        <circle cx="43" cy="16" r="4" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#2E7D32"/>
+        <rect x="4" y="8" width="48" height="20" rx="3" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.28)" strokeWidth="0.8"/>
+        <rect x="4" y="8" width="48" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="4" y="24" width="48" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <circle cx="28" cy="18" r="7.5" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.38)" strokeWidth="0.8"/>
+        <text x="28" y="22" textAnchor="middle" fill="rgba(255,255,255,0.95)" fontFamily="Arial,sans-serif" fontSize="13" fontWeight="900">$</text>
+        <circle cx="10" cy="18" r="4" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.18)" strokeWidth="0.6"/>
+        <circle cx="46" cy="18" r="4" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.18)" strokeWidth="0.6"/>
       </svg>
     ),
   },
   {
+    /* Cuenta DNI — Banco Provincia: verde con figura humana (logo real) */
     name: "Cuenta DNI",
     icon: (
-      <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden="true">
-        <rect width="52" height="32" rx="5" fill="#ffffff"/>
-        <rect x="0" y="0" width="52" height="13" rx="5" fill="#003DA5"/>
-        <rect x="0" y="8" width="52" height="5" fill="#003DA5"/>
-        <text x="26" y="10" textAnchor="middle" fill="white" fontFamily="Arial,sans-serif" fontSize="6.5" fontWeight="700" letterSpacing="0.5">CUENTA</text>
-        <text x="26" y="26" textAnchor="middle" fill="#003DA5" fontFamily="Arial,sans-serif" fontSize="14" fontWeight="900" letterSpacing="1.5">DNI</text>
+      <svg width="56" height="36" viewBox="0 0 56 36" aria-hidden="true">
+        <rect width="56" height="36" rx="6" fill="#00873E"/>
+        <circle cx="28" cy="9" r="4.5" fill="white"/>
+        <rect x="24.5" y="14.5" width="7" height="9" rx="2.5" fill="white"/>
+        <line x1="24.5" y1="17" x2="16" y2="12" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+        <line x1="31.5" y1="17" x2="40" y2="12" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+        <line x1="26" y1="23.5" x2="23.5" y2="31" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+        <line x1="30" y1="23.5" x2="32.5" y2="31" stroke="white" strokeWidth="3" strokeLinecap="round"/>
       </svg>
     ),
   },
