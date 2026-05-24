@@ -334,7 +334,6 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [cartButtonPop, setCartButtonPop] = useState(false);
   const [activeView, setActiveView] = useState("inicio");
   const [welcomeBgIndex, setWelcomeBgIndex] = useState(0);
-  const [branchesOpen, setBranchesOpen] = useState(false);
   const [homeCategory, setHomeCategory] = useState("");
   const [selectedProductKey, setSelectedProductKey] = useState("");
   const [detailPhotoIndex, setDetailPhotoIndex] = useState(0);
@@ -1251,43 +1250,22 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </a>
               </div>
 
-              {/* Sucursales — desplegable con 5 direcciones, cada una abre Maps */}
+              {/* Sucursales — abre Google Maps con las 5 ubicaciones como paradas */}
               <div className="welcome-branches">
-                <button
+                <a
                   className="welcome-btn-locations"
-                  onClick={() => setBranchesOpen((o) => !o)}
-                  type="button"
-                  aria-expanded={branchesOpen}
+                  href="https://www.google.com/maps/dir/Miguel+Cane+508+Glew+Buenos+Aires/Av+Hipolito+Yrigoyen+19051+Longchamps+Buenos+Aires/Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires/Av+Hipolito+Yrigoyen+21890+Glew+Buenos+Aires/Almafuerte+45+Glew+Buenos+Aires"
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
                   </svg>
                   Ver ubicaciones de nuestras sucursales
-                  <svg
-                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                    aria-hidden="true"
-                    style={{ transition: "transform 0.25s", transform: branchesOpen ? "rotate(180deg)" : "rotate(0deg)", marginLeft: "auto", flexShrink: 0 }}
-                  >
-                    <polyline points="6 9 12 15 18 9"/>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
                   </svg>
-                </button>
-
-                {branchesOpen && (
-                  <div className="welcome-locations-list">
-                    {storeBranches.map((branch) => (
-                      <a
-                        key={branch.id}
-                        className="welcome-location-item"
-                        href={branch.mapsUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <span className="welcome-location-address">📍 {branch.address}</span>
-                        <span className="welcome-location-cta">Ver en mapa →</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
+                </a>
               </div>
               </div>{/* end welcome-content */}
             </section>
