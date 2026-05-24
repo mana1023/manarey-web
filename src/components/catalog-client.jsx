@@ -375,11 +375,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
   useRevealOnScroll(activeView);
 
-  // Slideshow de fondo en la sección bienvenida — agrega tus fotos a /public/welcome-bg/
+  // Slideshow de fondo — roperos de pino de MercadoLibre AR
   const WELCOME_BGS = [
-    "https://images.pexels.com/photos/7587809/pexels-photo-7587809.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/19878516/pexels-photo-19878516.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/6487951/pexels-photo-6487951.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://http2.mlstatic.com/D_Q_NP_2X_603693-MLA93554321500_102025-E.webp",
+    "https://http2.mlstatic.com/D_Q_NP_2X_981778-MLA110751696800_052026-E.webp",
+    "https://http2.mlstatic.com/D_Q_NP_2X_979164-MLA93829985707_092025-E.webp",
+    "https://http2.mlstatic.com/D_Q_NP_2X_886685-MLA108911935624_032026-E.webp",
   ];
   useEffect(() => {
     if (activeView !== "inicio") return undefined;
