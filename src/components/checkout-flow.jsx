@@ -432,7 +432,7 @@ export function CheckoutFlow({ initialCustomer }) {
           clearInterval(pollingRef.current);
           setPollingActive(false);
           window.localStorage.removeItem("manarey-cart");
-          window.location.href = "/checkout/success";
+          window.location.href = `/checkout/success?code=${encodeURIComponent(completedOrder)}`;
         }
       } catch {
         // silently retry next interval
@@ -552,7 +552,7 @@ export function CheckoutFlow({ initialCustomer }) {
         const data = await res.json();
         if (data.status === "approved") {
           window.localStorage.removeItem("manarey-cart");
-          window.location.href = "/checkout/success";
+          window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}`;
         } else if (data.status === "in_process" || data.status === "pending") {
           window.localStorage.removeItem("manarey-cart");
           window.location.href = "/checkout/pending";
@@ -588,7 +588,7 @@ export function CheckoutFlow({ initialCustomer }) {
       if (!res.ok) throw new Error(data.error);
       window.localStorage.removeItem("manarey-cart");
       if (data.whatsappUrl) window.open(data.whatsappUrl, "_blank", "noopener,noreferrer");
-      window.location.href = "/checkout/success";
+      window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}`;
     } catch (err) {
       setPaymentError(err.message);
     } finally {
@@ -1248,6 +1248,16 @@ export function CheckoutFlow({ initialCustomer }) {
                       <p className="cf-transfer-order">
                         Pedido <strong>{completedOrder}</strong>
                       </p>
+                      <a
+                        href={`/api/orders/${encodeURIComponent(completedOrder)}/boleta`}
+                        className="cf-boleta-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={`boleta-${completedOrder}.pdf`}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Descargar boleta
+                      </a>
 
                       {/* Polling status */}
                       {pollingActive && !pollingTimedOut && (

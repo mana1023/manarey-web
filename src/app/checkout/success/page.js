@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export const metadata = {
-  title: "Pago confirmado | Manarey",
-};
+function SuccessContent() {
+  const params = useSearchParams();
+  const code = params.get("code") || "";
 
-export default function CheckoutSuccessPage() {
   return (
     <main className="checkout-result-shell">
       <div className="checkout-result-card checkout-result-success">
@@ -19,6 +22,11 @@ export default function CheckoutSuccessPage() {
         <p className="checkout-result-body">
           Mercado Pago aprobó el pago. Nos contactaremos para coordinar la entrega o el retiro desde nuestras sucursales.
         </p>
+        {code && (
+          <p className="checkout-result-code">
+            Código de pedido: <strong>{code}</strong>
+          </p>
+        )}
         <div className="checkout-result-steps">
           <div className="checkout-result-step">
             <span className="step-num">1</span>
@@ -33,10 +41,38 @@ export default function CheckoutSuccessPage() {
             <span>Recibi tu mueble con envio coordinado</span>
           </div>
         </div>
-        <Link href="/" className="checkout-result-cta">
-          Seguir comprando
-        </Link>
+        <div className="checkout-result-actions">
+          <Link href="/" className="checkout-result-cta checkout-result-cta--secondary">
+            Seguir comprando
+          </Link>
+          {code && (
+            <a
+              href={`/api/orders/${encodeURIComponent(code)}/boleta`}
+              className="checkout-result-cta checkout-result-cta--primary"
+              download={`boleta-${code}.pdf`}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Descargar boleta
+            </a>
+          )}
+        </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <main className="checkout-result-shell">
+        <div className="checkout-result-card checkout-result-success" />
+      </main>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

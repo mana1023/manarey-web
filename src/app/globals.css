@@ -2509,26 +2509,55 @@ img {
   background: linear-gradient(135deg, #c8a828, #a88a1a);
 }
 
+.checkout-result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.checkout-result-code {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: -4px 0 8px;
+}
+
 .checkout-result-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
-  padding: 14px 28px;
+  gap: 7px;
+  min-height: 50px;
+  padding: 13px 26px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #d2a23e, #a9731e);
-  color: #fff9f0;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.97rem;
   text-decoration: none;
-  box-shadow: 0 12px 28px rgba(169, 115, 30, 0.28);
   transition: all 0.22s ease;
   width: fit-content;
 }
 
-.checkout-result-cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 36px rgba(169, 115, 30, 0.34);
+.checkout-result-cta--primary {
+  background: linear-gradient(135deg, #d2a23e, #a9731e);
+  color: #fff9f0;
+  box-shadow: 0 10px 24px rgba(169, 115, 30, 0.28);
+}
+
+.checkout-result-cta--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(169, 115, 30, 0.36);
+}
+
+.checkout-result-cta--secondary {
+  background: transparent;
+  color: #7a6a56;
+  border: 1.5px solid rgba(88, 61, 28, 0.2);
+}
+
+.checkout-result-cta--secondary:hover {
+  border-color: rgba(210, 162, 62, 0.5);
+  color: #2b1d13;
+  background: rgba(210, 162, 62, 0.06);
 }
 
 .checkout-result-actions-row {
@@ -3271,6 +3300,30 @@ img {
   font-size: 0.87rem;
   color: var(--muted);
   text-align: center;
+}
+
+.cf-boleta-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(201, 160, 64, 0.4);
+  color: #a07820;
+  background: rgba(201, 160, 64, 0.07);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.cf-boleta-link:hover {
+  background: rgba(201, 160, 64, 0.14);
+  border-color: #c9a040;
+  color: #7a5c10;
 }
 
 .cf-transfer-total-top {
