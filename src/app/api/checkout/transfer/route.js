@@ -23,7 +23,20 @@ export async function POST(request) {
     }
 
     // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos)
-    syncOrderToVentas(order).catch((e) => console.error("[transfer] syncOrderToVentas error:", e?.message || e));
+    syncOrderToVentas({
+      order_code: order.orderCode,
+      payment_method: "transfer",
+      customer_name: order.customer.fullName,
+      customer_phone: order.customer.phone,
+      customer_address: order.customer.address,
+      customer_city: order.customer.city,
+      customer_notes: order.customer.notes,
+      shipping_zone_id: order.summary.shipping.id,
+      shipping_cost: order.summary.shipping.cost,
+      subtotal: order.summary.subtotal,
+      total: order.summary.total,
+      raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
+    }).catch((e) => console.error("[transfer] syncOrderToVentas error:", e?.message || e));
 
     const phone = order.customer.phone;
     if (phone) {
