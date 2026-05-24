@@ -1355,11 +1355,6 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     <h2>{homeCategory || "Selección Manarey"}</h2>
                   </div>
                   <div className="showcase-top">
-                    {homeCategory && (
-                      <button className="showcase-tab active" onClick={() => setHomeCategory("")} type="button">
-                        ✕ Limpiar filtro
-                      </button>
-                    )}
                     {categories.filter((c) => c !== "todas").slice(0, 9).map((item) => (
                       <button
                         key={item}

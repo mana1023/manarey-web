@@ -2139,6 +2139,15 @@ img {
     grid-template-columns: 1fr;
   }
 
+  /* En mobile: ocultar la card grande del showcase, solo mostrar las 4 mini-cards */
+  .showcase-main-card {
+    display: none;
+  }
+  .showcase-side-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
   .showcase-side-grid,
   .category-highlight-grid,
   .hero-metrics,
