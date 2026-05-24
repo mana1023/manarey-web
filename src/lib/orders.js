@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { query } from "@/lib/db";
 import { buildCheckoutSummary } from "@/lib/shipping";
 import { getShippingSettings } from "@/lib/settings-db";
+import { getBranchByDisplayName } from "@/lib/store-config";
 
 let ordersReadyPromise;
 
@@ -310,12 +311,28 @@ export async function syncOrderToVentas(order) {
   const formaPago = formaMapping[order.payment_method] || "tarjeta";
   const incluyeEnvio = order.shipping_zone_id === "delivery" ? 1 : 0;
 
+  const isPickup = order.shipping_zone_id === "pickup";
+
+  // Para retiro: local = sucursal real, cliente_nombre = "Pagina Web" (para el historial)
+  // Para envío: local = "Pagina Web", cliente_nombre = nombre real del cliente
+  const branchFromAddress = isPickup ? getBranchByDisplayName(order.customer_address || customer.address || "") : null;
+  const localName = isPickup ? (branchFromAddress?.dbName || "Pagina Web") : "Pagina Web";
+  const clienteNombreVenta = isPickup ? "Pagina Web" : (order.customer_name || customer.fullName || "");
+
+  // Para retiro: guardar datos reales en notas para que aparezcan en la boleta
+  const realClientInfo = isPickup
+    ? `WEB | Cliente: ${order.customer_name || customer.fullName || ""} | Tel: ${order.customer_phone || customer.phone || ""}`
+    : "";
+
   // Extraer calle y numero de la direccion
-  const addressParts = (order.customer_address || "").match(/^(.*?)\s*(\d+)\s*$/);
-  const clienteCalle = addressParts ? addressParts[1].trim() : (order.customer_address || "");
+  const rawAddress = isPickup ? "" : (order.customer_address || "");
+  const addressParts = rawAddress.match(/^(.*?)\s*(\d+)\s*$/);
+  const clienteCalle = addressParts ? addressParts[1].trim() : rawAddress;
   const clienteNumero = addressParts ? addressParts[2] : "";
   const entreCalles = customer.betweenStreets || "";
-  const houseNotes = order.customer_notes || customer.notes || "";
+  const houseNotes = realClientInfo
+    ? `${realClientInfo}${order.customer_notes || customer.notes ? " | " + (order.customer_notes || customer.notes) : ""}`
+    : (order.customer_notes || customer.notes || "");
 
   const ventaResult = await query(
     `
@@ -354,9 +371,9 @@ export async function syncOrderToVentas(order) {
     `,
     [
       orderCode,
-      "Pagina Web",
+      localName,
       "Tienda Online",
-      order.customer_name || customer.fullName || "",
+      clienteNombreVenta,
       order.customer_phone || customer.phone || "",
       clienteCalle,
       clienteNumero,

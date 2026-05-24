@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrder, markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
-import { storeSettings } from "@/lib/store-config";
-import { sendPurchaseMessage } from "@/lib/whatsapp-sender";
+import { storeSettings, getBranchByDisplayName } from "@/lib/store-config";
+import { sendPurchaseMessage, sendBranchPickupNotification } from "@/lib/whatsapp-sender";
 
 function getMpToken() {
   const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
@@ -96,6 +96,22 @@ export async function POST(request) {
         total: order.summary.total,
         raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
       }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
+
+      // Notificar al local si es retiro en sucursal
+      if (order.summary.shipping.id === "pickup") {
+        const branch = getBranchByDisplayName(order.customer.address || "");
+        if (branch?.phone) {
+          sendBranchPickupNotification(branch.phone, {
+            orderCode: order.orderCode,
+            customerName: order.customer.fullName,
+            customerPhone: order.customer.phone,
+            branchName: branch.shortName || branch.name,
+            items: order.summary.items || [],
+            total: order.summary.total,
+            paymentMethod: "card",
+          }).catch(() => {});
+        }
+      }
 
       const phone = customer.telefono || customer.phone;
       if (phone) {

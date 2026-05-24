@@ -30,6 +30,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_1 || "Miguel Cane 508 esquina San Ignacio, Glew",
     mapsUrl: "https://maps.google.com/?q=Miguel+Cane+508+Glew+Buenos+Aires",
+    phone: process.env.BRANCH_PHONE_CANE || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
     id: "longchamps",
@@ -39,6 +40,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_2 || "Av. Hipolito Yrigoyen 19.051, Longchamps",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19051+Longchamps+Buenos+Aires",
+    phone: process.env.BRANCH_PHONE_LONGCHAMPS || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
     id: "glew",
@@ -48,6 +50,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 || "Av. Hipolito Yrigoyen 19.861, Glew",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires",
+    phone: process.env.BRANCH_PHONE_GLEW || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
     id: "vidriera",
@@ -57,6 +60,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_4 || "Av. Hipolito Yrigoyen 21.890 esquina Monroe, Glew",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+21890+Glew+Buenos+Aires",
+    phone: process.env.BRANCH_PHONE_VIDRIERA || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
     id: "estacion",
@@ -66,8 +70,20 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_5 || "Almafuerte 45 entre Andrade y Obligado, Glew",
     mapsUrl: "https://maps.google.com/?q=Almafuerte+45+Glew+Buenos+Aires",
+    phone: process.env.BRANCH_PHONE_ESTACION || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
 ];
+
+/**
+ * Dado el nombre de display de una sucursal (como viene del checkout)
+ * devuelve el dbName para usar en la tabla ventas.
+ */
+export function getBranchByDisplayName(displayName) {
+  if (!displayName) return null;
+  return storeBranches.find(
+    (b) => b.name === displayName || b.dbName === displayName || b.shortName === displayName,
+  ) || null;
+}
 
 export const shippingModes = [
   {

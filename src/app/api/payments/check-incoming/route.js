@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
-import { sendPurchaseMessage } from "@/lib/whatsapp-sender";
+import { sendPurchaseMessage, sendBranchPickupNotification } from "@/lib/whatsapp-sender";
+import { getBranchByDisplayName } from "@/lib/store-config";
 
 function getMpToken() {
   const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
@@ -125,16 +126,36 @@ export async function POST() {
           [order.order_code],
         );
         if (updatedOrder.rows[0]) {
-          await syncOrderToVentas(updatedOrder.rows[0]).catch(() => {});
+          const row = updatedOrder.rows[0];
+          await syncOrderToVentas(row).catch(() => {});
 
           // Mensaje de confirmación al cliente (personalizado según si es nuevo o recurrente)
-          const phone = updatedOrder.rows[0].customer_phone;
-          const nombre = updatedOrder.rows[0].customer_name || "";
-          const total = Number(updatedOrder.rows[0].total || 0);
-          const orderCode = updatedOrder.rows[0].order_code;
+          const phone = row.customer_phone;
+          const nombre = row.customer_name || "";
+          const total = Number(row.total || 0);
+          const rowOrderCode = row.order_code;
           if (phone) {
-            const prev = await countPreviousPaidOrders(phone, orderCode).catch(() => 0);
-            sendPurchaseMessage(phone, nombre, orderCode, total, prev);
+            const prev = await countPreviousPaidOrders(phone, rowOrderCode).catch(() => 0);
+            sendPurchaseMessage(phone, nombre, rowOrderCode, total, prev);
+          }
+
+          // Notificar al local si es retiro en sucursal
+          if (row.shipping_zone_id === "pickup") {
+            const rawPayload = typeof row.raw_payload === "string" ? JSON.parse(row.raw_payload || "{}") : (row.raw_payload || {});
+            const customer = rawPayload.customer || {};
+            const summary = rawPayload.summary || {};
+            const branch = getBranchByDisplayName(row.customer_address || customer.address || "");
+            if (branch?.phone) {
+              sendBranchPickupNotification(branch.phone, {
+                orderCode: rowOrderCode,
+                customerName: row.customer_name || customer.fullName || "",
+                customerPhone: phone || "",
+                branchName: branch.shortName || branch.name,
+                items: summary.items || [],
+                total,
+                paymentMethod: row.payment_method,
+              }).catch(() => {});
+            }
           }
         }
 
@@ -237,6 +258,25 @@ export async function GET(request) {
       if (phone) {
         const prev = await countPreviousPaidOrders(phone, orderCode).catch(() => 0);
         sendPurchaseMessage(phone, fullOrder.customer_name || "", orderCode, Number(fullOrder.total || 0), prev);
+      }
+
+      // Notificar al local si es retiro en sucursal
+      if (fullOrder.shipping_zone_id === "pickup") {
+        const rawPL = typeof fullOrder.raw_payload === "string" ? JSON.parse(fullOrder.raw_payload || "{}") : (fullOrder.raw_payload || {});
+        const cust = rawPL.customer || {};
+        const summ = rawPL.summary || {};
+        const branch = getBranchByDisplayName(fullOrder.customer_address || cust.address || "");
+        if (branch?.phone) {
+          sendBranchPickupNotification(branch.phone, {
+            orderCode,
+            customerName: fullOrder.customer_name || cust.fullName || "",
+            customerPhone: phone || "",
+            branchName: branch.shortName || branch.name,
+            items: summ.items || [],
+            total: Number(fullOrder.total || 0),
+            paymentMethod: fullOrder.payment_method,
+          }).catch(() => {});
+        }
       }
 
       return NextResponse.json({ isPaid: true, paymentId: match.id, justConfirmed: true });

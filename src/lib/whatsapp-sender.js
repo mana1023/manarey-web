@@ -123,6 +123,45 @@ export function sendPurchaseMessage(phone, nombre, orderCode, total, previousPai
  * Mensaje cuando se crea un pedido por transferencia (aún no pagado).
  * Mismo criterio: si ya compró antes → corto, si es nuevo → con agendamiento.
  */
+/**
+ * Notifica al local cuando llega un pedido web para retirar.
+ * Se envía al teléfono de la sucursal con el detalle del pedido.
+ */
+export function sendBranchPickupNotification(branchPhone, {
+  orderCode,
+  customerName,
+  customerPhone,
+  branchName,
+  items = [],
+  total,
+  paymentMethod,
+}) {
+  if (!branchPhone) return Promise.resolve(false);
+
+  const paymentLabel = { card: "Tarjeta/MP", transfer: "Transferencia" }[paymentMethod] || paymentMethod;
+  const itemsList = items
+    .map((i) => `  • ${i.nombre}${i.medida ? ` (${i.medida})` : ""}${i.accessoryLabel ? ` + ${i.accessoryLabel}` : ""} x${i.quantity}`)
+    .join("\n");
+
+  const msg = [
+    `🛒 *Nuevo pedido web — Retiro en ${branchName}*`,
+    ``,
+    `*Código:* ${orderCode}`,
+    `*Cliente:* ${customerName}`,
+    `*Teléfono:* ${customerPhone}`,
+    `*Forma de pago:* ${paymentLabel}`,
+    ``,
+    `*Productos:*`,
+    itemsList || "  (sin detalle)",
+    ``,
+    `*Total: ${currencyFmt.format(total)}*`,
+    ``,
+    `Coordinar retiro con el cliente.`,
+  ].join("\n");
+
+  return sendWhatsAppMessage(branchPhone, msg).catch(() => false);
+}
+
 export function sendTransferPendingMessage(phone, nombre, orderCode, total, previousPaidOrders = 0) {
   if (!phone) return Promise.resolve(false);
 
