@@ -472,6 +472,17 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     }
   }, [selectedProductKey]);
 
+  // Habilitar zoom del viewport SOLO cuando hay un producto abierto (para hacer zoom en las fotos)
+  useEffect(() => {
+    const meta = document.querySelector("meta[name='viewport']");
+    if (!meta) return;
+    if (selectedProductKey) {
+      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover");
+    } else {
+      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover");
+    }
+  }, [selectedProductKey]);
+
   // Cargar sesión del cliente al montar
   useEffect(() => {
     fetch("/api/auth/customer/me")

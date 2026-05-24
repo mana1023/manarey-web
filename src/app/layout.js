@@ -2,6 +2,14 @@ import "./globals.css";
 import { storeSettings } from "@/lib/store-config";
 import Script from "next/script";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata = {
   metadataBase: new URL("https://www.manarey.com.ar"),
   verification: {
