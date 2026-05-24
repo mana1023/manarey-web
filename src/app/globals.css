@@ -2522,6 +2522,76 @@ img {
   margin: -4px 0 8px;
 }
 
+/* ── Bloque retiro en sucursal (success page) ────────────────────────────── */
+.checkout-pickup-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(201, 160, 64, 0.07);
+  border: 1.5px solid rgba(201, 160, 64, 0.3);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 8px 0 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.checkout-pickup-intro {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.checkout-pickup-branch {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2b1d13;
+  margin: 0;
+}
+
+.checkout-pickup-address {
+  font-size: 0.88rem;
+  color: #5a4a38;
+  margin: 0;
+}
+
+.checkout-pickup-hours {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: #7a6a56;
+  margin-top: 2px;
+}
+
+.checkout-pickup-welcome {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #5a7a5a;
+  margin: 4px 0 6px;
+}
+
+.checkout-pickup-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #c9a040;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.18s, transform 0.18s;
+  margin-top: 4px;
+}
+
+.checkout-pickup-map-btn:hover {
+  background: #a07820;
+  transform: translateY(-2px);
+}
+
 .checkout-result-cta {
   display: inline-flex;
   align-items: center;

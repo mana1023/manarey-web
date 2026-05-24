@@ -345,8 +345,8 @@ export function CheckoutFlow({ initialCustomer }) {
       .then((r) => r.json())
       .then(({ branches: rawBranches }) => {
         if (!rawBranches?.length) {
-          // If no stock info, show all branches
-          setBranches(storeBranches.map((b) => ({ local: b.name, stock: 0 })));
+          // If no stock info, show all branches using dbName as key
+          setBranches(storeBranches.map((b) => ({ local: b.dbName, stock: 0 })));
           return;
         }
 
@@ -367,7 +367,7 @@ export function CheckoutFlow({ initialCustomer }) {
         if (shown.length === 1) setSelectedBranch(shown[0].local);
       })
       .catch(() => {
-        setBranches(storeBranches.map((b) => ({ local: b.name, stock: 0 })));
+        setBranches(storeBranches.map((b) => ({ local: b.dbName, stock: 0 })));
       })
       .finally(() => setBranchesLoading(false));
   }, [shippingMode, cart]);
@@ -432,7 +432,7 @@ export function CheckoutFlow({ initialCustomer }) {
           clearInterval(pollingRef.current);
           setPollingActive(false);
           window.localStorage.removeItem("manarey-cart");
-          window.location.href = `/checkout/success?code=${encodeURIComponent(completedOrder)}`;
+          window.location.href = `/checkout/success?code=${encodeURIComponent(completedOrder)}${selectedBranch ? `&branch=${encodeURIComponent(selectedBranch)}` : ""}`;
         }
       } catch {
         // silently retry next interval
@@ -552,7 +552,7 @@ export function CheckoutFlow({ initialCustomer }) {
         const data = await res.json();
         if (data.status === "approved") {
           window.localStorage.removeItem("manarey-cart");
-          window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}`;
+          window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}${selectedBranch ? `&branch=${encodeURIComponent(selectedBranch)}` : ""}`;
         } else if (data.status === "in_process" || data.status === "pending") {
           window.localStorage.removeItem("manarey-cart");
           window.location.href = "/checkout/pending";
@@ -588,7 +588,7 @@ export function CheckoutFlow({ initialCustomer }) {
       if (!res.ok) throw new Error(data.error);
       window.localStorage.removeItem("manarey-cart");
       if (data.whatsappUrl) window.open(data.whatsappUrl, "_blank", "noopener,noreferrer");
-      window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}`;
+      window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}${selectedBranch ? `&branch=${encodeURIComponent(selectedBranch)}` : ""}`;
     } catch (err) {
       setPaymentError(err.message);
     } finally {
