@@ -1455,59 +1455,82 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               Inicio
             </button>
-            <section className="catalog-hero">
-              <p className="eyebrow">Catalogo</p>
-              <h2>Todos nuestros productos</h2>
-            </section>
-
             {!catalogError ? (
               <>
                 <section className="catalog-tools">
-                  <div className="catalog-toolbar">
-                    <div className="search-wrapper">
-                      <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                      </svg>
-                      <input
-                        className="search-input"
-                        placeholder="Buscar producto, categoría, medida..."
-                        value={query}
-                        onChange={(event) => setQuery(event.target.value)}
-                      />
-                      {query && (
-                        <button className="search-clear" onClick={() => setQuery("")} type="button">✕</button>
-                      )}
+                  {/* Título */}
+                  <div className="catalog-tools-header">
+                    <div>
+                      <p className="eyebrow">Catálogo</p>
+                      <h2 className="catalog-tools-title">Todos nuestros productos</h2>
                     </div>
-                    <select
-                      className="sort-select"
-                      value={sortBy}
-                      onChange={(event) => setSortBy(event.target.value)}
-                    >
-                      <option value="relevancia">Destacados primero</option>
-                      <option value="precio-asc">Precio: menor a mayor</option>
-                      <option value="precio-desc">Precio: mayor a menor</option>
-                      <option value="nombre">Nombre A–Z</option>
-                    </select>
+                    <div className="catalog-counts">
+                      <span className="catalog-count-badge">{filteredGroups.length} productos</span>
+                      <span className="catalog-count-badge available">{inStockCount} disponibles</span>
+                    </div>
                   </div>
 
-                  <div className="category-rail">
-                    {categories.map((item) => (
-                      <button
-                        key={item}
-                        className={category === item ? "category-pill active" : "category-pill"}
-                        onClick={() => setCategory(item)}
-                        type="button"
-                      >
-                        {item === "todas" ? "Todas" : item}
+                  {/* Barra de búsqueda */}
+                  <div className="search-wrapper">
+                    <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="20" height="20" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                      className="search-input"
+                      placeholder="Buscar por nombre, categoría o medida..."
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      aria-label="Buscar productos"
+                    />
+                    {query && (
+                      <button className="search-clear" onClick={() => setQuery("")} type="button" aria-label="Limpiar búsqueda">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                       </button>
-                    ))}
+                    )}
                   </div>
 
-                  <div className="catalog-summary">
-                    <span><strong>{filteredGroups.length}</strong> productos</span>
-                    <span><strong>{inStockCount}</strong> disponibles</span>
-                    {query && <span className="catalog-summary-filter">Buscando: "{query}"</span>}
+                  {/* Categorías + ordenamiento */}
+                  <div className="catalog-filter-row">
+                    <div className="category-rail">
+                      {categories.map((item) => (
+                        <button
+                          key={item}
+                          className={category === item ? "category-pill active" : "category-pill"}
+                          onClick={() => setCategory(item)}
+                          type="button"
+                        >
+                          {item === "todas" ? "Todas" : item}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="sort-wrapper">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/>
+                      </svg>
+                      <select
+                        className="sort-select"
+                        value={sortBy}
+                        onChange={(event) => setSortBy(event.target.value)}
+                        aria-label="Ordenar productos"
+                      >
+                        <option value="relevancia">Destacados primero</option>
+                        <option value="precio-asc">Menor precio</option>
+                        <option value="precio-desc">Mayor precio</option>
+                        <option value="nombre">A – Z</option>
+                      </select>
+                    </div>
                   </div>
+
+                  {query && (
+                    <div className="catalog-search-tag">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                      Resultados para <strong>"{query}"</strong>
+                      <button onClick={() => setQuery("")} type="button" aria-label="Quitar filtro">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </div>
+                  )}
                 </section>
 
                 {session.isAdmin ? (
