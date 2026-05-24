@@ -1,6 +1,7 @@
 import { query } from "@/lib/db";
 
-let metadataReadyPromise;
+// Persistir en globalThis para sobrevivir entre invocaciones warm (serverless)
+const g = globalThis;
 
 function toNullableNumber(value) {
   if (value === null || value === undefined || value === "") return null;
@@ -9,8 +10,11 @@ function toNullableNumber(value) {
 }
 
 async function ensureMetadataTable() {
-  if (!metadataReadyPromise) {
-    metadataReadyPromise = (async () => {
+  // Si ya corrió en este proceso, saltar directamente
+  if (g._manareyMetaDone) return;
+
+  if (!g._manareyMetaPromise) {
+    g._manareyMetaPromise = (async () => {
       await query(`
         create table if not exists public.productos_web_metadata (
           product_key text primary key,
@@ -23,7 +27,7 @@ async function ensureMetadataTable() {
           updated_at timestamp without time zone default now()
         )
       `);
-      // Add new columns if missing
+      // Correr todas las migraciones EN PARALELO en vez de secuencial
       const newCols = [
         "alter table public.productos_web_metadata add column if not exists largo_cm numeric",
         "alter table public.productos_web_metadata add column if not exists litros numeric",
@@ -37,15 +41,24 @@ async function ensureMetadataTable() {
         "alter table public.productos_web_metadata add column if not exists featured_order integer",
         "alter table public.productos_web_metadata add column if not exists images_data text",
       ];
-      for (const sql of newCols) {
-        await query(sql).catch(() => {});
-      }
+      await Promise.all(newCols.map((sql) => query(sql).catch(() => {})));
+      // Índices para acelerar la query principal del catálogo
+      await query(`create index if not exists idx_productos_nombre on public.productos (lower(trim(nombre)))`).catch(() => {});
+      await query(`create index if not exists idx_productos_categoria on public.productos (categoria)`).catch(() => {});
+      g._manareyMetaDone = true;
     })().catch((err) => {
-      metadataReadyPromise = undefined;
+      g._manareyMetaPromise = undefined;
       throw err;
     });
   }
-  await metadataReadyPromise;
+  await g._manareyMetaPromise;
+}
+
+// Cache en memoria: 90 segundos
+const CACHE_TTL_MS = 90_000;
+
+export function invalidateProductsCache() {
+  g._manareyProductsCache = null;
 }
 
 function mapProduct(row) {
@@ -103,6 +116,13 @@ function mapProduct(row) {
 }
 
 export async function getCatalogProducts() {
+  // Devolver del cache si está fresco
+  const now = Date.now();
+  const cached = g._manareyProductsCache;
+  if (cached && now - cached.ts < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   await ensureMetadataTable();
 
   const sql = `
@@ -152,7 +172,12 @@ export async function getCatalogProducts() {
   `;
 
   const result = await query(sql);
-  return result.rows.map(mapProduct);
+  const data = result.rows.map(mapProduct);
+
+  // Guardar en cache
+  g._manareyProductsCache = { data, ts: Date.now() };
+
+  return data;
 }
 
 export async function getCatalogProductByKey(productKey) {
@@ -218,6 +243,7 @@ export async function updateProductMetadata(productKey, payload) {
     [productKey, description || null, imageData, imagesDataJson, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride],
   );
 
+  invalidateProductsCache();
   return getCatalogProductByKey(productKey);
 }
 
@@ -267,6 +293,7 @@ export async function renameProduct(productKey, newName) {
     );
   }
 
+  invalidateProductsCache();
   return newProductKey || productKey;
 }
 
@@ -301,6 +328,7 @@ export async function setProductFeatured(productKey, isFeatured) {
      ON CONFLICT (product_key) DO UPDATE SET is_featured = true, featured_order = $2, updated_at = now()`,
     [productKey, nextOrder],
   );
+  invalidateProductsCache();
 }
 
 /**
@@ -309,10 +337,14 @@ export async function setProductFeatured(productKey, isFeatured) {
  */
 export async function reorderFeaturedProducts(orderedKeys) {
   await ensureMetadataTable();
-  for (let i = 0; i < orderedKeys.length; i++) {
-    await query(
-      `UPDATE public.productos_web_metadata SET featured_order = $1, updated_at = now() WHERE product_key = $2`,
-      [i + 1, orderedKeys[i]],
-    );
-  }
+  // Correr en paralelo en vez de secuencial
+  await Promise.all(
+    orderedKeys.map((key, i) =>
+      query(
+        `UPDATE public.productos_web_metadata SET featured_order = $1, updated_at = now() WHERE product_key = $2`,
+        [i + 1, key],
+      ),
+    ),
+  );
+  invalidateProductsCache();
 }
