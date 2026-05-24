@@ -45,6 +45,39 @@ async function ensureMetadataTable() {
       // Índices para acelerar la query principal del catálogo
       await query(`create index if not exists idx_productos_nombre on public.productos (lower(trim(nombre)))`).catch(() => {});
       await query(`create index if not exists idx_productos_categoria on public.productos (categoria)`).catch(() => {});
+
+      // ── Migración: renombrar claves antiguas (con precio_venta) a nuevas (sin precio_venta)
+      // La fórmula vieja incluía precio_venta → cambiar precio en el escritorio borraba la metadata.
+      // La fórmula nueva es: md5(nombre | medida | color)  (sin precio_venta, igual que ya se quitó categoria)
+      // Este UPDATE corre una sola vez: toma cada registro de metadata cuyo key coincide con la
+      // fórmula VIEJA y lo mueve al key NUEVO, siempre que el nuevo key no exista ya.
+      await query(`
+        UPDATE public.productos_web_metadata meta
+        SET product_key = new_keys.new_key, updated_at = now()
+        FROM (
+          SELECT DISTINCT
+            md5(concat_ws('|',
+              lower(trim(nombre)),
+              lower(coalesce(trim(medida), '')),
+              coalesce(precio_venta::text, ''),
+              lower(coalesce(trim(color), ''))
+            )) AS old_key,
+            md5(concat_ws('|',
+              lower(trim(nombre)),
+              lower(coalesce(trim(medida), '')),
+              lower(coalesce(trim(color), ''))
+            )) AS new_key
+          FROM public.productos
+          WHERE precio_venta IS NOT NULL
+        ) new_keys
+        WHERE meta.product_key = new_keys.old_key
+          AND new_keys.old_key <> new_keys.new_key
+          AND NOT EXISTS (
+            SELECT 1 FROM public.productos_web_metadata m2
+            WHERE m2.product_key = new_keys.new_key
+          )
+      `).catch(() => {});
+
       g._manareyMetaDone = true;
     })().catch((err) => {
       g._manareyMetaPromise = undefined;
@@ -130,7 +163,7 @@ export async function getCatalogProducts() {
       select
         -- SIN categoria en el key: cambiar categoría en el sistema desktop
         -- ya no rompe el vínculo con la metadata (imágenes, precios, descripciones)
-        md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as product_key,
+        md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) as product_key,
         min(initcap(trim(nombre))) as nombre,
         nullif(min(trim(categoria)), '') as categoria,
         nullif(min(trim(medida)), '') as medida,
@@ -254,33 +287,32 @@ export async function renameProduct(productKey, newName) {
 
   // Buscar el producto por el key sin categoría
   const existing = await query(
-    `SELECT min(medida) as medida, precio_venta, min(color) as color
+    `SELECT min(medida) as medida, min(color) as color
      FROM public.productos
-     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $1
-     GROUP BY precio_venta LIMIT 1`,
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) = $1
+     LIMIT 1`,
     [productKey],
   );
   if (!existing.rows.length) throw new Error("Producto no encontrado.");
 
-  const { medida, precio_venta, color } = existing.rows[0];
+  const { medida, color } = existing.rows[0];
 
   // Actualizar el nombre en todos los registros que coincidan
   await query(
     `UPDATE public.productos SET nombre = $1
-     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $2`,
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) = $2`,
     [newName, productKey],
   );
 
-  // Calcular el nuevo product_key (sin categoría) desde las filas ya actualizadas
+  // Calcular el nuevo product_key desde las filas ya actualizadas
   const newKeyResult = await query(
-    `SELECT md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as new_key
+    `SELECT md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) as new_key
      FROM public.productos
      WHERE lower(trim(nombre)) = lower(trim($1))
        AND lower(coalesce(trim(medida), '')) = lower(trim(coalesce($2, '')))
-       AND coalesce(precio_venta::text, '') = coalesce($3::text, '')
-       AND lower(coalesce(trim(color), '')) = lower(trim(coalesce($4, '')))
+       AND lower(coalesce(trim(color), '')) = lower(trim(coalesce($3, '')))
      LIMIT 1`,
-    [newName, medida, precio_venta, color],
+    [newName, medida, color],
   );
 
   const newProductKey = newKeyResult.rows[0]?.new_key;
