@@ -2981,26 +2981,25 @@ img {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 18px;
-  border: 2px solid rgba(88, 61, 28, 0.12);
-  border-radius: 18px;
-  background: rgba(255, 252, 244, 0.84);
+  padding: 16px 20px;
+  border: 1.5px solid rgba(88, 61, 28, 0.14);
+  border-radius: 14px;
+  background: #fff;
   cursor: pointer;
   text-align: left;
   font: inherit;
-  transition: all 0.2s ease;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
 }
 
 .cf-mode-btn:hover {
-  border-color: rgba(210, 162, 62, 0.3);
+  border-color: rgba(210, 162, 62, 0.45);
   background: rgba(255, 252, 244, 0.98);
-  transform: translateY(-2px);
 }
 
 .cf-mode-btn.active {
-  border-color: #d2a23e;
-  background: rgba(210, 162, 62, 0.08);
-  box-shadow: 0 0 0 3px rgba(210, 162, 62, 0.14);
+  border-color: #c9a040;
+  background: rgba(201, 160, 64, 0.07);
+  box-shadow: 0 0 0 3px rgba(201, 160, 64, 0.13);
 }
 
 .cf-mode-btn div {
@@ -3010,18 +3009,31 @@ img {
 
 .cf-mode-btn strong {
   display: block;
-  font-size: 0.97rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: #2b1d13;
 }
 
-.cf-mode-btn span {
-  font-size: 0.84rem;
+.cf-mode-btn > div > span {
+  font-size: 0.82rem;
   color: var(--muted);
 }
 
 .cf-mode-icon {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(201, 160, 64, 0.1);
+  color: #c9a040;
   flex-shrink: 0;
+}
+
+.cf-mode-btn.active .cf-mode-icon {
+  background: rgba(201, 160, 64, 0.18);
+  color: #a07820;
 }
 
 /* Branch list */
@@ -3032,33 +3044,64 @@ img {
 
 .cf-branch-btn {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   padding: 14px 18px;
-  border: 2px solid rgba(88, 61, 28, 0.1);
+  border: 1.5px solid rgba(88, 61, 28, 0.12);
   border-radius: 14px;
-  background: rgba(255, 252, 244, 0.8);
+  background: #fff;
   cursor: pointer;
   font: inherit;
   text-align: left;
-  transition: all 0.18s;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
 }
 
 .cf-branch-btn:hover {
-  border-color: rgba(210, 162, 62, 0.3);
+  border-color: rgba(210, 162, 62, 0.4);
   background: rgba(255, 252, 244, 1);
 }
 
 .cf-branch-btn.active {
-  border-color: #d2a23e;
-  background: rgba(210, 162, 62, 0.1);
+  border-color: #c9a040;
+  background: rgba(201, 160, 64, 0.07);
+  box-shadow: 0 0 0 3px rgba(201, 160, 64, 0.12);
+}
+
+.cf-branch-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 
 .cf-branch-name {
-  font-weight: 600;
+  font-weight: 700;
   color: #2b1d13;
   font-size: 0.95rem;
+}
+
+.cf-branch-address {
+  font-size: 0.83rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.cf-branch-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c9a040;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.cf-branch-map-link:hover {
+  color: #a07820;
+  text-decoration: underline;
 }
 
 .cf-branch-stock {
@@ -3068,6 +3111,8 @@ img {
   background: rgba(69, 103, 79, 0.12);
   color: #45674f;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 /* Payment methods */

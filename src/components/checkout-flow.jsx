@@ -840,7 +840,12 @@ export function CheckoutFlow({ initialCustomer }) {
                   onClick={() => setShippingMode("pickup")}
                   type="button"
                 >
-                  <span className="cf-mode-icon">🏪</span>
+                  <span className="cf-mode-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                      <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                  </span>
                   <div>
                     <strong>Retiro en local</strong>
                     <span>Sin costo de envío</span>
@@ -851,7 +856,14 @@ export function CheckoutFlow({ initialCustomer }) {
                   onClick={() => setShippingMode("delivery")}
                   type="button"
                 >
-                  <span className="cf-mode-icon">🚚</span>
+                  <span className="cf-mode-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="1" y="3" width="15" height="13" rx="1"/>
+                      <path d="M16 8h4l3 5v3h-7V8z"/>
+                      <circle cx="5.5" cy="18.5" r="2.5"/>
+                      <circle cx="18.5" cy="18.5" r="2.5"/>
+                    </svg>
+                  </span>
                   <div>
                     <strong>Envío a domicilio</strong>
                     <span>Cotizado por distancia</span>
@@ -869,21 +881,43 @@ export function CheckoutFlow({ initialCustomer }) {
                     <p className="cf-muted">No encontramos stock disponible. Consultanos por WhatsApp.</p>
                   ) : (
                     <div className="cf-branch-list">
-                      {branches.map((b) => (
-                        <button
-                          key={b.local}
-                          className={`cf-branch-btn${selectedBranch === b.local ? " active" : ""}`}
-                          onClick={() => setSelectedBranch(b.local)}
-                          type="button"
-                        >
-                          <span className="cf-branch-name">{getBranchLabel(b.local)}</span>
-                          {b.stock > 0 && (
-                            <span className="cf-branch-stock">
-                              {b.stock > 2 ? `${b.stock} en stock` : b.stock === 1 ? "Último" : `${b.stock} disponibles`}
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                      {branches.map((b) => {
+                        const branchInfo = storeBranches.find(
+                          (s) => s.dbName.toLowerCase() === (b.local || "").toLowerCase(),
+                        );
+                        return (
+                          <button
+                            key={b.local}
+                            className={`cf-branch-btn${selectedBranch === b.local ? " active" : ""}`}
+                            onClick={() => setSelectedBranch(b.local)}
+                            type="button"
+                          >
+                            <div className="cf-branch-info">
+                              <span className="cf-branch-name">{branchInfo?.shortName || getBranchLabel(b.local)}</span>
+                              {branchInfo?.address && (
+                                <span className="cf-branch-address">{branchInfo.address}</span>
+                              )}
+                              {branchInfo?.mapsUrl && (
+                                <a
+                                  className="cf-branch-map-link"
+                                  href={branchInfo.mapsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                  Ver dónde queda
+                                </a>
+                              )}
+                            </div>
+                            {b.stock > 0 && (
+                              <span className="cf-branch-stock">
+                                {b.stock > 2 ? `${b.stock} en stock` : b.stock === 1 ? "Último" : `${b.stock} disponibles`}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
