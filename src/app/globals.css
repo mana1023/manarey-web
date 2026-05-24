@@ -6694,13 +6694,25 @@ body {
 
 /* ── Showcase mini cards ─────────────────────────────────────── */
 .showcase-mini-card {
-  background: rgba(255, 251, 242, 0.92) !important;
-  border: 1.5px solid rgba(210, 162, 62, 0.1) !important;
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
+  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
 }
 
 .showcase-mini-card:hover {
-  background: #fff !important;
-  border-color: rgba(210, 162, 62, 0.3) !important;
+  background: linear-gradient(160deg, #2e1a09 0%, #3a2214 55%, #241508 100%) !important;
+  border-color: rgba(210, 162, 62, 0.45) !important;
+}
+
+/* Textos en showcase-mini-copy sobre fondo oscuro */
+.showcase-mini-copy .price-tag {
+  color: #f0c96a !important;
+}
+.showcase-mini-copy h4 {
+  color: rgba(255, 248, 228, 0.95) !important;
+}
+.showcase-mini-copy p,
+.showcase-mini-copy .product-category {
+  color: rgba(210, 162, 62, 0.72) !important;
 }
 
 /* ── Mobile: adaptar secciones oscuras ───────────────────────── */
