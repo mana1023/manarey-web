@@ -1254,7 +1254,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="welcome-branches">
                 <a
                   className="welcome-btn-locations"
-                  href="https://www.google.com/maps/dir/Miguel+Cane+508+Glew+Buenos+Aires/Av+Hipolito+Yrigoyen+19051+Longchamps+Buenos+Aires/Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires/Av+Hipolito+Yrigoyen+21890+Glew+Buenos+Aires/Almafuerte+45+Glew+Buenos+Aires"
+                  href="https://www.google.com/maps/d/viewer?mid=1AKB1a7mCOOJhi7bcmGlFV6KdLtBuWIs"
                   target="_blank"
                   rel="noreferrer"
                 >
