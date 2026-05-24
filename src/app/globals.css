@@ -1081,7 +1081,7 @@ img {
 .product-card {
   overflow: hidden;
   border-radius: 26px;
-  background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(248, 240, 225, 0.9));
+  background: linear-gradient(160deg, #fffaf0 0%, #f5e8cb 100%);
   display: flex;
   flex-direction: column;
 }
@@ -1877,11 +1877,11 @@ img {
 }
 
 .related-card {
-  border: 1px solid var(--line);
+  border: 1px solid rgba(210, 162, 62, 0.2);
   border-radius: 20px;
   padding: 0;
   overflow: hidden;
-  background: var(--surface-strong);
+  background: linear-gradient(160deg, #fffaf0 0%, #f5e8cb 100%);
   text-align: left;
 }
 
@@ -2686,10 +2686,12 @@ img {
 
 /* ─── MEJORAS DE TARJETAS DE PRODUCTO ────────────────────────────────────── */
 .product-card {
+  border-color: rgba(210, 162, 62, 0.22) !important;
   box-shadow: 0 8px 28px rgba(89, 58, 24, 0.08);
 }
 
 .product-card:hover {
+  border-color: rgba(210, 162, 62, 0.45) !important;
   box-shadow: 0 28px 56px rgba(89, 58, 24, 0.18) !important;
 }
 
