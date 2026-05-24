@@ -192,50 +192,53 @@ img {
   .info-banner {
     border-radius: 16px;
     margin-top: 10px;
+    overflow: hidden;
   }
   .info-banner-content {
-    flex-direction: row;
+    display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    width: 400%; /* 4 items × 100% */
+    animation: info-banner-carousel 16s ease-in-out infinite;
     gap: 0;
-    padding: 0 4px;
+    padding: 0;
   }
-  .info-banner-content::-webkit-scrollbar { display: none; }
   .info-banner-item {
-    flex: 0 0 auto;
+    flex: 0 0 25%; /* cada item = 100% del banner visible */
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 14px 16px;
-    min-width: 90px;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 16px;
     text-align: center;
+    min-width: 0;
   }
   .info-banner-icon-wrap {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
   }
   .info-banner-icon-wrap svg {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
   .info-banner-text strong {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     line-height: 1.3;
-    white-space: nowrap;
+    white-space: normal;
   }
   .info-banner-text span {
-    display: none;
+    display: block;
+    font-size: 0.72rem;
+    opacity: 0.7;
   }
   .info-banner-divider {
-    width: 1px;
-    height: auto;
-    margin: 12px 0;
-    align-self: stretch;
-    background: linear-gradient(180deg, transparent, rgba(210,162,62,0.2) 30%, rgba(210,162,62,0.2) 70%, transparent);
-    display: block !important;
-    flex-shrink: 0;
+    display: none !important;
+  }
+  @keyframes info-banner-carousel {
+    0%,  20% { transform: translateX(0); }
+    25%, 45% { transform: translateX(-25%); }
+    50%, 70% { transform: translateX(-50%); }
+    75%, 95% { transform: translateX(-75%); }
+    100%     { transform: translateX(0); }
   }
 }
 
