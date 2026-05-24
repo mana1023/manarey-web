@@ -5983,22 +5983,23 @@ img {
 
 /* Logo circular en sección de bienvenida */
 .welcome-logo-wrap {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  align-self: center;
 }
 
 .welcome-logo-img {
-  width: 150px;
-  height: 150px;
+  width: 210px;
+  height: 210px;
   object-fit: contain;
   border-radius: 50%;
   display: block;
-  filter: drop-shadow(0 6px 24px rgba(210, 162, 62, 0.35));
+  filter: drop-shadow(0 8px 32px rgba(210, 162, 62, 0.45));
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .welcome-logo-img:hover {
   transform: scale(1.04);
-  filter: drop-shadow(0 8px 32px rgba(210, 162, 62, 0.5));
+  filter: drop-shadow(0 10px 40px rgba(210, 162, 62, 0.6));
 }
 
 /* Textos de bienvenida */
@@ -6192,8 +6193,8 @@ img {
     max-width: 100%;
   }
   .welcome-logo-img {
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
   }
   .welcome-btn {
     min-height: 54px;
