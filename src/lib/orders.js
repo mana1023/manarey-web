@@ -353,7 +353,7 @@ export async function syncOrderToVentas(order) {
     `,
     [
       orderCode,
-      "WEB",
+      "Pagina Web",
       "Tienda Online",
       order.customer_name || customer.fullName || "",
       order.customer_phone || customer.phone || "",

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createOrder, markOrderPayment, countPreviousPaidOrders } from "@/lib/orders";
+import { createOrder, markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
 import { sendPurchaseMessage } from "@/lib/whatsapp-sender";
 
@@ -80,6 +80,9 @@ export async function POST(request) {
         status: "paid",
         rawPayload: JSON.stringify(mpData),
       }).catch(() => {});
+
+      // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos)
+      syncOrderToVentas(order).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
 
       const phone = customer.telefono || customer.phone;
       if (phone) {

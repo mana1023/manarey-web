@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createOrder, countPreviousPaidOrders } from "@/lib/orders";
+import { createOrder, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { sendTransferPendingMessage } from "@/lib/whatsapp-sender";
 import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
@@ -21,6 +21,9 @@ export async function POST(request) {
     } catch (mpErr) {
       console.error("[transfer] MP preference error:", mpErr?.message || mpErr);
     }
+
+    // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos)
+    syncOrderToVentas(order).catch((e) => console.error("[transfer] syncOrderToVentas error:", e?.message || e));
 
     const phone = order.customer.phone;
     if (phone) {
