@@ -165,7 +165,7 @@ export async function getCatalogProducts() {
         -- ya no rompe el vínculo con la metadata (imágenes, precios, descripciones)
         md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) as product_key,
         min(initcap(trim(nombre))) as nombre,
-        nullif(min(trim(categoria)), '') as categoria,
+        nullif(min(initcap(trim(categoria))), '') as categoria,
         nullif(min(trim(medida)), '') as medida,
         nullif(min(trim(color)), '') as color,
         max(precio_venta) as precio_venta,
