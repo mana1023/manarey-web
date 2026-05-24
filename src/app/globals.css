@@ -5938,24 +5938,24 @@ img {
   max-width: 560px;
 }
 
-/* Logo grande centrado */
+/* Logo circular en sección de bienvenida */
 .welcome-logo-wrap {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
-.welcome-logo-wrap .brand-logo {
-  gap: 16px;
+.welcome-logo-img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  filter: drop-shadow(0 6px 24px rgba(210, 162, 62, 0.35));
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.welcome-logo-wrap .brand-mark {
-  width: 90px;
-  color: #e8a93a;
-}
-
-.welcome-logo-wrap .brand-wording span {
-  font-size: clamp(2.6rem, 7vw, 4.5rem);
-  color: #f0c96a;
-  letter-spacing: 0.18em;
+.welcome-logo-img:hover {
+  transform: scale(1.04);
+  filter: drop-shadow(0 8px 32px rgba(210, 162, 62, 0.5));
 }
 
 /* Textos de bienvenida */
@@ -6148,8 +6148,9 @@ img {
     padding: 36px 24px 32px;
     max-width: 100%;
   }
-  .welcome-logo-wrap .brand-mark {
-    width: 72px;
+  .welcome-logo-img {
+    width: 120px;
+    height: 120px;
   }
   .welcome-btn {
     min-height: 54px;

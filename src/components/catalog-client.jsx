@@ -1178,9 +1178,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 />
               ))}
               <div className="welcome-content">
-              {/* Logo grande */}
+              {/* Logo circular */}
               <div className="welcome-logo-wrap">
-                <BrandLogo />
+                <img
+                  src="/logo-circular.png"
+                  alt="Manarey Mueblería"
+                  className="welcome-logo-img"
+                  draggable={false}
+                />
               </div>
 
               {/* Tagline */}
