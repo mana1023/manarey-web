@@ -342,12 +342,11 @@ export async function syncOrderToVentas(order) {
         notas,
         estado,
         pdf_generado,
-        descuento_tipo,
         descuento_valor,
         descuento_aplicado
       )
       values (
-        $1,$2,now(),now(),$3,$4,$5,$6,$7,$8,$9,$10,$11,'',$12,$13,'completo','completo',$14,$15,0,$16,'completada',0,'ninguno',0,0
+        $1,$2,now(),now(),$3,$4,$5,$6,$7,$8,$9,$10,$11,'',$12,$13,'completo','completo',$14,$15,0,$16,'completada',0,0,0
       )
       returning id
     `,
