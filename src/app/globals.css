@@ -5596,3 +5596,177 @@ img {
   from { opacity: 0; transform: scale(1.03); }
   to   { opacity: 1; transform: scale(1); }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   OVERHAUL VISUAL — diseño premium, wow factor, menos blanco
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Fondo general: más rico, más cálido, menos blanco ──────── */
+body {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 218, 110, 0.28), transparent),
+    radial-gradient(ellipse 50% 60% at 90% 40%, rgba(195, 130, 45, 0.13), transparent),
+    linear-gradient(170deg, #dfc799 0%, #ebd9b0 22%, #f3e6cc 55%, #f8f0df 100%);
+}
+
+/* ── Hero: oscuro, lujoso, inmersivo ────────────────────────── */
+.hero-home {
+  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
+  border-color: rgba(210, 162, 62, 0.22) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(210,162,62,0.12) !important;
+}
+
+/* Título con degradado dorado — efecto premium */
+.hero-home h1 {
+  background: linear-gradient(135deg, #f8ead4 25%, #e8aa3e 75%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-home-copy .eyebrow {
+  color: #d4943a;
+  letter-spacing: 0.22em;
+}
+
+.hero-subtitle {
+  color: rgba(248, 228, 195, 0.68) !important;
+}
+
+/* Métricas sobre fondo oscuro */
+.hero-home .metric-card {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(210, 162, 62, 0.18);
+}
+
+.hero-home .metric-card strong {
+  color: #e8a93a;
+}
+
+.hero-home .metric-card span {
+  color: rgba(245, 222, 185, 0.55);
+}
+
+/* Botón fantasma visible sobre fondo oscuro */
+.hero-home-actions .ghost-button {
+  border-color: rgba(245, 222, 185, 0.26);
+  color: rgba(245, 222, 185, 0.82);
+  background: rgba(255, 255, 255, 0.04);
+}
+.hero-home-actions .ghost-button:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 222, 185, 0.5);
+  color: #f8ead4;
+}
+
+/* ── Service ribbon: oscuro, consistente con el hero ─────────── */
+.service-ribbon {
+  background: linear-gradient(135deg, #1e1108 0%, #2e1a0a 100%) !important;
+  border-color: rgba(210, 162, 62, 0.2) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14) !important;
+}
+
+.service-pill {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(210, 162, 62, 0.12) !important;
+}
+
+.service-pill strong {
+  color: #e8aa3e;
+}
+
+.service-pill span {
+  color: rgba(245, 220, 178, 0.58);
+}
+
+/* ── Showcase (productos destacados): más cálido ─────────────── */
+.showcase-section {
+  background: linear-gradient(160deg, rgba(255, 252, 245, 0.97) 0%, rgba(252, 242, 222, 0.94) 100%) !important;
+}
+
+/* ── Sección "¿Qué estás buscando?": oscura para contraste ─── */
+.home-invite {
+  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
+  border-color: rgba(210, 162, 62, 0.2) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+}
+
+.home-invite .eyebrow {
+  color: #d4943a;
+}
+
+.home-invite h2 {
+  color: #f8ead4;
+  background: linear-gradient(135deg, #f8ead4 20%, #e8aa3e 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tarjetas de categoría sobre fondo oscuro */
+.category-highlight-card {
+  background: rgba(255, 250, 238, 0.92) !important;
+  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
+  padding: 22px !important;
+  border-radius: 20px !important;
+}
+
+.category-highlight-card:hover {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(210, 162, 62, 0.5) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* ── Sucursales: tarjetas más cálidas ────────────────────────── */
+.home-branch-card {
+  background: linear-gradient(145deg, rgba(255,252,244,0.98) 0%, rgba(255,245,225,0.92) 100%) !important;
+  border-color: rgba(210, 162, 62, 0.18) !important;
+  padding: 18px 20px !important;
+}
+
+.home-branch-card:hover {
+  border-color: rgba(210, 162, 62, 0.4) !important;
+  box-shadow: 0 8px 28px rgba(60, 30, 5, 0.12) !important;
+}
+
+/* ── Header: sutil toque oscuro cuando scrollea ──────────────── */
+.site-header {
+  background: linear-gradient(135deg, rgba(250,244,232,0.95) 0%, rgba(248,238,218,0.92) 100%) !important;
+  border-color: rgba(210, 162, 62, 0.18) !important;
+}
+
+/* ── Cards de producto: más profundidad ──────────────────────── */
+.product-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+}
+
+.product-card:hover {
+  box-shadow: 0 16px 48px rgba(60, 30, 5, 0.16), 0 4px 12px rgba(60, 30, 5, 0.08) !important;
+  border-color: rgba(210, 162, 62, 0.28) !important;
+  transform: translateY(-4px) !important;
+}
+
+/* ── Showcase mini cards ─────────────────────────────────────── */
+.showcase-mini-card {
+  background: rgba(255, 251, 242, 0.92) !important;
+  border: 1.5px solid rgba(210, 162, 62, 0.1) !important;
+}
+
+.showcase-mini-card:hover {
+  background: #fff !important;
+  border-color: rgba(210, 162, 62, 0.3) !important;
+}
+
+/* ── Mobile: adaptar secciones oscuras ───────────────────────── */
+@media (max-width: 760px) {
+  /* El fade del hero apunta al color oscuro del hero */
+  .hero-home-brand .brand-panel.editorial::after {
+    background: linear-gradient(to bottom, transparent, rgba(24, 14, 6, 0.65)) !important;
+  }
+
+  /* Sección de categorías oscura: tarjetas con buen contraste */
+  .home-invite {
+    padding: 24px 20px !important;
+  }
+}
