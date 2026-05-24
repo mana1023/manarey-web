@@ -62,8 +62,11 @@ img {
 
 .page-shell {
   width: min(1240px, calc(100vw - 20px));
+  max-width: 100%;
   margin: 0 auto;
   padding: 16px 0 40px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .site-header,
@@ -877,6 +880,10 @@ img {
   background: transparent;
   border: none;
   box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Cabecera: título + contadores */
@@ -940,6 +947,9 @@ img {
 
 .search-input {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 16px 52px 16px 50px;
   border: 1.5px solid rgba(210, 162, 62, 0.3);
   border-radius: 999px;
@@ -1015,6 +1025,8 @@ img {
   border-radius: 999px;
   border: 1.5px solid rgba(210, 162, 62, 0.32);
   background: linear-gradient(135deg, #241508 0%, #2e1a09 100%);
+  max-width: 100%;
+  box-sizing: border-box;
   color: rgba(245, 222, 185, 0.8);
   box-shadow: 0 4px 14px rgba(0,0,0,0.18);
 }
