@@ -78,6 +78,7 @@ function normalizeCustomer(payload = {}) {
     city: String(payload.city || "").trim(),
     distanceKm: String(payload.distanceKm || "").trim(),
     notes: String(payload.notes || "").trim(),
+    betweenStreets: String(payload.betweenStreets || "").trim(),
   };
 }
 
@@ -365,7 +366,7 @@ export async function syncOrderToVentas(order) {
         descuento_aplicado
       )
       values (
-        $1,$2,now(),now(),$3,$4,$5,$6,$7,$8,$9,$10,$11,$17,$12,$13,'completo','completo',$14,$15,0,$16,'completada',0,0,0
+        $1,$2,(now() AT TIME ZONE 'America/Argentina/Buenos_Aires'),(now() AT TIME ZONE 'America/Argentina/Buenos_Aires'),$3,$4,$5,$6,$7,$8,$9,$10,$11,$17,$12,$13,'completo','completo',$14,$15,0,$16,'completada',0,0,0
       )
       returning id
     `,
