@@ -3051,8 +3051,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       )}
 
       {/* ── Botón flotante WhatsApp ─────────────────────────────────────────── */}
-      {whatsappNumber && (        <a
+      {whatsappNumber && (
+        <a
           className="wsp-fab"
+          style={cart.length > 0 && !cartOpen ? { bottom: "90px" } : undefined}
           href={buildContactLink("Hola, quiero consultar sobre un producto de Manarey.", "Consulta Manarey")}
           target="_blank"
           rel="noreferrer noopener"
