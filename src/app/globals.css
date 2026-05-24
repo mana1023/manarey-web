@@ -1911,13 +1911,33 @@ img {
     font-size: 0.93rem;
   }
 
-  /* Hero home: imagen debajo del texto en mobile */
+  /* Hero home: imagen ARRIBA, texto abajo — efecto portada */
   .hero-home {
     grid-template-columns: 1fr;
+    padding: 0 0 26px;
+    overflow: hidden;
+    gap: 0;
   }
 
   .hero-home-brand {
-    min-height: 260px;
+    order: -1;
+    min-height: 320px;
+  }
+
+  .hero-home-copy {
+    padding: 22px 26px 0;
+  }
+
+  /* Botones de hero: apilados y full-width en mobile */
+  .hero-home-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-home-actions .hero-buy-button,
+  .hero-home-actions .ghost-button {
+    width: 100%;
+    justify-content: center;
   }
 
   /* Categorías: 2x2 en mobile */
@@ -4940,22 +4960,12 @@ img {
     margin-bottom: 0;
   }
 
-  /* Hero de inicio: columna única, imagen abajo */
-  .hero-home {
-    padding: 18px 16px 20px !important;
-    gap: 16px;
+  /* Hero en pantallas muy pequeñas: imagen más compacta */
+  .hero-home-brand {
+    min-height: 260px;
   }
-  .hero-home h1 {
-    font-size: clamp(1.7rem, 8vw, 2.4rem) !important;
-  }
-  .hero-home-copy p.hero-subtitle {
-    font-size: 0.88rem;
-    line-height: 1.5;
-  }
-  /* Panel de producto destacado: más bajo en mobile */
-  .hero-home-brand .brand-panel {
-    min-height: 200px;
-    max-height: 240px;
+  .hero-home-copy {
+    padding: 18px 20px 0;
   }
 
   /* Showcase de productos: más compacto */
@@ -5462,9 +5472,6 @@ img {
     font-size: clamp(2.2rem, 10vw, 3.5rem) !important;
   }
 
-  .hero-home-copy {
-    padding: 10px 0 0;
-  }
 }
 
 /* Payment methods marquee strip */
@@ -5531,4 +5538,61 @@ img {
   flex-shrink: 0;
   border-radius: 6px;
   display: block;
+}
+
+/* ── Hero mobile: imagen full-bleed arriba + bienvenida ────────────────── */
+@media (max-width: 760px) {
+  /* Imagen va de borde a borde en el hero card */
+  .hero-home-brand .brand-panel.editorial {
+    border-radius: 0;
+    min-height: 320px;
+  }
+
+  /* Fade inferior sobre la imagen para conectar visualmente con el texto */
+  .hero-home-brand .brand-panel.editorial::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, rgba(240, 224, 192, 0.55));
+    pointer-events: none;
+  }
+
+  /* Entrada animada de la imagen */
+  .hero-home-brand {
+    animation: heroFadeIn 0.6s ease both;
+  }
+
+  /* Métricas: 3 columnas en mobile, más compactas */
+  .hero-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .metric-card {
+    padding: 12px 8px;
+    text-align: center;
+    border-radius: 16px;
+  }
+
+  .metric-card strong {
+    font-size: 1.3rem;
+  }
+
+  .metric-card span {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero-home-brand .brand-panel.editorial {
+    min-height: 260px;
+  }
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
 }
