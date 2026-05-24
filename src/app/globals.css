@@ -923,7 +923,7 @@ img {
 .search-icon {
   position: absolute;
   left: 18px;
-  color: #c49a38;
+  color: rgba(210, 162, 62, 0.65);
   pointer-events: none;
   flex-shrink: 0;
 }
@@ -931,18 +931,22 @@ img {
 .search-input {
   width: 100%;
   padding: 16px 52px 16px 50px;
-  border: 1.5px solid rgba(210, 162, 62, 0.22);
+  border: 1.5px solid rgba(210, 162, 62, 0.3);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
-  color: var(--text);
+  background: linear-gradient(135deg, #241508 0%, #2e1a09 100%);
+  color: rgba(255, 248, 228, 0.92);
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 10px rgba(89, 58, 24, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.search-input::placeholder {
+  color: rgba(245, 222, 185, 0.38);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: rgba(210, 162, 62, 0.55);
+  border-color: rgba(210, 162, 62, 0.6);
   box-shadow: 0 0 0 4px rgba(210, 162, 62, 0.1), 0 2px 10px rgba(89, 58, 24, 0.08);
 }
 
