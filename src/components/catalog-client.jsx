@@ -333,6 +333,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartButtonPop, setCartButtonPop] = useState(false);
   const [activeView, setActiveView] = useState("inicio");
+  const [welcomeBgIndex, setWelcomeBgIndex] = useState(0);
   const [homeCategory, setHomeCategory] = useState("");
   const [selectedProductKey, setSelectedProductKey] = useState("");
   const [detailPhotoIndex, setDetailPhotoIndex] = useState(0);
@@ -373,6 +374,20 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   }
 
   useRevealOnScroll(activeView);
+
+  // Slideshow de fondo en la sección bienvenida — agrega tus fotos a /public/welcome-bg/
+  const WELCOME_BGS = [
+    "https://images.pexels.com/photos/7587809/pexels-photo-7587809.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/19878516/pexels-photo-19878516.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/6487951/pexels-photo-6487951.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  ];
+  useEffect(() => {
+    if (activeView !== "inicio") return undefined;
+    const timer = setInterval(() => {
+      setWelcomeBgIndex((i) => (i + 1) % WELCOME_BGS.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [activeView]);
 
   const accessoryProduct = useMemo(
     () =>
@@ -1110,6 +1125,15 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           <>
             {/* ── Bienvenida ──────────────────────────────────────────────── */}
             <section className="welcome-section">
+              {/* Slides de fondo con crossfade */}
+              {WELCOME_BGS.map((src, i) => (
+                <div
+                  key={src}
+                  className={`welcome-bg-slide${i === welcomeBgIndex ? " active" : ""}`}
+                  style={{ backgroundImage: `url(${src})` }}
+                  aria-hidden="true"
+                />
+              ))}
               <div className="welcome-content">
               {/* Logo grande */}
               <div className="welcome-logo-wrap">

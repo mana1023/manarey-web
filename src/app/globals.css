@@ -5607,11 +5607,23 @@ img {
   border-radius: 32px;
   border: 1px solid rgba(210, 162, 62, 0.22);
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.34);
-  /* Foto de dormitorio con placard de madera natural — podés reemplazar con una foto propia */
-  background-image: url('https://images.pexels.com/photos/7587809/pexels-photo-7587809.jpeg?auto=compress&cs=tinysrgb&w=1600');
+  /* El fondo lo manejan los .welcome-bg-slide (slideshow JS) */
+  background: #180e06;
+  min-height: 420px;
+}
+
+/* Slides de fondo con crossfade */
+.welcome-bg-slide {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: right center;
-  min-height: 420px;
+  opacity: 0;
+  transition: opacity 1.4s ease-in-out;
+  z-index: 0;
+}
+.welcome-bg-slide.active {
+  opacity: 1;
 }
 
 /* Overlay: oscuro a la izquierda para que el texto sea legible, translúcido a la derecha */
@@ -5626,13 +5638,14 @@ img {
     rgba(20, 10, 3, 0.60) 65%,
     rgba(14, 7, 2, 0.18) 100%
   );
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Contenedor del contenido (encima del overlay) */
 .welcome-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -5800,6 +5813,7 @@ img {
       rgba(22, 11, 3, 0.93) 50%,
       rgba(18, 9, 2, 0.80) 100%
     );
+    z-index: 1;
   }
   .welcome-content {
     padding: 36px 24px 32px;
