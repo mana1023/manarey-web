@@ -1,4 +1,5 @@
 const nextConfig = {
+  serverExternalPackages: ["pdfkit"],
   images: {
     remotePatterns: [],
   },
