@@ -86,31 +86,105 @@ img {
   backdrop-filter: blur(18px);
 }
 
-.service-ribbon {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 16px;
-  padding: 16px 18px;
+/* ─── BANNER INFORMATIVO ──────────────────────────────────────────────────── */
+.info-banner {
+  position: relative;
+  overflow: hidden;
   border-radius: 26px;
+  background:
+    linear-gradient(90deg, rgba(20,11,3,0.82) 0%, rgba(20,11,3,0.55) 60%, rgba(20,11,3,0.70) 100%),
+    url('https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1600')
+    center/cover no-repeat;
+  margin-top: 16px;
 }
 
-.service-pill {
-  display: grid;
+.info-banner-content {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+  padding: 0 8px;
+}
+
+.info-banner-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 28px;
+  flex: 1;
+}
+
+.info-banner-icon-wrap {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(210, 162, 62, 0.15);
+  border: 1px solid rgba(210, 162, 62, 0.30);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d2a23e;
+}
+
+.info-banner-text {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 251, 243, 0.68);
-  border: 1px solid rgba(88, 61, 28, 0.08);
 }
 
-.service-pill strong {
+.info-banner-text strong {
+  color: #f5e0b0;
   font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-.service-pill span {
-  color: var(--muted);
-  line-height: 1.5;
+.info-banner-text span {
+  color: rgba(240, 220, 175, 0.65);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.info-banner-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 20px 0;
+  background: rgba(210, 162, 62, 0.18);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .info-banner-content {
+    flex-wrap: wrap;
+    padding: 4px 8px;
+  }
+  .info-banner-item {
+    flex: 1 1 calc(50% - 1px);
+    padding: 20px 20px;
+    min-width: 200px;
+  }
+  .info-banner-divider:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .info-banner-content {
+    flex-direction: column;
+    padding: 4px 0;
+  }
+  .info-banner-item {
+    flex: unset;
+    width: 100%;
+    padding: 16px 20px;
+  }
+  .info-banner-divider {
+    width: auto;
+    height: 1px;
+    margin: 0 20px;
+    align-self: auto;
+  }
 }
 
 .site-header {

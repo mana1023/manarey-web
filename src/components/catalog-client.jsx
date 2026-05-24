@@ -1095,22 +1095,64 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         </div>
       )}
 
-      <section className="service-ribbon">
-        <button
-          className="service-pill service-pill-branches"
-          type="button"
-          onClick={() => navigateTo("sobre-nosotros")}
-        >
-          <strong>🏠 {storeBranches.length} sucursales</strong>
-          <span>Retiro en local o envio a domicilio</span>
-        </button>
-        <div className="service-pill service-pill-desktop">
-          <strong>💳 Tarjeta, transferencia y QR</strong>
-          <span>Paga como prefieras</span>
-        </div>
-        <div className="service-pill service-pill-desktop">
-          <strong>💬 WhatsApp</strong>
-          <span>Atencion y cierre de venta personalizado</span>
+      {/* ── Banner informativo ─────────────────────────────────────────── */}
+      <section className="info-banner">
+        <div className="info-banner-content">
+
+          <div className="info-banner-item">
+            <div className="info-banner-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </div>
+            <div className="info-banner-text">
+              <strong>{storeBranches.length} sucursales</strong>
+              <span>Retirá en local o recibí en tu domicilio en el sur del GBA</span>
+            </div>
+          </div>
+
+          <div className="info-banner-divider" aria-hidden="true" />
+
+          <div className="info-banner-item">
+            <div className="info-banner-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <div className="info-banner-text">
+              <strong>Tarjeta, transferencia y QR</strong>
+              <span>Todas las formas de pago — sin vueltas</span>
+            </div>
+          </div>
+
+          <div className="info-banner-divider" aria-hidden="true" />
+
+          <div className="info-banner-item">
+            <div className="info-banner-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div className="info-banner-text">
+              <strong>Atención por WhatsApp</strong>
+              <span>Asesoramiento y cierre de venta personalizado</span>
+            </div>
+          </div>
+
+          <div className="info-banner-divider" aria-hidden="true" />
+
+          <div className="info-banner-item">
+            <div className="info-banner-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </div>
+            <div className="info-banner-text">
+              <strong>+8 años de trayectoria</strong>
+              <span>Empresa familiar con años de experiencia</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
