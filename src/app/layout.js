@@ -14,6 +14,11 @@ export const metadata = {
   description:
     "Muebleria Manarey — muebles, dormitorios, cocina y mas. Compra online con envio o retiro en nuestras sucursales en el sur del Gran Buenos Aires.",
   keywords: ["muebles", "muebleria", "hogar", "dormitorio", "cocina", "Buenos Aires", "Longchamps", "Glew", "Cane"],
+  icons: {
+    icon: "/og-image.png",
+    shortcut: "/og-image.png",
+    apple: "/og-image.png",
+  },
   openGraph: {
     title: "Manarey | Muebles y articulos del hogar",
     description:
@@ -22,11 +27,20 @@ export const metadata = {
     siteName: "Manarey",
     locale: "es_AR",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1080,
+        height: 1080,
+        alt: "Manarey Mueblería",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Manarey | Muebles y articulos del hogar",
     description: "Muebleria con sucursales en el sur del Gran Buenos Aires. Compra online.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
