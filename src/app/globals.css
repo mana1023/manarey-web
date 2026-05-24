@@ -5602,16 +5602,43 @@ img {
    ══════════════════════════════════════════════════════════════════ */
 
 .welcome-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  border: 1px solid rgba(210, 162, 62, 0.22);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.34);
+  /* Foto de ambiente — reemplazá esta URL con una foto tuya de Instagram o Facebook */
+  background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center right;
+  min-height: 420px;
+}
+
+/* Overlay: oscuro a la izquierda para que el texto sea legible, translúcido a la derecha */
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    rgba(18, 9, 2, 0.96) 0%,
+    rgba(28, 13, 4, 0.90) 38%,
+    rgba(20, 10, 3, 0.60) 65%,
+    rgba(14, 7, 2, 0.18) 100%
+  );
+  z-index: 0;
+}
+
+/* Contenedor del contenido (encima del overlay) */
+.welcome-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 48px 28px 40px;
-  border-radius: 32px;
-  background: linear-gradient(160deg, #180e06 0%, #2c1909 55%, #1c1007 100%);
-  border: 1px solid rgba(210, 162, 62, 0.22);
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
-  gap: 0;
+  align-items: flex-start;
+  text-align: left;
+  padding: 52px 52px 48px;
+  max-width: 560px;
 }
 
 /* Logo grande centrado */
@@ -5719,7 +5746,7 @@ img {
   margin-top: 36px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
 }
 
@@ -5734,7 +5761,7 @@ img {
 .welcome-branches-pills {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -5761,8 +5788,22 @@ img {
 /* Mobile: ajustes */
 @media (max-width: 760px) {
   .welcome-section {
-    padding: 36px 20px 32px;
     border-radius: 24px;
+    min-height: 0;
+    /* En móvil la foto cubre todo con un overlay más cerrado */
+    background-position: center center;
+  }
+  .welcome-section::before {
+    background: linear-gradient(
+      160deg,
+      rgba(16, 8, 2, 0.97) 0%,
+      rgba(22, 11, 3, 0.93) 50%,
+      rgba(18, 9, 2, 0.80) 100%
+    );
+  }
+  .welcome-content {
+    padding: 36px 24px 32px;
+    max-width: 100%;
   }
   .welcome-logo-wrap .brand-mark {
     width: 72px;

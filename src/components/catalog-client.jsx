@@ -1110,6 +1110,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           <>
             {/* ── Bienvenida ──────────────────────────────────────────────── */}
             <section className="welcome-section">
+              <div className="welcome-content">
               {/* Logo grande */}
               <div className="welcome-logo-wrap">
                 <BrandLogo />
@@ -1189,6 +1190,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   ))}
                 </div>
               </div>
+              </div>{/* end welcome-content */}
             </section>
           </>
         ) : null}
