@@ -31,6 +31,7 @@ export async function POST(request) {
           address: customer.address || selectedBranch || "",
           city: customer.city || "Retiro en sucursal",
           distanceKm: customer.distanceKm || "",
+          betweenStreets: customer.betweenStreets || "",
           notes: customer.notes || "",
         },
       },
