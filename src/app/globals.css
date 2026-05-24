@@ -5764,7 +5764,7 @@ img {
   max-width: 420px;
 }
 
-/* Botón "Ver ubicaciones de nuestras sucursales" */
+/* Botón "Ver ubicaciones de nuestras sucursales" — abre Google Maps */
 .welcome-btn-locations {
   display: flex;
   align-items: center;
@@ -5781,6 +5781,7 @@ img {
   transition: background 0.2s, border-color 0.2s, color 0.2s;
   width: 100%;
   text-align: left;
+  text-decoration: none;
 }
 .welcome-btn-locations:hover {
   background: rgba(210, 162, 62, 0.1);
