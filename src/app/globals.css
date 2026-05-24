@@ -5598,6 +5598,182 @@ img {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   PÁGINA DE BIENVENIDA — welcome section con botones sociales
+   ══════════════════════════════════════════════════════════════════ */
+
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 28px 40px;
+  border-radius: 32px;
+  background: linear-gradient(160deg, #180e06 0%, #2c1909 55%, #1c1007 100%);
+  border: 1px solid rgba(210, 162, 62, 0.22);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
+  gap: 0;
+}
+
+/* Logo grande centrado */
+.welcome-logo-wrap {
+  margin-bottom: 20px;
+}
+
+.welcome-logo-wrap .brand-logo {
+  gap: 16px;
+}
+
+.welcome-logo-wrap .brand-mark {
+  width: 90px;
+  color: #e8a93a;
+}
+
+.welcome-logo-wrap .brand-wording span {
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  color: #f0c96a;
+  letter-spacing: 0.18em;
+}
+
+/* Textos de bienvenida */
+.welcome-tagline {
+  font-size: 1rem;
+  color: rgba(248, 228, 195, 0.65);
+  margin: 0 0 4px;
+  letter-spacing: 0.04em;
+}
+
+.welcome-years {
+  font-size: 0.82rem;
+  color: rgba(210, 162, 62, 0.7);
+  margin: 0 0 36px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* Botones de acción */
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.welcome-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.welcome-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.08);
+}
+
+.welcome-btn:active {
+  transform: scale(0.97);
+}
+
+/* Comprar por la web — dorado Manarey */
+.welcome-btn-catalog {
+  background: linear-gradient(135deg, #d2a23e 0%, #a9731e 100%);
+  color: #fff9f0;
+  box-shadow: 0 8px 28px rgba(169, 115, 30, 0.4);
+}
+
+/* WhatsApp — verde */
+.welcome-btn-wsp {
+  background: #25D366;
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(37, 211, 102, 0.35);
+}
+
+/* Instagram — degradado */
+.welcome-btn-ig {
+  background: linear-gradient(135deg, #833AB4 0%, #E1306C 50%, #F77737 100%);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(225, 48, 108, 0.35);
+}
+
+/* Facebook — azul */
+.welcome-btn-fb {
+  background: #1877F2;
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(24, 119, 242, 0.35);
+}
+
+/* Sucursales como pills */
+.welcome-branches {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-branches-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(248, 220, 160, 0.5);
+  margin: 0;
+}
+
+.welcome-branches-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.welcome-branch-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(210, 162, 62, 0.18);
+  color: rgba(248, 228, 195, 0.7);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.welcome-branch-pill:hover {
+  background: rgba(210, 162, 62, 0.12);
+  border-color: rgba(210, 162, 62, 0.4);
+  color: #f0c96a;
+}
+
+/* Mobile: ajustes */
+@media (max-width: 760px) {
+  .welcome-section {
+    padding: 36px 20px 32px;
+    border-radius: 24px;
+  }
+  .welcome-logo-wrap .brand-mark {
+    width: 72px;
+  }
+  .welcome-btn {
+    min-height: 54px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
    OVERHAUL VISUAL — diseño premium, wow factor, menos blanco
    ══════════════════════════════════════════════════════════════════ */
 
