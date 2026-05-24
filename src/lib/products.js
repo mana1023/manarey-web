@@ -168,11 +168,11 @@ export async function getCatalogProducts() {
         nullif(min(trim(categoria)), '') as categoria,
         nullif(min(trim(medida)), '') as medida,
         nullif(min(trim(color)), '') as color,
-        precio_venta,
+        max(precio_venta) as precio_venta,
         sum(greatest(coalesce(cantidad, 0), 0))::integer as stock_total,
         (array_remove(array_agg(nullif(trim(descripcion), '') order by length(nullif(trim(descripcion), '')) desc), null))[1] as raw_description
       from public.productos
-      group by 1, precio_venta
+      group by 1
     )
     select
       grouped.product_key,
