@@ -90,100 +90,123 @@ img {
 .info-banner {
   position: relative;
   overflow: hidden;
-  border-radius: 26px;
+  border-radius: 32px;
+  /* misma foto de ropero de pino que la sección de bienvenida */
   background:
-    linear-gradient(90deg, rgba(20,11,3,0.82) 0%, rgba(20,11,3,0.55) 60%, rgba(20,11,3,0.70) 100%),
-    url('https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1600')
-    center/cover no-repeat;
+    linear-gradient(
+      105deg,
+      rgba(15, 8, 2, 0.88) 0%,
+      rgba(22, 12, 3, 0.72) 45%,
+      rgba(15, 8, 2, 0.60) 100%
+    ),
+    url('https://http2.mlstatic.com/D_Q_NP_2X_979164-MLA93829985707_092025-E.webp')
+    center 30%/cover no-repeat;
   margin-top: 16px;
+  border: 1px solid rgba(210, 162, 62, 0.18);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
 }
 
 .info-banner-content {
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: space-evenly;
   gap: 0;
-  padding: 0 8px;
 }
 
 .info-banner-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 28px 28px;
+  gap: 18px;
+  padding: 32px 28px;
   flex: 1;
+  transition: background 0.2s;
+}
+
+.info-banner-item:hover {
+  background: rgba(210, 162, 62, 0.06);
 }
 
 .info-banner-icon-wrap {
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: rgba(210, 162, 62, 0.15);
-  border: 1px solid rgba(210, 162, 62, 0.30);
+  background: rgba(210, 162, 62, 0.12);
+  border: 1.5px solid rgba(210, 162, 62, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #d2a23e;
+  box-shadow: 0 0 18px rgba(210, 162, 62, 0.12);
 }
 
 .info-banner-text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .info-banner-text strong {
-  color: #f5e0b0;
-  font-size: 1rem;
+  color: #f0c96a;
+  font-size: 1.02rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1.2;
 }
 
 .info-banner-text span {
-  color: rgba(240, 220, 175, 0.65);
-  font-size: 0.82rem;
-  line-height: 1.4;
+  color: rgba(240, 215, 165, 0.62);
+  font-size: 0.83rem;
+  line-height: 1.45;
 }
 
 .info-banner-divider {
   width: 1px;
   align-self: stretch;
-  margin: 20px 0;
-  background: rgba(210, 162, 62, 0.18);
+  margin: 24px 0;
+  background: linear-gradient(180deg, transparent, rgba(210,162,62,0.25) 30%, rgba(210,162,62,0.25) 70%, transparent);
   flex-shrink: 0;
 }
 
 @media (max-width: 900px) {
   .info-banner-content {
     flex-wrap: wrap;
-    padding: 4px 8px;
   }
   .info-banner-item {
-    flex: 1 1 calc(50% - 1px);
-    padding: 20px 20px;
-    min-width: 200px;
+    flex: 1 1 calc(50% - 2px);
+    padding: 24px 22px;
+    min-width: 180px;
   }
-  .info-banner-divider:nth-child(4) {
+  /* ocultar el 3er y 4to separador en 2 columnas */
+  .info-banner-divider:nth-child(4),
+  .info-banner-divider:nth-child(6) {
+    display: none;
+  }
+  /* el 1er separador pasa a ser horizontal entre las 2 filas */
+  .info-banner-divider:nth-child(2) {
     display: none;
   }
 }
 
 @media (max-width: 520px) {
+  .info-banner {
+    border-radius: 24px;
+  }
   .info-banner-content {
     flex-direction: column;
-    padding: 4px 0;
   }
   .info-banner-item {
     flex: unset;
     width: 100%;
-    padding: 16px 20px;
+    padding: 18px 22px;
   }
   .info-banner-divider {
     width: auto;
     height: 1px;
-    margin: 0 20px;
+    margin: 0 22px;
     align-self: auto;
+    background: linear-gradient(90deg, transparent, rgba(210,162,62,0.22) 30%, rgba(210,162,62,0.22) 70%, transparent);
+    display: block !important;
   }
 }
 
