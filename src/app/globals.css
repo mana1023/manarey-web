@@ -926,6 +926,8 @@ img {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .search-icon {
@@ -2140,7 +2142,7 @@ img {
 
 @media (max-width: 760px) {
   .page-shell {
-    width: calc(100vw - 12px);
+    width: calc(100vw - 24px);
     padding-top: 10px;
   }
 
@@ -2221,6 +2223,8 @@ img {
   .catalog-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    width: 100%;
+    min-width: 0;
   }
 }
 
