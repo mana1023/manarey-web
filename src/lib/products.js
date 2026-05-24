@@ -128,7 +128,9 @@ export async function getCatalogProducts() {
   const sql = `
     with grouped as (
       select
-        md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as product_key,
+        -- SIN categoria en el key: cambiar categoría en el sistema desktop
+        -- ya no rompe el vínculo con la metadata (imágenes, precios, descripciones)
+        md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as product_key,
         min(initcap(trim(nombre))) as nombre,
         nullif(min(trim(categoria)), '') as categoria,
         nullif(min(trim(medida)), '') as medida,
@@ -250,41 +252,40 @@ export async function updateProductMetadata(productKey, payload) {
 export async function renameProduct(productKey, newName) {
   await ensureMetadataTable();
 
-  // Obtener los atributos actuales del producto para recalcular la clave
+  // Buscar el producto por el key sin categoría
   const existing = await query(
-    `SELECT min(categoria) as categoria, min(medida) as medida, precio_venta, min(color) as color
+    `SELECT min(medida) as medida, precio_venta, min(color) as color
      FROM public.productos
-     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $1
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $1
      GROUP BY precio_venta LIMIT 1`,
     [productKey],
   );
   if (!existing.rows.length) throw new Error("Producto no encontrado.");
 
-  const { categoria, medida, precio_venta, color } = existing.rows[0];
+  const { medida, precio_venta, color } = existing.rows[0];
 
   // Actualizar el nombre en todos los registros que coincidan
   await query(
     `UPDATE public.productos SET nombre = $1
-     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $2`,
+     WHERE md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) = $2`,
     [newName, productKey],
   );
 
-  // Calcular el nuevo product_key desde las filas ya actualizadas
+  // Calcular el nuevo product_key (sin categoría) desde las filas ya actualizadas
   const newKeyResult = await query(
-    `SELECT md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(categoria), '')), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as new_key
+    `SELECT md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), coalesce(precio_venta::text, ''), lower(coalesce(trim(color), '')))) as new_key
      FROM public.productos
      WHERE lower(trim(nombre)) = lower(trim($1))
-       AND lower(coalesce(trim(categoria), '')) = lower(trim(coalesce($2, '')))
-       AND lower(coalesce(trim(medida), '')) = lower(trim(coalesce($3, '')))
-       AND coalesce(precio_venta::text, '') = coalesce($4::text, '')
-       AND lower(coalesce(trim(color), '')) = lower(trim(coalesce($5, '')))
+       AND lower(coalesce(trim(medida), '')) = lower(trim(coalesce($2, '')))
+       AND coalesce(precio_venta::text, '') = coalesce($3::text, '')
+       AND lower(coalesce(trim(color), '')) = lower(trim(coalesce($4, '')))
      LIMIT 1`,
-    [newName, categoria, medida, precio_venta, color],
+    [newName, medida, precio_venta, color],
   );
 
   const newProductKey = newKeyResult.rows[0]?.new_key;
 
-  // Migrar la metadata al nuevo product_key si cambió
+  // Migrar la metadata al nuevo product_key si cambió (solo pasa cuando se renombra)
   if (newProductKey && newProductKey !== productKey) {
     await query(
       `UPDATE public.productos_web_metadata SET product_key = $1, updated_at = now()
