@@ -257,7 +257,7 @@ export function CheckoutFlow({ initialCustomer }) {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
-  const [deliveryAddress, setDeliveryAddress] = useState({ street: "", number: "", city: "", notes: "" });
+  const [deliveryAddress, setDeliveryAddress] = useState({ street: "", number: "", city: "", betweenStreets: "", houseNotes: "" });
   const [distanceKm, setDistanceKm] = useState("");
   const [shippingQuoting, setShippingQuoting] = useState(false);
   const [shippingError, setShippingError] = useState("");
@@ -400,7 +400,7 @@ export function CheckoutFlow({ initialCustomer }) {
     }, 800);
 
     return () => window.clearTimeout(tid);
-  }, [deliveryAddress.street, deliveryAddress.number, deliveryAddress.city, shippingMode]);
+  }, [deliveryAddress.street, deliveryAddress.number, deliveryAddress.city, shippingMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Transfer payment polling ──────────────────────────────────────────────
 
@@ -523,7 +523,8 @@ export function CheckoutFlow({ initialCustomer }) {
       address: fullAddress,
       city: shippingMode === "delivery" ? deliveryAddress.city : "Retiro en sucursal",
       distanceKm: shippingMode === "delivery" ? distanceKm : "",
-      notes: deliveryAddress.notes || "",
+      betweenStreets: deliveryAddress.betweenStreets || "",
+      notes: deliveryAddress.houseNotes || "",
     };
   }
 
@@ -922,13 +923,26 @@ export function CheckoutFlow({ initialCustomer }) {
                     />
                   </div>
                   <div className="cf-input-group">
-                    <label>Notas de entrega (opcional)</label>
+                    <label>Entre calles (opcional)</label>
                     <input
                       className="cf-input"
-                      placeholder="Piso, timbre, referencias..."
-                      value={deliveryAddress.notes}
-                      onChange={(e) => setDeliveryAddress((a) => ({ ...a, notes: e.target.value }))}
+                      placeholder="Ej: Entre Mitre y San Martín"
+                      value={deliveryAddress.betweenStreets}
+                      onChange={(e) => setDeliveryAddress((a) => ({ ...a, betweenStreets: e.target.value }))}
                     />
+                  </div>
+                  <div className="cf-input-group">
+                    <label>Descripción del domicilio (opcional)</label>
+                    <input
+                      className="cf-input"
+                      placeholder="Ej: Casa azul, portón negro, timbre 2B..."
+                      value={deliveryAddress.houseNotes}
+                      onChange={(e) => setDeliveryAddress((a) => ({ ...a, houseNotes: e.target.value }))}
+                    />
+                  </div>
+                  <div className="cf-delivery-notice">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Te avisaremos por WhatsApp cuando tu pedido salga para entrega. Los envíos se realizan de lunes a sábados de 16 a 18 hs aprox.
                   </div>
                   {shippingQuoting && <p className="cf-muted">Calculando costo de envío...</p>}
                   {shippingError && <p className="cf-error">{shippingError}</p>}
