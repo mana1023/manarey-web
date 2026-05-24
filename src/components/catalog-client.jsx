@@ -1192,6 +1192,193 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               </div>
               </div>{/* end welcome-content */}
             </section>
+
+            {/* ── Hero ────────────────────────────────────────────────────── */}
+            <section className="hero-home">
+              <div className="hero-home-copy">
+                <p className="eyebrow">Empresa familiar desde 2017</p>
+                <h1>Tu hogar merece lo mejor.</h1>
+                <p className="hero-subtitle">Muebles y artículos del hogar con entrega a domicilio o retiro en nuestros {storeBranches.length} locales del sur del GBA.</p>
+                <div className="hero-home-actions">
+                  <button className="hero-buy-button" onClick={() => navigateTo("catalogo")} type="button">
+                    Ver catálogo
+                  </button>
+                  <button className="ghost-button" onClick={() => navigateTo("contacto")} type="button">
+                    Contactanos
+                  </button>
+                </div>
+                <div className="hero-metrics">
+                  <div className="metric-card">
+                    <strong>{inStockCount > 0 ? `+${inStockCount}` : visibleProducts.length}</strong>
+                    <span>productos disponibles</span>
+                  </div>
+                  <div className="metric-card">
+                    <strong>{storeBranches.length}</strong>
+                    <span>sucursales</span>
+                  </div>
+                  <div className="metric-card">
+                    <strong>+8 años</strong>
+                    <span>de trayectoria</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hero-home-brand">
+                <div className="brand-panel editorial">
+                  {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
+                    <img alt={featuredMainProduct.nombre} className="product-image" loading="lazy" src={featuredMainProduct.imageData} />
+                  ) : (
+                    <ProductPlaceholder title="Seleccion destacada" />
+                  )}
+                  <div className="brand-panel-overlay">
+                    <p className="eyebrow">Producto destacado</p>
+                    <h2>{featuredMainProduct?.nombre || "Colección Manarey"}</h2>
+                    {featuredMainProduct && (
+                      <>
+                        <p style={{ fontSize: "1.3rem", fontWeight: 800 }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
+                        <div className="showcase-overlay-actions" style={{ marginTop: 12 }}>
+                          <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
+                            Ver producto
+                          </button>
+                          <button className="ghost-button" onClick={() => addToCart(featuredMainProduct)} type="button">
+                            Al carrito
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ── Destacados ──────────────────────────────────────────────── */}
+            {!catalogError && (
+              <section className="showcase-section reveal-block" data-reveal>
+                <div className="showcase-heading">
+                  <div>
+                    <p className="eyebrow">Productos destacados</p>
+                    <h2>{homeCategory || "Selección Manarey"}</h2>
+                  </div>
+                  <div className="showcase-top">
+                    {homeCategory && (
+                      <button className="showcase-tab active" onClick={() => setHomeCategory("")} type="button">
+                        ✕ Limpiar filtro
+                      </button>
+                    )}
+                    {categories.filter((c) => c !== "todas").slice(0, 9).map((item) => (
+                      <button
+                        key={item}
+                        className={homeCategory === item ? "showcase-tab active" : "showcase-tab"}
+                        onClick={() => setHomeCategory(homeCategory === item ? "" : item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="showcase-grid">
+                  <article className="showcase-main-card">
+                    <div className="showcase-main-visual">
+                      {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
+                        <img alt={featuredMainProduct.nombre} className="product-image" src={featuredMainProduct.imageData} />
+                      ) : (
+                        <ProductPlaceholder title={homeCategory || "Destacado"} />
+                      )}
+                      <div className="showcase-overlay">
+                        <h3>{featuredMainProduct ? getDisplayName(featuredMainProduct.productKey, featuredMainProduct.nombre) : "Destacado"}</h3>
+                        {featuredMainProduct && (
+                          <p style={{ fontWeight: 700, fontSize: "1.2rem" }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
+                        )}
+                        <div className="showcase-overlay-actions">
+                          {featuredMainProduct && (
+                            <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
+                              Ver producto
+                            </button>
+                          )}
+                          <button className="ghost-button" onClick={() => { setCategory(homeCategory || "todas"); navigateTo("catalogo"); }} type="button">
+                            Ver todos
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+
+                  <div className="showcase-side-grid">
+                    {featuredSideProducts.map((product) => (
+                      <button className="showcase-mini-card" key={product.productKey} onClick={() => openProductDetail(product)} type="button">
+                        <div className="showcase-mini-visual">
+                          {product.imageData && !isVideoSrc(product.imageData) ? (
+                            <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
+                          ) : (
+                            <ProductPlaceholder compact title={product.nombre} />
+                          )}
+                        </div>
+                        <div className="showcase-mini-copy">
+                          <h4>{getDisplayName(product.productKey, product.nombre)}</h4>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                            <p style={{ fontWeight: 700, color: "var(--gold-strong)" }}>{currencyFormatter.format(product.precioVenta)}</p>
+                            {!product.isSoldOut && <span style={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600 }}>En stock</span>}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* ── Categorías ──────────────────────────────────────────────── */}
+            {heroCategories.length > 0 && (
+              <section className="home-invite reveal-block" data-reveal>
+                <div className="invite-copy">
+                  <p className="eyebrow">Categorías</p>
+                  <h2>¿Qué estás buscando?</h2>
+                </div>
+                <div className="category-highlight-grid">
+                  {heroCategories.map((item) => (
+                    <button
+                      key={item}
+                      className="category-highlight-card"
+                      onClick={() => { setHomeCategory(item); setCategory(item); navigateTo("catalogo"); }}
+                      type="button"
+                    >
+                      <span className="cat-card-name">{item}</span>
+                      <strong className="cat-card-cta">Ver productos →</strong>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* ── Sucursales ──────────────────────────────────────────────── */}
+            <section className="home-branches reveal-block" id="home-branches" data-reveal>
+              <div className="home-branches-header">
+                <div>
+                  <p className="eyebrow">Nuestras sucursales</p>
+                  <h2>Vení a conocer los showrooms.</h2>
+                  <p className="home-branches-sub">Zona sur del Gran Buenos Aires. También hacemos envíos.</p>
+                </div>
+                <button className="ghost-button" onClick={() => navigateTo("sobre-nosotros")} type="button">
+                  Ver todas →
+                </button>
+              </div>
+              <div className="home-branches-grid">
+                {storeBranches.map((branch) => (
+                  <div className="home-branch-card" key={branch.id}>
+                    <span className="home-branch-icon">📍</span>
+                    <div>
+                      <strong>{branch.name}</strong>
+                      <p>{branch.address}</p>
+                      <a className="branch-directions-btn" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
+                        🗺️ Cómo llegar
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           </>
         ) : null}
 
