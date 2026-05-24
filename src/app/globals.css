@@ -5607,10 +5607,10 @@ img {
   border-radius: 32px;
   border: 1px solid rgba(210, 162, 62, 0.22);
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.34);
-  /* Foto de ambiente de pino natural — podés reemplazar con una foto propia */
-  background-image: url('https://images.unsplash.com/photo-1568506758676-94f1a4e9b4fc?auto=format&fit=crop&w=1600&q=80');
+  /* Foto de dormitorio con placard de madera natural — podés reemplazar con una foto propia */
+  background-image: url('https://images.pexels.com/photos/7587809/pexels-photo-7587809.jpeg?auto=compress&cs=tinysrgb&w=1600');
   background-size: cover;
-  background-position: center right;
+  background-position: right center;
   min-height: 420px;
 }
 
