@@ -334,6 +334,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [cartButtonPop, setCartButtonPop] = useState(false);
   const [activeView, setActiveView] = useState("inicio");
   const [welcomeBgIndex, setWelcomeBgIndex] = useState(0);
+  const [branchesOpen, setBranchesOpen] = useState(false);
   const [homeCategory, setHomeCategory] = useState("");
   const [selectedProductKey, setSelectedProductKey] = useState("");
   const [detailPhotoIndex, setDetailPhotoIndex] = useState(0);
@@ -1198,22 +1199,43 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </a>
               </div>
 
-              {/* Sucursales como pills */}
+              {/* Sucursales — botón que despliega las direcciones */}
               <div className="welcome-branches">
-                <p className="welcome-branches-title">📍 Nuestros locales</p>
-                <div className="welcome-branches-pills">
-                  {storeBranches.map((branch) => (
-                    <a
-                      key={branch.id}
-                      className="welcome-branch-pill"
-                      href={branch.mapsUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {branch.shortName}
-                    </a>
-                  ))}
-                </div>
+                <button
+                  className="welcome-btn-locations"
+                  onClick={() => setBranchesOpen((o) => !o)}
+                  type="button"
+                  aria-expanded={branchesOpen}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Ver ubicaciones de nuestras sucursales
+                  <svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    aria-hidden="true"
+                    style={{ transition: "transform 0.25s", transform: branchesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </button>
+
+                {branchesOpen && (
+                  <div className="welcome-locations-list">
+                    {storeBranches.map((branch) => (
+                      <a
+                        key={branch.id}
+                        className="welcome-location-item"
+                        href={branch.mapsUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <span className="welcome-location-address">📍 {branch.address}</span>
+                        <span className="welcome-location-cta">Ver en mapa →</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
               </div>{/* end welcome-content */}
             </section>
