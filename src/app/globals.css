@@ -165,15 +165,22 @@ img {
   color: var(--muted);
 }
 
+.brand-logo-img {
+  display: block;
+  width: 200px;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+}
+
+.brand-logo-img.compact {
+  width: 160px;
+}
+
+/* SVG logo (sección de bienvenida oscura) */
 .brand-logo {
   display: grid;
   justify-items: center;
-  gap: 10px;
-}
-
-.brand-logo.compact {
-  display: inline-flex;
-  align-items: center;
   gap: 10px;
 }
 
@@ -188,19 +195,11 @@ img {
   height: auto;
 }
 
-.brand-logo.compact .brand-mark {
-  width: 30px;
-}
-
 .brand-wording span {
   font-size: clamp(2.2rem, 3.4vw, 4rem);
   letter-spacing: 0.1em;
   line-height: 0.95;
   color: #d3a23d;
-}
-
-.brand-logo.compact .brand-wording span {
-  font-size: 1rem;
 }
 
 .main-nav,
@@ -762,10 +761,6 @@ img {
   display: grid;
   place-items: center;
   padding: 18px;
-}
-
-.image-placeholder .brand-logo.compact .brand-wording span {
-  font-size: 1.2rem;
 }
 
 .product-copy {
@@ -1862,6 +1857,10 @@ img {
 }
 
 @media (max-width: 480px) {
+  .brand-logo-img.compact {
+    width: 120px;
+  }
+
   .brand-mark {
     width: 96px;
   }
