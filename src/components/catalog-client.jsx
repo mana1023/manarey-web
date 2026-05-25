@@ -1669,7 +1669,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   );
                 })() : null}
 
-                <section className="catalog-grid">
+                <section className={`catalog-grid${session.isAdmin ? " catalog-grid--admin" : ""}`}>
                   {filteredGroups.length === 0 ? (
                     <article className="empty-state">
                       <p className="eyebrow">Sin resultados</p>
