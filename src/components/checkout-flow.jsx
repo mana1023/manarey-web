@@ -124,82 +124,91 @@ function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
 
 // ─── Formulario de Transferencia ─────────────────────────────────────────────
 
-function TransferInfo({ total, order, onWhatsApp, showMpFallbackNote, compact }) {
-  const [expanded, setExpanded] = useState(!compact);
+function CopyField({ label, value }) {
+  const [copied, setCopied] = useState(false);
+  function handleCopy() {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // fallback: select text
+      const el = document.createElement("textarea");
+      el.value = value;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+  return (
+    <div className="cf-copy-field">
+      <div className="cf-copy-field-info">
+        <span className="cf-copy-field-label">{label}</span>
+        <span className="cf-copy-field-value">{value}</span>
+      </div>
+      <button className={`cf-copy-btn${copied ? " cf-copy-btn--ok" : ""}`} type="button" onClick={handleCopy}>
+        {copied ? (
+          <>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            ¡Copiado!
+          </>
+        ) : (
+          <>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
+function TransferInfo({ total, order, onWhatsApp, transferInitPoint }) {
   const cbu = process.env.NEXT_PUBLIC_TRANSFER_CBU || "0000003100041574114890";
   const alias = process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "muebleria.manarey.mp";
-  const cuentaDni = process.env.NEXT_PUBLIC_TRANSFER_CUENTA_DNI || "";
-
-  if (compact && !expanded) {
-    return (
-      <div className="cf-transfer-alt">
-        <button className="cf-transfer-alt-toggle" type="button" onClick={() => setExpanded(true)}>
-          ¿Preferís transferir manualmente con alias o CBU?
-          <span className="cf-transfer-alt-arrow">›</span>
-        </button>
-      </div>
-    );
-  }
 
   return (
-    <div className={`cf-transfer-panel${compact ? " cf-transfer-panel--compact" : ""}`}>
-      {compact && (
-        <button className="cf-transfer-alt-back" type="button" onClick={() => setExpanded(false)}>
-          ← Volver
-        </button>
-      )}
-
-      {showMpFallbackNote && (
-        <div className="cf-transfer-fallback-note">
-          <span>ℹ️</span>
-          <p>El link de pago no está disponible en este momento. Podés pagar directamente con tu banco usando los datos de abajo.</p>
-        </div>
-      )}
-
-      <p className="cf-transfer-title">Transferí el importe a cualquiera de estas opciones:</p>
-
-      <div className="cf-transfer-total cf-transfer-total-top">
-        <span>Total a transferir:</span>
-        <strong>{currencyFmt.format(total)}</strong>
+    <div className="cf-transfer-panel">
+      {/* Total destacado */}
+      <div className="cf-transfer-amount-hero">
+        <span className="cf-transfer-amount-label">Total a transferir</span>
+        <span className="cf-transfer-amount-value">{currencyFmt.format(total)}</span>
       </div>
 
-      <div className="cf-transfer-grid">
-        <div className="cf-transfer-method">
-          <span className="cf-transfer-icon">💙</span>
-          <div>
-            <strong>CBU / CVU (cualquier banco o billetera)</strong>
-            <p>Desde MercadoPago, MODO, Cuenta DNI, BBVA, Santander, Ualá, etc.</p>
-            {alias ? (
-              <p className="cf-transfer-alias">Alias: <code className="cf-transfer-code">{alias}</code></p>
-            ) : null}
-            {cbu ? (
-              <p className="cf-transfer-alias">CBU/CVU: <code className="cf-transfer-code">{cbu}</code></p>
-            ) : (
-              <p className="cf-transfer-note">Pedinos el CBU por WhatsApp</p>
-            )}
-          </div>
-        </div>
+      {/* Instrucción */}
+      <p className="cf-transfer-instruction">
+        Abrí tu app favorita y transferí al alias o CVU:
+      </p>
+      <p className="cf-transfer-apps-hint">
+        MercadoPago · Ualá · MODO · Naranja X · Cuenta DNI · cualquier banco
+      </p>
 
-        {cuentaDni ? (
-          <div className="cf-transfer-method">
-            <span className="cf-transfer-icon">📱</span>
-            <div>
-              <strong>Cuenta DNI (Banco Provincia)</strong>
-              <p>Abrí la app y transferí al alias o CBU indicado arriba.</p>
-              <code className="cf-transfer-code">{cuentaDni}</code>
-            </div>
-          </div>
-        ) : null}
+      {/* Campos copiables */}
+      <div className="cf-copy-fields">
+        {alias && <CopyField label="Alias" value={alias} />}
+        {cbu && <CopyField label="CVU" value={cbu} />}
       </div>
 
-      {order && (
-        <p className="cf-transfer-order">Código de pedido: <strong>{order}</strong></p>
+      {/* Botón secundario MP (para quien prefiera el link) */}
+      {transferInitPoint && (
+        <a
+          href={transferInitPoint}
+          className="cf-mp-secondary-btn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Pagar con MercadoPago →
+        </a>
       )}
 
+      {/* Enviar comprobante */}
       <div className="cf-transfer-confirm-section">
-        <p className="cf-transfer-confirm-title">✅ ¿Ya transferiste?</p>
+        <p className="cf-transfer-confirm-title">¿Ya transferiste?</p>
         <p className="cf-transfer-confirm-sub">
-          Envianos el comprobante por WhatsApp con el código <strong>{order}</strong> y confirmamos tu pedido de inmediato.
+          El pago se detecta automáticamente. Si no aparece en unos minutos,
+          envianos el comprobante por WhatsApp con el código <strong>{order}</strong>.
         </p>
         <button className="cf-whatsapp-btn cf-whatsapp-btn-primary" type="button" onClick={onWhatsApp}>
           💬 Enviar comprobante por WhatsApp
@@ -1154,65 +1163,12 @@ export function CheckoutFlow({ initialCustomer }) {
 
                   {completedOrder && !paymentBusy && (
                     <>
-                      {/* Botón universal (MP init_point — cualquier app puede abrirlo) */}
-                      {transferInitPoint && (
-                        <div className="cf-mp-pay-panel">
-                          {isMobile ? (
-                            <div className="cf-mp-mobile">
-                              <p className="cf-mp-instruction">
-                                Tocá el botón y elegí tu app para pagar{" "}
-                                <strong>{currencyFmt.format(total)}</strong>
-                              </p>
-                              <a
-                                href={transferInitPoint}
-                                className="cf-mp-open-btn"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Pagar ahora
-                              </a>
-                              <p className="cf-mp-note">
-                                Se abre la app de pago que tengas instalada: MercadoPago, Ualá, MODO, Naranja X u otra.
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="cf-mp-desktop">
-                              <p className="cf-mp-instruction">
-                                Escaneá el QR con tu celular para pagar{" "}
-                                <strong>{currencyFmt.format(total)}</strong>
-                              </p>
-                              <div className="cf-qr-wrapper">
-                                <img
-                                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(transferInitPoint)}&size=240x240&format=png&margin=10`}
-                                  alt="QR de pago"
-                                  width={240}
-                                  height={240}
-                                  className="cf-qr-img"
-                                />
-                              </div>
-                              <p className="cf-mp-note">
-                                Cualquier app de billetera puede escanear este QR: MercadoPago, Cuenta DNI, MODO, Ualá, etc.
-                              </p>
-                              <a
-                                href={transferInitPoint}
-                                className="cf-mp-browser-link"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                También podés pagar desde el navegador →
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Siempre mostramos la info de transferencia manual como alternativa */}
+                      {/* Pantalla de pago: alias/CVU copiable + MP como opción secundaria */}
                       <TransferInfo
                         total={total}
                         order={completedOrder}
                         onWhatsApp={handleTransferWhatsApp}
-                        showMpFallbackNote={false}
-                        compact={!!transferInitPoint}
+                        transferInitPoint={transferInitPoint}
                       />
 
                       <p className="cf-transfer-order">

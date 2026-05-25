@@ -88,20 +88,25 @@ export async function POST() {
           return true;
         }
 
-        // Match por monto exacto para transferencias manuales
-        // Solo si el pago es tipo bank_transfer o account_money
-        const isTransferType = ["bank_transfer", "account_money"].includes(
-          p.payment_type_id,
-        );
+        // Match por monto exacto para transferencias manuales por alias/CVU
+        // Cubre bank_transfer (CBU/CVU desde bancos), account_money (dinero en cuenta MP),
+        // y debit_card (algunas billeteras lo registran así)
+        const isTransferType = [
+          "bank_transfer",
+          "account_money",
+          "debit_card",
+          "pix",
+        ].includes(p.payment_type_id);
         if (isTransferType) {
           const mpAmount = Number(p.transaction_amount || 0);
-          const tolerance = orderTotal * 0.01; // 1% tolerancia
+          // Tolerancia fija de $50 o 1% (lo que sea mayor) para absorber diferencias de redondeo
+          const tolerance = Math.max(50, orderTotal * 0.01);
           if (Math.abs(mpAmount - orderTotal) <= tolerance) {
-            // Verificar que el pago sea reciente (dentro de 30min de la orden)
+            // El pago puede llegar hasta 60 min DESPUÉS de la orden (tiempo de procesamiento bancario)
             const orderTime = new Date(order.created_at).getTime();
             const payTime = new Date(p.date_created).getTime();
             const diffMs = payTime - orderTime;
-            if (diffMs >= -60000 && diffMs <= 45 * 60 * 1000) {
+            if (diffMs >= -120000 && diffMs <= 60 * 60 * 1000) {
               return true;
             }
           }
@@ -228,15 +233,16 @@ export async function GET(request) {
       if (fullOrder.preference_id && p.preference_id === fullOrder.preference_id) return true;
       if (fullOrder.external_reference && p.external_reference === fullOrder.external_reference) return true;
 
-      // Match por monto para transferencias directas al CVU
-      const isTransfer = ["bank_transfer", "account_money"].includes(p.payment_type_id);
+      // Match por monto para transferencias directas por alias/CVU
+      const isTransfer = ["bank_transfer", "account_money", "debit_card", "pix"].includes(p.payment_type_id);
       if (isTransfer) {
         const diff = Math.abs(Number(p.transaction_amount) - orderTotal);
-        if (diff <= orderTotal * 0.01) {
+        const tolerance = Math.max(50, orderTotal * 0.01);
+        if (diff <= tolerance) {
           const orderTime = new Date(fullOrder.created_at).getTime();
           const payTime = new Date(p.date_created).getTime();
           const diffMs = payTime - orderTime;
-          return diffMs >= -60000 && diffMs <= 45 * 60 * 1000;
+          return diffMs >= -120000 && diffMs <= 60 * 60 * 1000;
         }
       }
       return false;
