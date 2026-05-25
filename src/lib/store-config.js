@@ -30,7 +30,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_1 || "Miguel Cané 508 esq. San Ignacio, Glew",
     mapsUrl: "https://maps.google.com/?q=Miguel+Cane+508+Glew+Buenos+Aires",
-    hours: "Lunes a sábado: 9 a 19 hs",
+    hours: "Lun a Vie: 9-13 y 16-20 hs · Sáb: 9-20 hs (corrido)",
     phone: process.env.BRANCH_PHONE_CANE || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
@@ -41,7 +41,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_2 || "Av. Hipólito Yrigoyen 19.051, Longchamps",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19051+Longchamps+Buenos+Aires",
-    hours: "Lunes a sábado: 9 a 19 hs",
+    hours: "Lunes a sábado: 9-18 hs",
     phone: process.env.BRANCH_PHONE_LONGCHAMPS || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
@@ -52,7 +52,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 || "Av. Hipólito Yrigoyen 19.861, Glew",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires",
-    hours: "Lunes a sábado: 9 a 19 hs",
+    hours: "Solo sábados: 9-14 hs",
     phone: process.env.BRANCH_PHONE_GLEW || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
@@ -63,7 +63,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_4 || "Av. Hipólito Yrigoyen 21.890 esq. Monroe, Glew",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+21890+Glew+Buenos+Aires",
-    hours: "Lunes a sábado: 9 a 19 hs",
+    hours: "Lunes a sábado: 9-18 hs",
     phone: process.env.BRANCH_PHONE_VIDRIERA || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
@@ -74,7 +74,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_5 || "Almafuerte 45 entre Andrade y Obligado, Glew",
     mapsUrl: "https://maps.google.com/?q=Almafuerte+45+Glew+Buenos+Aires",
-    hours: "Lunes a sábado: 9 a 19 hs",
+    hours: "Lun a Sáb: 9-13 y 16-20 hs",
     phone: process.env.BRANCH_PHONE_ESTACION || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
 ];
