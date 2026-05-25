@@ -165,87 +165,10 @@ function CopyField({ label, value }) {
   );
 }
 
-// Apps de pago con deep links para Argentina
-const PAYMENT_APPS = [
-  {
-    id: "mp",
-    name: "MercadoPago",
-    emoji: "💙",
-    color: "#009EE3",
-    // link especial: se pasa el initPoint si está disponible, si no abre la app
-    deepLink: (initPoint) => initPoint || "mercadopago://",
-    fallback: "https://www.mercadopago.com.ar",
-  },
-  {
-    id: "modo",
-    name: "MODO",
-    emoji: "🟢",
-    color: "#00B140",
-    deepLink: () => "modo://",
-    fallback: "https://modo.com.ar",
-  },
-  {
-    id: "uala",
-    name: "Ualá",
-    emoji: "🟣",
-    color: "#6B3FA0",
-    deepLink: () => "uala://",
-    fallback: "https://www.uala.com.ar",
-  },
-  {
-    id: "naranjax",
-    name: "Naranja X",
-    emoji: "🟠",
-    color: "#FF6B00",
-    deepLink: () => "naranjax://",
-    fallback: "https://naranjax.com",
-  },
-  {
-    id: "bbva",
-    name: "BBVA",
-    emoji: "🔵",
-    color: "#004A97",
-    deepLink: () => "bbvaar://",
-    fallback: "https://www.bbva.com.ar",
-  },
-  {
-    id: "cuentadni",
-    name: "Cuenta DNI",
-    emoji: "🏦",
-    color: "#1A237E",
-    deepLink: () => "bpba://",
-    fallback: "https://cuentadni.com.ar",
-  },
-];
-
-function TransferInfo({ total, order, onWhatsApp, transferInitPoint }) {
+function TransferInfo({ total, order, onWhatsApp }) {
   const [copied, setCopied] = useState(null); // "alias" | "cvu"
   const cbu   = process.env.NEXT_PUBLIC_TRANSFER_CBU   || "0000003100041574114890";
   const alias = process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "muebleria.manarey.mp";
-
-  function copyAndOpen(app) {
-    // 1. Copiar alias al portapapeles para que lo peguen en la app
-    const valueToCopy = alias || cbu;
-    if (valueToCopy) {
-      try {
-        navigator.clipboard.writeText(valueToCopy);
-      } catch {
-        const el = document.createElement("textarea");
-        el.value = valueToCopy;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
-      }
-    }
-    // 2. Redirigir a la app
-    const link = app.deepLink(app.id === "mp" ? transferInitPoint : null);
-    window.location.href = link;
-    // 3. Fallback al sitio web si la app no está instalada
-    setTimeout(() => {
-      window.open(app.fallback, "_blank", "noopener,noreferrer");
-    }, 1200);
-  }
 
   function copyField(val, which) {
     try { navigator.clipboard.writeText(val); } catch {
@@ -254,77 +177,67 @@ function TransferInfo({ total, order, onWhatsApp, transferInitPoint }) {
       document.execCommand("copy"); document.body.removeChild(el);
     }
     setCopied(which);
-    setTimeout(() => setCopied(null), 2000);
+    setTimeout(() => setCopied(null), 2500);
   }
 
   return (
     <div className="cf-transfer-panel">
-      {/* Total destacado */}
+
+      {/* Total con advertencia de monto exacto */}
       <div className="cf-transfer-amount-hero">
         <span className="cf-transfer-amount-label">Total a transferir</span>
         <span className="cf-transfer-amount-value">{currencyFmt.format(total)}</span>
+        <span className="cf-transfer-exact-warning">
+          ⚠️ Transferí el monto exacto para que se confirme automáticamente
+        </span>
       </div>
 
-      {/* Elegí tu app */}
-      <div className="cf-app-chooser">
-        <p className="cf-app-chooser-title">Elegí con qué app pagar:</p>
-        <div className="cf-app-grid">
-          {PAYMENT_APPS.map((app) => (
+      {/* Sugerencia MercadoPago (solo texto, sin botón) */}
+      <p className="cf-transfer-mp-tip">
+        💡 Podés pagar abriendo <strong>MercadoPago</strong>, <strong>Ualá</strong>, <strong>MODO</strong> u otra billetera y transferiendo al alias de abajo.
+      </p>
+
+      {/* Alias y CVU copiables */}
+      <div className="cf-copy-fields">
+        {alias && (
+          <div className="cf-copy-field">
+            <div className="cf-copy-field-info">
+              <span className="cf-copy-field-label">Alias</span>
+              <span className="cf-copy-field-value">{alias}</span>
+            </div>
             <button
-              key={app.id}
-              className="cf-app-btn"
-              style={{ "--app-color": app.color }}
+              className={`cf-copy-btn${copied === "alias" ? " cf-copy-btn--ok" : ""}`}
               type="button"
-              onClick={() => copyAndOpen(app)}
+              onClick={() => copyField(alias, "alias")}
             >
-              <span className="cf-app-emoji">{app.emoji}</span>
-              <span className="cf-app-name">{app.name}</span>
+              {copied === "alias" ? (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado</>
+              ) : (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar</>
+              )}
             </button>
-          ))}
-        </div>
-        <p className="cf-app-hint">
-          Se copia el alias automáticamente para que lo pegues en tu app.
-        </p>
+          </div>
+        )}
+        {cbu && (
+          <div className="cf-copy-field">
+            <div className="cf-copy-field-info">
+              <span className="cf-copy-field-label">CVU</span>
+              <span className="cf-copy-field-value">{cbu}</span>
+            </div>
+            <button
+              className={`cf-copy-btn${copied === "cvu" ? " cf-copy-btn--ok" : ""}`}
+              type="button"
+              onClick={() => copyField(cbu, "cvu")}
+            >
+              {copied === "cvu" ? (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado</>
+              ) : (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar</>
+              )}
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Alias y CVU copiables (alternativa) */}
-      <details className="cf-transfer-manual">
-        <summary className="cf-transfer-manual-toggle">
-          ¿Preferís transferir manualmente con alias o CVU?
-        </summary>
-        <div className="cf-copy-fields">
-          {alias && (
-            <div className="cf-copy-field">
-              <div className="cf-copy-field-info">
-                <span className="cf-copy-field-label">Alias</span>
-                <span className="cf-copy-field-value">{alias}</span>
-              </div>
-              <button
-                className={`cf-copy-btn${copied === "alias" ? " cf-copy-btn--ok" : ""}`}
-                type="button"
-                onClick={() => copyField(alias, "alias")}
-              >
-                {copied === "alias" ? "✓ Copiado" : "Copiar"}
-              </button>
-            </div>
-          )}
-          {cbu && (
-            <div className="cf-copy-field">
-              <div className="cf-copy-field-info">
-                <span className="cf-copy-field-label">CVU</span>
-                <span className="cf-copy-field-value">{cbu}</span>
-              </div>
-              <button
-                className={`cf-copy-btn${copied === "cvu" ? " cf-copy-btn--ok" : ""}`}
-                type="button"
-                onClick={() => copyField(cbu, "cvu")}
-              >
-                {copied === "cvu" ? "✓ Copiado" : "Copiar"}
-              </button>
-            </div>
-          )}
-        </div>
-      </details>
 
       {/* Enviar comprobante */}
       <div className="cf-transfer-confirm-section">
@@ -1286,12 +1199,11 @@ export function CheckoutFlow({ initialCustomer }) {
 
                   {completedOrder && !paymentBusy && (
                     <>
-                      {/* Pantalla de pago: alias/CVU copiable + MP como opción secundaria */}
+                      {/* Pantalla de pago: alias/CVU copiable */}
                       <TransferInfo
                         total={total}
                         order={completedOrder}
                         onWhatsApp={handleTransferWhatsApp}
-                        transferInitPoint={transferInitPoint}
                       />
 
                       <p className="cf-transfer-order">

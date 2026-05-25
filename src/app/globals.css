@@ -3597,6 +3597,24 @@ img {
   color: #fff;
   letter-spacing: -0.02em;
 }
+.cf-transfer-exact-warning {
+  font-size: 0.76rem;
+  color: #f5c842;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Sugerencia MP (sin botón) */
+.cf-transfer-mp-tip {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #5a4a38;
+  background: rgba(201,160,64,0.08);
+  border: 1px solid rgba(201,160,64,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  line-height: 1.5;
+}
 
 /* Instrucciones */
 .cf-transfer-instruction {
