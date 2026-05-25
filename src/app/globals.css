@@ -1310,6 +1310,133 @@ img {
 
 .help-strip {
   margin-top: 28px;
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
+  border-color: rgba(210, 162, 62, 0.18) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28) !important;
+  text-align: left !important;
+}
+
+.help-strip-header {
+  margin-bottom: 28px;
+}
+
+.help-strip-header .eyebrow {
+  color: rgba(210, 162, 62, 0.72) !important;
+}
+
+.help-strip h2 {
+  color: rgba(255, 248, 228, 0.96) !important;
+  margin: 6px 0 8px !important;
+}
+
+.help-strip-sub {
+  color: rgba(210, 162, 62, 0.6);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Cards dentro del help-strip */
+.help-card {
+  background: rgba(255, 248, 228, 0.04) !important;
+  border: 1px solid rgba(210, 162, 62, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 24px 22px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.help-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(210, 162, 62, 0.38) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22) !important;
+}
+
+/* Card destacada (consulta personalizada) */
+.help-card--featured {
+  background: rgba(210, 162, 62, 0.1) !important;
+  border-color: rgba(210, 162, 62, 0.35) !important;
+}
+
+/* Ícono */
+.help-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.help-card-icon--whatsapp {
+  background: rgba(37, 211, 102, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+}
+
+.help-card-icon--consult {
+  background: rgba(210, 162, 62, 0.18);
+  color: #f0c96a;
+  border: 1px solid rgba(210, 162, 62, 0.35);
+}
+
+.help-card-icon--email {
+  background: rgba(147, 197, 253, 0.12);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+}
+
+/* Título de cada card */
+.help-card h3 {
+  color: rgba(255, 248, 228, 0.95) !important;
+  font-size: 1rem !important;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Descripción */
+.help-card p {
+  color: rgba(210, 162, 62, 0.62) !important;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* Botón de acción de cada card */
+.help-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(210, 162, 62, 0.35);
+  background: rgba(210, 162, 62, 0.1);
+  color: #f0c96a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.help-card-btn:hover {
+  background: rgba(210, 162, 62, 0.2);
+  border-color: rgba(210, 162, 62, 0.55);
+  transform: translateX(2px);
+}
+
+/* Botón primario (card central) */
+.help-card-btn--primary {
+  background: linear-gradient(135deg, rgba(210,162,62,0.25), rgba(169,115,30,0.35)) !important;
+  border-color: rgba(210, 162, 62, 0.5) !important;
+  color: #f6e0a6 !important;
+}
+.help-card-btn--primary:hover {
+  background: linear-gradient(135deg, rgba(210,162,62,0.38), rgba(169,115,30,0.48)) !important;
 }
 
 .site-footer {
