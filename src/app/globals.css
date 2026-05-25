@@ -3690,6 +3690,96 @@ img {
   background: rgba(0,158,227,0.1);
 }
 
+/* ── App chooser grid ────────────────────────────────────────────────── */
+.cf-app-chooser {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cf-app-chooser-title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #2b1d13;
+}
+.cf-app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media (max-width: 380px) {
+  .cf-app-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.cf-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 6px;
+  background: #fff;
+  border: 1.5px solid color-mix(in srgb, var(--app-color, #C9A040) 30%, transparent);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  min-height: 68px;
+}
+.cf-app-btn:hover,
+.cf-app-btn:active {
+  background: color-mix(in srgb, var(--app-color, #C9A040) 8%, white);
+  border-color: var(--app-color, #C9A040);
+  transform: scale(1.03);
+}
+.cf-app-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.cf-app-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2b1d13;
+  text-align: center;
+  line-height: 1.2;
+}
+.cf-app-hint {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #9a8a74;
+  text-align: center;
+}
+
+/* ── Manual transfer (collapsible) ─────────────────────────────────── */
+.cf-transfer-manual {
+  border: 1px solid rgba(201,160,64,0.18);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cf-transfer-manual-toggle {
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7A6A56;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.cf-transfer-manual-toggle::-webkit-details-marker { display: none; }
+.cf-transfer-manual-toggle::before {
+  content: "›";
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+details[open] .cf-transfer-manual-toggle::before {
+  transform: rotate(90deg);
+}
+.cf-transfer-manual .cf-copy-fields {
+  padding: 0 14px 12px;
+}
+
 .cf-transfer-title {
   margin: 0;
   font-weight: 600;
