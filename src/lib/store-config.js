@@ -52,7 +52,7 @@ export const storeBranches = [
     city: "Buenos Aires",
     address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 || "Av. Hipólito Yrigoyen 19.861, Glew",
     mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires",
-    hours: "Solo sábados: 9-14 hs",
+    hours: "Lun a Vie: 9-18 hs · Sáb: 9-14 hs",
     phone: process.env.BRANCH_PHONE_GLEW || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
   {
