@@ -211,8 +211,7 @@ export async function GET(_request, { params }) {
     const order = orderRes.rows[0];
 
     // Solo permitir boleta de órdenes pagadas
-    const isPaid = order.status === "paid" || order.payment_status === "approved"
-      || order.payment_method === "transfer" || order.payment_method === "whatsapp";
+    const isPaid = order.status === "paid" || order.payment_status === "approved";
     if (!isPaid) {
       return new NextResponse("La boleta solo está disponible una vez confirmado el pago", { status: 403 });
     }

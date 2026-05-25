@@ -124,17 +124,35 @@ function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
 
 // ─── Formulario de Transferencia ─────────────────────────────────────────────
 
-function TransferInfo({ total, order, onWhatsApp, showMpFallbackNote }) {
+function TransferInfo({ total, order, onWhatsApp, showMpFallbackNote, compact }) {
+  const [expanded, setExpanded] = useState(!compact);
   const cbu = process.env.NEXT_PUBLIC_TRANSFER_CBU || "0000003100041574114890";
   const alias = process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "muebleria.manarey.mp";
   const cuentaDni = process.env.NEXT_PUBLIC_TRANSFER_CUENTA_DNI || "";
 
+  if (compact && !expanded) {
+    return (
+      <div className="cf-transfer-alt">
+        <button className="cf-transfer-alt-toggle" type="button" onClick={() => setExpanded(true)}>
+          ¿Preferís transferir manualmente con alias o CBU?
+          <span className="cf-transfer-alt-arrow">›</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="cf-transfer-panel">
+    <div className={`cf-transfer-panel${compact ? " cf-transfer-panel--compact" : ""}`}>
+      {compact && (
+        <button className="cf-transfer-alt-back" type="button" onClick={() => setExpanded(false)}>
+          ← Volver
+        </button>
+      )}
+
       {showMpFallbackNote && (
         <div className="cf-transfer-fallback-note">
           <span>ℹ️</span>
-          <p>El link de MercadoPago no está disponible en este momento. Podés pagar directamente con tu banco usando los datos de abajo.</p>
+          <p>El link de pago no está disponible en este momento. Podés pagar directamente con tu banco usando los datos de abajo.</p>
         </div>
       )}
 
@@ -149,8 +167,8 @@ function TransferInfo({ total, order, onWhatsApp, showMpFallbackNote }) {
         <div className="cf-transfer-method">
           <span className="cf-transfer-icon">💙</span>
           <div>
-            <strong>MercadoPago / CBU / CVU</strong>
-            <p>Desde cualquier banco, MODO, Cuenta DNI, o la app de MercadoPago.</p>
+            <strong>CBU / CVU (cualquier banco o billetera)</strong>
+            <p>Desde MercadoPago, MODO, Cuenta DNI, BBVA, Santander, Ualá, etc.</p>
             {alias ? (
               <p className="cf-transfer-alias">Alias: <code className="cf-transfer-code">{alias}</code></p>
             ) : null}
@@ -1052,33 +1070,18 @@ export function CheckoutFlow({ initialCustomer }) {
                       <span>Formulario seguro con Mercado Pago. Todas las tarjetas.</span>
                     </div>
                   </button>
-                  {isMobile ? (
-                    <button
-                      className="cf-payment-btn"
-                      onClick={() => setPaymentMethod("transfer")}
-                      type="button"
-                      disabled={paymentBusy}
-                    >
-                      <span className="cf-payment-icon">🏦</span>
-                      <div>
-                        <strong>Transferencia bancaria</strong>
-                        <span>MercadoPago, Cuenta DNI, CBU / CVU, cualquier banco.</span>
-                      </div>
-                    </button>
-                  ) : (
-                    <button
-                      className="cf-payment-btn"
-                      onClick={() => { setPaymentMethod("transfer"); handleTransferOrder("mp"); }}
-                      type="button"
-                      disabled={paymentBusy}
-                    >
-                      <span className="cf-payment-icon">📱</span>
-                      <div>
-                        <strong>QR</strong>
-                        <span>Escaneá el QR con MercadoPago, Cuenta DNI o cualquier billetera.</span>
-                      </div>
-                    </button>
-                  )}
+                  <button
+                    className="cf-payment-btn"
+                    onClick={() => { setPaymentMethod("transfer"); handleTransferOrder("mp"); }}
+                    type="button"
+                    disabled={paymentBusy}
+                  >
+                    <span className="cf-payment-icon">🏦</span>
+                    <div>
+                      <strong>Transferencia / Billetera virtual</strong>
+                      <span>MercadoPago, Cuenta DNI, Ualá, MODO, CBU / CVU — cualquier app.</span>
+                    </div>
+                  </button>
                   {storeSettings.whatsappNumber && (
                     <button
                       className="cf-payment-btn"
@@ -1123,11 +1126,11 @@ export function CheckoutFlow({ initialCustomer }) {
                 </div>
               )}
 
-              {/* Transfer – selector de sub-método + UI dinámica */}
+              {/* Transfer – pantalla de pago unificada */}
               {paymentMethod === "transfer" && (
                 <div className="cf-card">
                   <div className="cf-card-header">
-                    <p className="cf-card-title">{!isMobile && transferSubMethod === "mp" ? "Pago con QR" : "Transferencia bancaria"}</p>
+                    <p className="cf-card-title">Transferencia / Billetera virtual</p>
                     {!pollingActive && (
                       <button
                         className="cf-link-btn"
@@ -1145,51 +1148,19 @@ export function CheckoutFlow({ initialCustomer }) {
                     )}
                   </div>
 
-                  {/* PASO A: elegir con qué billetera/banco van a pagar */}
-                  {!transferSubMethod && !paymentBusy && (
-                    <div className="cf-transfer-submethods">
-                      <p className="cf-transfer-subtitle">¿Con qué vas a pagar?</p>
-                      <button
-                        className="cf-transfer-submethod-btn"
-                        type="button"
-                        onClick={() => handleTransferOrder("mp")}
-                      >
-                        <span className="cf-transfer-submethod-icon">💙</span>
-                        <div>
-                          <strong>MercadoPago</strong>
-                          <span>{isMobile ? "Abrí la app y pagá directo" : "Escaneá el QR con tu celular"}</span>
-                        </div>
-                        <span className="cf-transfer-submethod-arrow">›</span>
-                      </button>
-                      <button
-                        className="cf-transfer-submethod-btn"
-                        type="button"
-                        onClick={() => handleTransferOrder("bank")}
-                      >
-                        <span className="cf-transfer-submethod-icon">🏦</span>
-                        <div>
-                          <strong>Otro banco o billetera</strong>
-                          <span>Transferí con CBU / CVU desde Cuenta DNI, BBVA, Santander, MODO, etc.</span>
-                        </div>
-                        <span className="cf-transfer-submethod-arrow">›</span>
-                      </button>
-                    </div>
-                  )}
-
                   {paymentBusy && (
                     <p className="cf-muted">Generando orden de pago...</p>
                   )}
 
-                  {/* PASO B: UI según sub-método elegido */}
                   {completedOrder && !paymentBusy && (
                     <>
-                      {/* Sub-método: MercadoPago CON link */}
-                      {transferSubMethod === "mp" && transferInitPoint && (
+                      {/* Botón universal (MP init_point — cualquier app puede abrirlo) */}
+                      {transferInitPoint && (
                         <div className="cf-mp-pay-panel">
                           {isMobile ? (
                             <div className="cf-mp-mobile">
                               <p className="cf-mp-instruction">
-                                Tocá el botón para abrir MercadoPago y completar el pago de{" "}
+                                Tocá el botón y elegí tu app para pagar{" "}
                                 <strong>{currencyFmt.format(total)}</strong>
                               </p>
                               <a
@@ -1198,29 +1169,29 @@ export function CheckoutFlow({ initialCustomer }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                <span>💙</span> Abrir MercadoPago
+                                Pagar ahora
                               </a>
                               <p className="cf-mp-note">
-                                Si tenés más de una cuenta de MercadoPago, la app te preguntará con cuál pagar.
+                                Se abre la app de pago que tengas instalada: MercadoPago, Ualá, MODO, Naranja X u otra.
                               </p>
                             </div>
                           ) : (
                             <div className="cf-mp-desktop">
                               <p className="cf-mp-instruction">
-                                Escaneá el QR con la cámara o la app de MercadoPago para pagar{" "}
+                                Escaneá el QR con tu celular para pagar{" "}
                                 <strong>{currencyFmt.format(total)}</strong>
                               </p>
                               <div className="cf-qr-wrapper">
                                 <img
                                   src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(transferInitPoint)}&size=240x240&format=png&margin=10`}
-                                  alt="QR MercadoPago"
+                                  alt="QR de pago"
                                   width={240}
                                   height={240}
                                   className="cf-qr-img"
                                 />
                               </div>
                               <p className="cf-mp-note">
-                                Si tenés más de una cuenta de MercadoPago, la app te va a preguntar con cuál pagar.
+                                Cualquier app de billetera puede escanear este QR: MercadoPago, Cuenta DNI, MODO, Ualá, etc.
                               </p>
                               <a
                                 href={transferInitPoint}
@@ -1235,29 +1206,18 @@ export function CheckoutFlow({ initialCustomer }) {
                         </div>
                       )}
 
-                      {/* Sub-método: MercadoPago SIN link (fallback a banco) o banco manual */}
-                      {(transferSubMethod === "bank" || (transferSubMethod === "mp" && !transferInitPoint)) && (
-                        <TransferInfo
-                          total={total}
-                          order={completedOrder}
-                          onWhatsApp={handleTransferWhatsApp}
-                          showMpFallbackNote={transferSubMethod === "mp" && !transferInitPoint}
-                        />
-                      )}
+                      {/* Siempre mostramos la info de transferencia manual como alternativa */}
+                      <TransferInfo
+                        total={total}
+                        order={completedOrder}
+                        onWhatsApp={handleTransferWhatsApp}
+                        showMpFallbackNote={false}
+                        compact={!!transferInitPoint}
+                      />
 
                       <p className="cf-transfer-order">
                         Pedido <strong>{completedOrder}</strong>
                       </p>
-                      <a
-                        href={`/api/orders/${encodeURIComponent(completedOrder)}/boleta`}
-                        className="cf-boleta-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        download={`boleta-${completedOrder}.pdf`}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Descargar boleta
-                      </a>
 
                       {/* Polling status */}
                       {pollingActive && !pollingTimedOut && (
@@ -1266,7 +1226,7 @@ export function CheckoutFlow({ initialCustomer }) {
                           <div>
                             <p className="cf-polling-title">Esperando confirmación de pago...</p>
                             <p className="cf-polling-sub">
-                              La app detectará tu pago automáticamente. No cierres esta página.
+                              El pago se detecta automáticamente. No cierres esta página.
                             </p>
                           </div>
                         </div>

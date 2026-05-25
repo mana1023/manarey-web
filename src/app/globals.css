@@ -3913,25 +3913,83 @@ img {
 .cf-mp-open-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  background: #009EE3;
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.05rem;
-  padding: 14px 32px;
+  background: linear-gradient(135deg, #C9A040 0%, #a87c28 100%);
+  color: #1a0e00;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 16px 40px;
   border-radius: 50px;
   text-decoration: none;
-  transition: background 0.18s, transform 0.12s;
-  letter-spacing: 0.01em;
+  transition: filter 0.18s, transform 0.12s;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 18px rgba(201,160,64,0.35);
+  width: 100%;
+  max-width: 320px;
 }
 
 .cf-mp-open-btn:hover {
-  background: #0079c0;
-  transform: translateY(-1px);
+  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 
 .cf-mp-open-btn span {
   font-size: 1.3rem;
+}
+
+/* Compact transfer fallback toggle */
+.cf-transfer-alt {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.cf-transfer-alt-toggle {
+  background: none;
+  border: none;
+  color: #7A6A56;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cf-transfer-alt-toggle:hover {
+  color: #C9A040;
+  background: rgba(201,160,64,0.06);
+  text-decoration: none;
+}
+
+.cf-transfer-alt-arrow {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cf-transfer-panel--compact {
+  margin-top: 12px;
+  border-top: 1px solid rgba(201,160,64,0.15);
+  padding-top: 12px;
+}
+
+.cf-transfer-alt-back {
+  background: none;
+  border: none;
+  color: #7A6A56;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0 0 10px 0;
+  display: block;
+  transition: color 0.15s;
+}
+
+.cf-transfer-alt-back:hover {
+  color: #C9A040;
 }
 
 .cf-transfer-confirm-note {
