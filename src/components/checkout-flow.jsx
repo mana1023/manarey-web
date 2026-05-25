@@ -465,6 +465,16 @@ export function CheckoutFlow({ initialCustomer }) {
     return () => window.clearTimeout(tid);
   }, [deliveryAddress.street, deliveryAddress.number, deliveryAddress.city, shippingMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Auto-sugerencia MercadoPago: abre el link en tab nuevo sin botón ─────────
+  // El navegador/OS muestra "¿Abrir con MercadoPago?" automáticamente en móvil
+  useEffect(() => {
+    if (!transferInitPoint || !completedOrder) return;
+    const tid = setTimeout(() => {
+      window.open(transferInitPoint, "_blank", "noopener,noreferrer");
+    }, 900);
+    return () => clearTimeout(tid);
+  }, [transferInitPoint, completedOrder]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Transfer payment polling ──────────────────────────────────────────────
 
   useEffect(() => {
@@ -689,7 +699,17 @@ export function CheckoutFlow({ initialCustomer }) {
   function handleTransferWhatsApp() {
     const phone = storeSettings.whatsappNumber || "5491164282270";
     const order = completedOrder || "";
-    const msg = `Hola Manarey! Realicé la transferencia para el pedido ${order}. Adjunto el comprobante. Total: ${currencyFmt.format(total)}`;
+    const productLines = cart
+      .map((item) => {
+        const accessory = item.selectedAccessory?.label ? ` + ${item.selectedAccessory.label}` : "";
+        return `  • ${item.quantity}x ${item.name}${accessory}`;
+      })
+      .join("\n");
+    const msg =
+      `Hola Manarey! Realicé la transferencia para el pedido *${order}*.\n\n` +
+      `*Productos:*\n${productLines}\n\n` +
+      `*Total:* ${currencyFmt.format(total)}\n\n` +
+      `Adjunto el comprobante.`;
     window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
       "_blank",
