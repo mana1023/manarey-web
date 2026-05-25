@@ -1447,7 +1447,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="home-branches-header">
                 <div>
                   <p className="eyebrow">Nuestras sucursales</p>
-                  <h2>Vení a conocer los showrooms.</h2>
+                  <h2>Vení a conocer los locales.</h2>
                   <p className="home-branches-sub">Zona sur del Gran Buenos Aires. También hacemos envíos.</p>
                 </div>
                 <button className="home-branches-all-btn" onClick={() => navigateTo("sobre-nosotros")} type="button">
