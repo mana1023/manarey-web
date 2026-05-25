@@ -1450,19 +1450,25 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   <h2>Vení a conocer los showrooms.</h2>
                   <p className="home-branches-sub">Zona sur del Gran Buenos Aires. También hacemos envíos.</p>
                 </div>
-                <button className="ghost-button" onClick={() => navigateTo("sobre-nosotros")} type="button">
-                  Ver todas →
+                <button className="home-branches-all-btn" onClick={() => navigateTo("sobre-nosotros")} type="button">
+                  Ver todas
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
               </div>
               <div className="home-branches-grid">
                 {storeBranches.map((branch) => (
                   <div className="home-branch-card" key={branch.id}>
-                    <span className="home-branch-icon">📍</span>
-                    <div>
-                      <strong>{branch.name}</strong>
-                      <p>{branch.address}</p>
-                      <a className="branch-directions-btn" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
-                        🗺️ Cómo llegar
+                    <div className="home-branch-pin">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                    </div>
+                    <div className="home-branch-info">
+                      <strong className="home-branch-name">{branch.name}</strong>
+                      <p className="home-branch-address">{branch.address}</p>
+                      <a className="home-branch-directions" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                        Cómo llegar
                       </a>
                     </div>
                   </div>
