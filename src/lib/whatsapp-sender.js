@@ -127,39 +127,61 @@ export function sendPurchaseMessage(phone, nombre, orderCode, total, previousPai
  * Notifica al local cuando llega un pedido web para retirar.
  * Se envía al teléfono de la sucursal con el detalle del pedido.
  */
-export function sendBranchPickupNotification(branchPhone, {
+/**
+ * Notifica al local un pedido web (pickup o delivery).
+ * - pickup   → va al teléfono de la sucursal elegida
+ * - delivery → va al número principal de la tienda
+ */
+export function sendBranchOrderNotification(toPhone, {
   orderCode,
   customerName,
   customerPhone,
+  customerAddress,
+  isPickup,
   branchName,
   items = [],
   total,
   paymentMethod,
 }) {
-  if (!branchPhone) return Promise.resolve(false);
+  if (!toPhone) return Promise.resolve(false);
 
-  const paymentLabel = { card: "Tarjeta/MP", transfer: "Transferencia" }[paymentMethod] || paymentMethod;
+  const paymentLabel = {
+    card: "Tarjeta / MercadoPago",
+    transfer: "Transferencia bancaria",
+    whatsapp: "Efectivo / WhatsApp",
+  }[paymentMethod] || paymentMethod || "—";
+
   const itemsList = items
     .map((i) => `  • ${i.nombre}${i.medida ? ` (${i.medida})` : ""}${i.accessoryLabel ? ` + ${i.accessoryLabel}` : ""} x${i.quantity}`)
     .join("\n");
 
+  const tipoEntrega = isPickup
+    ? `📦 *Retiro en sucursal: ${branchName}*`
+    : `🚚 *Envío a domicilio — ${customerAddress || "ver dirección"}*`;
+
   const msg = [
-    `🛒 *Nuevo pedido web — Retiro en ${branchName}*`,
+    `🛒 *Nuevo pedido web*`,
+    tipoEntrega,
     ``,
     `*Código:* ${orderCode}`,
     `*Cliente:* ${customerName}`,
     `*Teléfono:* ${customerPhone}`,
-    `*Forma de pago:* ${paymentLabel}`,
+    `*Pago:* ${paymentLabel}`,
     ``,
     `*Productos:*`,
     itemsList || "  (sin detalle)",
     ``,
     `*Total: ${currencyFmt.format(total)}*`,
     ``,
-    `Coordinar retiro con el cliente.`,
+    isPickup ? `Coordinar retiro con el cliente.` : `Coordinar envío al domicilio del cliente.`,
   ].join("\n");
 
-  return sendWhatsAppMessage(branchPhone, msg).catch(() => false);
+  return sendWhatsAppMessage(toPhone, msg).catch(() => false);
+}
+
+/** @deprecated Usar sendBranchOrderNotification */
+export function sendBranchPickupNotification(branchPhone, opts) {
+  return sendBranchOrderNotification(branchPhone, { ...opts, isPickup: true });
 }
 
 export function sendTransferPendingMessage(phone, nombre, orderCode, total, previousPaidOrders = 0) {

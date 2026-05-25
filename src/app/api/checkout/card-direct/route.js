@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { createOrder, markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
-import { storeSettings, getBranchByDisplayName } from "@/lib/store-config";
-import { sendPurchaseMessage, sendBranchPickupNotification } from "@/lib/whatsapp-sender";
+import { storeSettings, getBranchByDisplayName, storeBranches } from "@/lib/store-config";
+import { sendPurchaseMessage, sendBranchOrderNotification } from "@/lib/whatsapp-sender";
+
+function getMainStorePhone() {
+  const central = storeBranches.find((b) => b.id === "longchamps");
+  return central?.phone || (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
+}
 
 function getMpToken() {
   const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
@@ -98,15 +103,19 @@ export async function POST(request) {
         raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
       }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
 
-      // Notificar al local si es retiro en sucursal
-      if (order.summary.shipping.id === "pickup") {
-        const branch = getBranchByDisplayName(order.customer.address || "");
-        if (branch?.phone) {
-          sendBranchPickupNotification(branch.phone, {
+      // Notificar al local (pickup → sucursal específica, delivery → Central)
+      {
+        const isPickup = order.summary.shipping.id === "pickup";
+        const branch = isPickup ? getBranchByDisplayName(order.customer.address || "") : null;
+        const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
+        if (notifyPhone) {
+          sendBranchOrderNotification(notifyPhone, {
             orderCode: order.orderCode,
             customerName: order.customer.fullName,
             customerPhone: order.customer.phone,
-            branchName: branch.shortName || branch.name,
+            customerAddress: isPickup ? "" : `${order.customer.address || ""}, ${order.customer.city || ""}`.trim().replace(/^,|,$/g, ""),
+            isPickup,
+            branchName: branch?.shortName || branch?.name || "",
             items: order.summary.items || [],
             total: order.summary.total,
             paymentMethod: "card",
