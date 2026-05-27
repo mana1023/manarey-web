@@ -15,10 +15,8 @@ export async function getProductStock(productKey) {
        FROM public.productos
        WHERE md5(concat_ws('|',
          lower(trim(nombre)),
-         lower(coalesce(trim(categoria), '')),
          lower(coalesce(trim(medida), '')),
-         coalesce(precio_venta::text, ''),
-         lower(coalesce(trim(color), ''))
+         lower(coalesce(trim(color),  ''))
        )) = $1`,
       [productKey],
     );
