@@ -537,20 +537,6 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       .finally(() => setBranchStockLoading(false));
   }, [session.isAdmin]);
 
-  // Fallback: si el batch tardó o falló, cargar stock individualmente para los productos visibles
-  useEffect(() => {
-    if (!session.isAdmin || !adminBranchFilter || branchStockLoading) return;
-    // Solo disparar si hay productos visibles sin stock cargado
-    const missing = pagedGroups
-      .map((g) => g.variants[0]?.productKey)
-      .filter(Boolean)
-      .filter((key) => !branchStockCache[key]);
-    if (missing.length === 0) return;
-    // Cargar de a lotes de 5 para no saturar
-    missing.slice(0, 5).forEach((key) => loadBranchStock(key));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adminBranchFilter, branchStockLoading, pagedGroups.length, session.isAdmin]);
-
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const filtered = visibleProducts.filter((product) => {
@@ -613,6 +599,19 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
   const totalPages = Math.max(1, Math.ceil(filteredGroups.length / PAGE_SIZE));
   const pagedGroups = filteredGroups.slice((catalogPage - 1) * PAGE_SIZE, catalogPage * PAGE_SIZE);
+
+  // Fallback: si el batch tardó o falló, cargar stock individualmente para los productos visibles
+  // Este useEffect va DESPUÉS de pagedGroups para poder usarlo como dependencia
+  useEffect(() => {
+    if (!session.isAdmin || !adminBranchFilter || branchStockLoading) return;
+    const missing = pagedGroups
+      .map((g) => g.variants[0]?.productKey)
+      .filter(Boolean)
+      .filter((key) => !branchStockCache[key]);
+    if (missing.length === 0) return;
+    missing.slice(0, 5).forEach((key) => loadBranchStock(key));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminBranchFilter, branchStockLoading, pagedGroups.length, session.isAdmin]);
 
   const homeProducts = useMemo(() => {
     // Si hay productos marcados como destacados (y no hay filtro de categoría activo), priorizarlos
