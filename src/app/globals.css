@@ -4714,19 +4714,21 @@ details[open] .cf-transfer-manual-toggle::before {
   gap: 8px;
   padding: 6px 0;
   font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9); /* la tarjeta tiene fondo oscuro */
 }
 
 .branch-stock-label {
   font-weight: 600;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.55);
   min-width: 80px;
 }
 
 .branch-stock-count {
-  font-weight: 700;
-  min-width: 24px;
+  font-weight: 800;
+  min-width: 28px;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  color: #fff;
 }
 
 .stock-btn {
