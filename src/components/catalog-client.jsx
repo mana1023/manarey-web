@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { upload } from "@vercel/blob/client";
 import { BrandLogo } from "@/components/brand-logo";
+import { ProductImage } from "@/components/product-image";
 import { calculateItemsSubtotal } from "@/lib/shipping";
 import { storeBranches, storeSettings } from "@/lib/store-config";
 
@@ -132,7 +133,7 @@ async function uploadVideoClientSide(file) {
   const ext = file.name.split(".").pop() || "mp4";
   const blob = await upload(`productos/video-${Date.now()}.${ext}`, file, {
     access: "public",
-    handleUploadUrl: "/api/products/upload-media",
+    handleUploadUrl: `${window.location.origin}/api/products/upload-media`,
   });
   return blob.url;
 }
@@ -1321,7 +1322,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="hero-home-brand">
                 <div className="brand-panel editorial">
                   {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
-                    <img alt={featuredMainProduct.nombre} className="product-image" loading="lazy" src={featuredMainProduct.imageData} />
+                    <ProductImage
+                      src={featuredMainProduct.imageData}
+                      alt={featuredMainProduct.nombre}
+                      className="product-image"
+                      fill
+                      priority
+                      sizes="(max-width: 900px) 100vw, 50vw"
+                    />
                   ) : (
                     <ProductPlaceholder title="Seleccion destacada" />
                   )}
@@ -1400,7 +1408,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       <button className="showcase-mini-card" key={product.productKey} onClick={() => openProductDetail(product)} type="button">
                         <div className="showcase-mini-visual">
                           {product.imageData && !isVideoSrc(product.imageData) ? (
-                            <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
+                            <ProductImage
+                              src={product.imageData}
+                              alt={product.nombre}
+                              className="product-image"
+                              fill
+                              sizes="(max-width: 600px) 45vw, 20vw"
+                            />
                           ) : (
                             <ProductPlaceholder compact title={product.nombre} />
                           )}
@@ -1703,7 +1717,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           aria-label={`Ver detalle de ${product.nombre}`}
                         >
                           {product.imageData && !isVideoSrc(product.imageData) ? (
-                            <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
+                            <ProductImage
+                              src={product.imageData}
+                              alt={product.nombre}
+                              className="product-image"
+                              fill
+                              sizes="(max-width: 480px) 50vw, (max-width: 900px) 33vw, 22vw"
+                            />
                           ) : (
                             <div className="image-placeholder card-no-image">
                               <span className="card-initial">{initial}</span>
@@ -2217,12 +2237,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             style={{ objectFit: "contain" }}
                           />
                         ) : (
-                          <img
+                          <ProductImage
+                            src={currentPhoto}
                             alt={`${selectedProduct.nombre} foto ${safeIndex + 1}`}
                             className="product-image detail-carousel-img"
                             key={safeIndex}
-                            loading="lazy"
-                            src={currentPhoto}
+                            fill
+                            sizes="(max-width: 900px) 100vw, 50vw"
+                            priority={safeIndex === 0}
                           />
                         )}
                       </div>
@@ -2420,7 +2442,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     >
                       <div className="related-visual">
                         {product.imageData && !isVideoSrc(product.imageData) ? (
-                          <img alt={product.nombre} className="product-image" loading="lazy" src={product.imageData} />
+                          <ProductImage
+                            src={product.imageData}
+                            alt={product.nombre}
+                            className="product-image"
+                            fill
+                            sizes="(max-width: 600px) 40vw, 15vw"
+                          />
                         ) : (
                           <ProductPlaceholder compact title={product.nombre} />
                         )}
@@ -2442,93 +2470,34 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       {adminEditorOpen && activeEditor ? (
         <div className="modal-backdrop">
           <div className="admin-editor-modal">
+            {/* Header */}
             <div className="admin-editor-header">
-              <h3 className="admin-editor-title">
-                ✏️ Editar producto
-                {activeEditor && products.find(p => p.productKey === activeEditor.productKey)?.nombre
-                  ? ` — ${products.find(p => p.productKey === activeEditor.productKey).nombre}`
-                  : ""}
-              </h3>
+              <div className="admin-editor-header-info">
+                <p className="admin-editor-eyebrow">Editar producto</p>
+                <h3 className="admin-editor-title">
+                  {products.find(p => p.productKey === activeEditor.productKey)?.nombre || activeEditor.nombre || "—"}
+                </h3>
+              </div>
               <button
                 className="admin-editor-close"
                 onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); setAdminEditorError(""); }}
                 type="button"
-                title="Cerrar sin guardar"
-              >✕</button>
+                aria-label="Cerrar"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
 
             <div className="admin-editor-body">
-              {/* Nombre en pantalla — alias solo frontend, no toca la BD — va primero */}
+
+              {/* ── FOTOS (primero, lo más visual) ──────────────────────── */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">🏪 Nombre en pantalla</p>
-                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
-                  Lo que ven los clientes en la tienda. <strong>No cambia la base de datos.</strong> Dejá vacío para usar el nombre del sistema.
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Fotos y video
                 </p>
-                <input
-                  className="editor-input"
-                  type="text"
-                  placeholder={activeEditor.nombreOriginal || activeEditor.nombre || "Nombre en pantalla…"}
-                  value={displayNames[activeEditor.productKey] || ""}
-                  onChange={(e) => setDisplayName(activeEditor.productKey, e.target.value)}
-                  style={{ width: "100%" }}
-                />
-                {displayNames[activeEditor.productKey] && (
-                  <div style={{
-                    marginTop: 6,
-                    padding: "6px 12px",
-                    background: "rgba(69,103,79,0.1)",
-                    border: "1px solid rgba(69,103,79,0.22)",
-                    borderRadius: 6,
-                    fontSize: "0.82rem",
-                    color: "#45674f",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}>
-                    <span>✅ Activo: <strong>"{displayNames[activeEditor.productKey]}"</strong></span>
-                    <button
-                      type="button"
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: "0.8rem" }}
-                      onClick={() => setDisplayName(activeEditor.productKey, "")}
-                    >Quitar</button>
-                  </div>
-                )}
-              </div>
 
-              {/* Nombre en la BD — campo peligroso, va después */}
-              <div className="admin-editor-section">
-                <p className="admin-editor-section-title">🏷️ Nombre en el sistema (base de datos)</p>
-                {activeEditor.medidaOriginal ? (
-                  <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
-                    Medida en sistema (DB): <strong>{activeEditor.medidaOriginal}</strong>
-                  </p>
-                ) : null}
-                <input
-                  className="editor-input"
-                  type="text"
-                  value={activeEditor.nombre}
-                  onChange={(e) => handleEditorChange(activeEditor.productKey, "nombre", e.target.value)}
-                  style={{ width: "100%" }}
-                />
-                {(activeEditor.nombre || "").trim() !== (activeEditor.nombreOriginal || "").trim() && (
-                  <div style={{
-                    marginTop: 8,
-                    padding: "8px 12px",
-                    background: "#fff3cd",
-                    border: "1px solid #ffc107",
-                    borderRadius: 6,
-                    fontSize: "0.82rem",
-                    color: "#856404",
-                  }}>
-                    ⚠️ <strong>Atención:</strong> Este cambio se guardará directamente en la base de datos del sistema y afectará a todos los registros con este nombre. Se te pedirá confirmación al guardar.
-                  </div>
-                )}
-              </div>
-
-              {/* Fotos */}
-              <div className="admin-editor-section">
-                <p className="admin-editor-section-title">📷 Fotos / Video del producto</p>
-                {(activeEditor.imagesData || []).length > 0 && (
+                {(activeEditor.imagesData || []).length > 0 ? (
                   <div className="admin-images-grid">
                     {(activeEditor.imagesData || []).map((src, i) => (
                       <div key={i} className="admin-image-thumb">
@@ -2539,68 +2508,147 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         )}
                         <div className="admin-image-thumb-actions">
                           {i > 0 && (
-                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, -1)} title="Mover izquierda">◀</button>
+                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, -1)} title="Mover izquierda">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            </button>
                           )}
                           {i < (activeEditor.imagesData.length - 1) && (
-                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, 1)} title="Mover derecha">▶</button>
+                            <button type="button" className="admin-img-move" onClick={() => handleMoveImage(activeEditor.productKey, i, 1)} title="Mover derecha">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
                           )}
-                          <button type="button" className="admin-img-remove" onClick={() => handleRemoveImage(activeEditor.productKey, i)} title="Quitar">✕</button>
+                          <button type="button" className="admin-img-remove" onClick={() => handleRemoveImage(activeEditor.productKey, i)} title="Quitar">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
                         </div>
                         {i === 0 && <span className="admin-img-main-badge">Principal</span>}
                       </div>
                     ))}
+                    {/* Agregar más */}
+                    <label className={`admin-image-add-tile${adminUploadBusy ? " admin-upload-busy" : ""}`}>
+                      {adminUploadBusy ? (
+                        <span className="admin-upload-spinner" />
+                      ) : (
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      )}
+                      <input accept="image/*,video/*" multiple hidden type="file" disabled={adminUploadBusy}
+                        onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
+                    </label>
                   </div>
+                ) : (
+                  <label className={`admin-upload-dropzone${adminUploadBusy ? " admin-upload-busy" : ""}`}>
+                    {adminUploadBusy ? (
+                      <>
+                        <span className="admin-upload-spinner" />
+                        <span className="admin-dropzone-text">Subiendo...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="admin-dropzone-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span className="admin-dropzone-text">Tocá para agregar fotos o video</span>
+                        <span className="admin-dropzone-hint">JPG, PNG, WebP, MP4 · Máx. 20 MB</span>
+                      </>
+                    )}
+                    <input accept="image/*,video/*" multiple hidden type="file" disabled={adminUploadBusy}
+                      onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
+                  </label>
                 )}
-                <label className={`upload-button admin-upload-btn${adminUploadBusy ? " admin-upload-busy" : ""}`} style={{ marginTop: 8 }}>
-                  {adminUploadBusy ? "⏳ Subiendo..." : "📷 Agregar fotos o video"}
-                  <input accept="image/*,video/*" multiple hidden type="file" disabled={adminUploadBusy}
-                    onChange={(event) => handleImageChange(event, activeEditor.productKey)} />
-                </label>
+
                 {adminUploadError && (
-                  <p style={{ color: "var(--danger, #e53e3e)", fontSize: "0.8rem", marginTop: 4 }}>{adminUploadError}</p>
+                  <div className="admin-upload-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {adminUploadError}
+                  </div>
                 )}
               </div>
 
-              {/* Precio */}
+              {/* ── NOMBRE EN PANTALLA ───────────────────────────────────── */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">💲 Precio de venta</p>
-                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 6 }}>
-                  Precio del sistema: <strong>{currencyFormatter.format(activeEditor.precioOriginal || 0)}</strong>.
-                  Dejá en blanco para usar ese precio, o ingresá uno distinto.
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                  Nombre en pantalla
                 </p>
+                <p className="admin-editor-hint">Lo que ven los clientes. <strong>No toca la base de datos.</strong> Dejá vacío para usar el nombre del sistema.</p>
                 <input
                   className="editor-input"
+                  type="text"
+                  placeholder={activeEditor.nombreOriginal || activeEditor.nombre || "Nombre en pantalla…"}
+                  value={displayNames[activeEditor.productKey] || ""}
+                  onChange={(e) => setDisplayName(activeEditor.productKey, e.target.value)}
+                />
+                {displayNames[activeEditor.productKey] && (
+                  <div className="admin-editor-tag admin-editor-tag--green">
+                    <span>Activo: <strong>"{displayNames[activeEditor.productKey]}"</strong></span>
+                    <button type="button" onClick={() => setDisplayName(activeEditor.productKey, "")}>Quitar</button>
+                  </div>
+                )}
+              </div>
+
+              {/* ── NOMBRE EN BD ─────────────────────────────────────────── */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                  Nombre en sistema (BD)
+                </p>
+                {activeEditor.medidaOriginal && (
+                  <p className="admin-editor-hint">Medida en sistema: <strong>{activeEditor.medidaOriginal}</strong></p>
+                )}
+                <input
+                  className="editor-input"
+                  type="text"
+                  value={activeEditor.nombre}
+                  onChange={(e) => handleEditorChange(activeEditor.productKey, "nombre", e.target.value)}
+                />
+                {(activeEditor.nombre || "").trim() !== (activeEditor.nombreOriginal || "").trim() && (
+                  <div className="admin-editor-tag admin-editor-tag--warn">
+                    ⚠️ <strong>Cambia la base de datos</strong> — afecta todos los registros con este nombre.
+                  </div>
+                )}
+              </div>
+
+              {/* ── PRECIO ──────────────────────────────────────────────── */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Precio de venta
+                </p>
+                <p className="admin-editor-hint">Sistema: <strong>{currencyFormatter.format(activeEditor.precioOriginal || 0)}</strong> — dejá vacío para usar ese precio.</p>
+                <input
+                  className="editor-input admin-price-input"
                   type="number"
                   min="0"
                   step="100"
                   placeholder={String(activeEditor.precioOriginal || "")}
                   value={activeEditor.precioVenta}
                   onChange={(e) => handleEditorChange(activeEditor.productKey, "precioVenta", e.target.value)}
-                  style={{ maxWidth: 180 }}
                 />
               </div>
 
-              {/* Descripcion */}
+              {/* ── DESCRIPCIÓN ─────────────────────────────────────────── */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">📝 Descripcion</p>
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+                  Descripción
+                </p>
                 <textarea
                   className="editor-textarea admin-editor-textarea"
-                  placeholder="Describe el producto: materiales, características, usos..."
+                  placeholder="Describí el producto: materiales, características, usos..."
                   value={activeEditor.description}
-                  rows={5}
+                  rows={4}
                   onChange={(e) => handleEditorChange(activeEditor.productKey, "description", e.target.value)}
                 />
               </div>
 
-              {/* Medidas */}
+              {/* ── MEDIDAS ─────────────────────────────────────────────── */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">📐 Medidas</p>
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M21 6H3"/><path d="M21 12H3"/><path d="M21 18H3"/></svg>
+                  Medidas
+                </p>
                 <div className="admin-editor-fields">
                   {[
-                    ["altoCm",       "Alto (cm)"],
-                    ["anchoCm",      "Ancho (cm)"],
-                    ["profundidadCm","Profundidad (cm)"],
-                    ["largoCm",      "Largo (cm)"],
+                    ["altoCm","Alto (cm)"],["anchoCm","Ancho (cm)"],
+                    ["profundidadCm","Prof. (cm)"],["largoCm","Largo (cm)"],
                   ].map(([field, label]) => (
                     <label key={field} className="admin-field-label">
                       <span>{label}</span>
@@ -2612,17 +2660,17 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </div>
               </div>
 
-              {/* Especificaciones técnicas */}
+              {/* ── SPECS TÉCNICAS ──────────────────────────────────────── */}
               <div className="admin-editor-section">
-                <p className="admin-editor-section-title">⚡ Especificaciones técnicas</p>
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Especificaciones
+                </p>
                 <div className="admin-editor-fields">
                   {[
-                    ["litros",   "Litros"],
-                    ["watts",    "Watts"],
-                    ["pesoKg",   "Peso (kg)"],
-                    ["voltaje",  "Voltaje"],
-                    ["material", "Material"],
-                    ["capacidad","Capacidad"],
+                    ["litros","Litros"],["watts","Watts"],
+                    ["pesoKg","Peso (kg)"],["voltaje","Voltaje"],
+                    ["material","Material"],["capacidad","Capacidad"],
                   ].map(([field, label]) => (
                     <label key={field} className="admin-field-label">
                       <span>{label}</span>
@@ -2634,10 +2682,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </div>
               </div>
 
-              {/* Stock por sucursal */}
+              {/* ── STOCK ───────────────────────────────────────────────── */}
               {branchStockCache[activeEditor.productKey] ? (
                 <div className="admin-editor-section">
-                  <p className="admin-editor-section-title">📦 Stock por sucursal</p>
+                  <p className="admin-editor-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Stock por sucursal
+                  </p>
                   <div className="editor-branch-stock">
                     {branchStockCache[activeEditor.productKey].map((b) => (
                       <div key={b.local} className="editor-branch-row">
@@ -2653,21 +2704,32 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </div>
               ) : (
                 <div className="admin-editor-section">
-                  <p className="admin-editor-section-title">📦 Stock por sucursal</p>
-                  <button className="ghost-button" onClick={() => loadBranchStock(activeEditor.productKey)} type="button">
-                    Cargar stock
+                  <p className="admin-editor-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Stock por sucursal
+                  </p>
+                  <button className="admin-load-stock-btn" onClick={() => loadBranchStock(activeEditor.productKey)} type="button">
+                    Ver stock
                   </button>
                 </div>
               )}
             </div>
 
-            {adminEditorError ? (
+            {adminEditorError && (
               <div className="admin-editor-error">{adminEditorError}</div>
-            ) : null}
+            )}
+
             <div className="admin-editor-footer">
-              <button className="primary-button" disabled={pending}
+              <button
+                className="admin-editor-cancel-btn"
+                onClick={() => { setAdminEditorOpen(false); setActiveEditor(null); setAdminEditorError(""); }}
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button className="primary-button admin-editor-save-btn" disabled={pending}
                 onClick={() => handleSave(activeEditor.productKey)} type="button">
-                {pending ? "Guardando..." : "Aplicar"}
+                {pending ? "Guardando..." : "Guardar cambios"}
               </button>
             </div>
           </div>
@@ -2816,44 +2878,82 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
             {cart.length === 0 ? (
               <div className="cart-empty">
-                <span className="cart-empty-icon">🛋️</span>
-                <p>Tu carrito está vacío.</p>
-                <button className="ghost-button" onClick={() => { navigateTo("catalogo"); setCartOpen(false); }} type="button">
-                  Ver catálogo →
-                </button>
+                <div className="cart-empty-illustration">
+                  <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
+                    <circle cx="36" cy="36" r="36" fill="rgba(210,162,62,0.10)"/>
+                    <path d="M22 26h4l3.5 16h14l3.5-12H27" stroke="var(--gold-strong)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    <circle cx="32" cy="46" r="2" fill="var(--gold-strong)"/>
+                    <circle cx="44" cy="46" r="2" fill="var(--gold-strong)"/>
+                    <path d="M40 20c2-3 6-3 7 0" stroke="var(--gold)" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                    <path d="M46 20c2-1 4 0 4 2" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <div className="cart-empty-copy">
+                  <p className="cart-empty-title">Tu carrito está vacío</p>
+                  <p className="cart-empty-sub">Agregá productos desde el catálogo o consultanos por WhatsApp.</p>
+                </div>
+                <div className="cart-empty-actions">
+                  <button className="primary-button" style={{ fontSize: "0.92rem", padding: "11px 22px" }} onClick={() => { navigateTo("catalogo"); setCartOpen(false); }} type="button">
+                    Ver catálogo
+                  </button>
+                  {whatsappNumber && (
+                    <a
+                      className="ghost-button"
+                      style={{ fontSize: "0.88rem", padding: "10px 18px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
+                      href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hola, quiero consultar sobre sus productos 😊")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      Consultar por WhatsApp
+                    </a>
+                  )}
+                </div>
+                <p className="cart-empty-hint">💡 También podés cerrar la venta por WhatsApp sin pagar online.</p>
               </div>
             ) : (
               <>
                 <div className="cart-list">
                   {cart.map((item) => {
                     const product = products.find((p) => p.productKey === item.productKey);
+                    const step = /silla/i.test(item.nombre) && !/pino/i.test(`${item.nombre} ${item.material || ""}`) ? 6 : 1;
+                    const stock = product?.stockTotal ?? Infinity;
+                    const atMax = item.quantity >= stock;
+                    const unitPrice = item.precioVenta + (item.accessoryPrice || 0);
+                    const lineTotal = unitPrice * item.quantity;
                     return (
                       <div className="cart-item" key={item.lineKey}>
                         <div className="cart-item-thumb">
                           {product?.imageData && !isVideoSrc(product.imageData)
                             ? <img src={product.imageData} alt={item.nombre} />
-                            : <span>{item.nombre[0]}</span>}
+                            : <span className="cart-thumb-letter">{item.nombre[0]}</span>}
                         </div>
                         <div className="cart-item-body">
                           <p className="cart-name">{item.nombre}</p>
                           {item.accessoryLabel ? <p className="cart-extra">+ {item.accessoryLabel}</p> : null}
-                          <p className="cart-line-total">
-                            {currencyFormatter.format((item.precioVenta + (item.accessoryPrice || 0)) * item.quantity)}
-                          </p>
-                        </div>
-                        <div className="cart-quantity">
-                          {(() => {
-                            const step = /silla/i.test(item.nombre) && !/pino/i.test(`${item.nombre} ${item.material || ""}`) ? 6 : 1;
-                            const stock = product?.stockTotal ?? Infinity;
-                            const atMax = item.quantity >= stock;
-                            return (
-                              <>
-                                <button onClick={() => changeCartQuantity(item.lineKey, -step)} type="button">−</button>
-                                <span>{item.quantity}{atMax && stock !== Infinity ? <span className="cart-qty-max" title={`Stock disponible: ${stock}`}> /{stock}</span> : null}</span>
-                                <button onClick={() => changeCartQuantity(item.lineKey, step)} type="button" disabled={atMax} title={atMax ? `Stock máximo: ${stock}` : undefined}>+</button>
-                              </>
-                            );
-                          })()}
+                          <div className="cart-item-pricing">
+                            <span className="cart-unit-price">{currencyFormatter.format(unitPrice)} c/u</span>
+                            <span className="cart-line-total">{currencyFormatter.format(lineTotal)}</span>
+                          </div>
+                          <div className="cart-quantity">
+                            <button onClick={() => changeCartQuantity(item.lineKey, -step)} type="button" aria-label="Restar cantidad">−</button>
+                            <span>
+                              {item.quantity}
+                              {atMax && stock !== Infinity ? <span className="cart-qty-max" title={`Stock máximo: ${stock}`}> /{stock}</span> : null}
+                            </span>
+                            <button onClick={() => changeCartQuantity(item.lineKey, step)} type="button" disabled={atMax} aria-label="Sumar cantidad" title={atMax ? `Stock máximo: ${stock}` : undefined}>+</button>
+                            <button
+                              className="cart-remove-btn"
+                              onClick={() => changeCartQuantity(item.lineKey, -item.quantity)}
+                              type="button"
+                              aria-label="Quitar del carrito"
+                              title="Quitar"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -2862,16 +2962,39 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
                 <div className="cart-footer">
                   <div className="cart-total-row">
-                    <span>Subtotal</span>
-                    <strong>{currencyFormatter.format(checkoutSummary.subtotal)}</strong>
+                    <div>
+                      <span className="cart-total-label">Subtotal</span>
+                      <p className="cart-total-sub">{cart.reduce((s, i) => s + i.quantity, 0)} producto{cart.reduce((s, i) => s + i.quantity, 0) !== 1 ? "s" : ""} · Envío se calcula al finalizar</p>
+                    </div>
+                    <strong className="cart-total-amount">{currencyFormatter.format(checkoutSummary.subtotal)}</strong>
                   </div>
-                  <p className="cart-footer-note">Envío y forma de pago se eligen en el siguiente paso.</p>
+
                   <a className="primary-button cart-checkout-btn" href="/checkout">
-                    Finalizar compra →
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    Finalizar compra
                   </a>
-                  <button className="ghost-button" style={{ width: "100%", marginTop: 8, textAlign: "center" }} onClick={() => setCartOpen(false)} type="button">
-                    Seguir comprando
-                  </button>
+
+                  <div className="cart-footer-bottom">
+                    <button className="cart-keep-shopping" onClick={() => setCartOpen(false)} type="button">
+                      ← Seguir comprando
+                    </button>
+                    <button
+                      className="cart-clear-btn"
+                      onClick={() => { if (window.confirm("¿Vaciar el carrito?")) setCart([]); }}
+                      type="button"
+                    >
+                      Vaciar
+                    </button>
+                  </div>
+
+                  <div className="cart-payment-strip">
+                    <span className="cart-payment-label">Aceptamos</span>
+                    <div className="cart-payment-icons">
+                      {["Visa", "Mastercard", "MP", "Naranja X", "Transferencia"].map((m) => (
+                        <span key={m} className="cart-payment-chip">{m}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </>
             )}

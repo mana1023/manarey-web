@@ -3,10 +3,28 @@ import { createOrder, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/o
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { sendTransferPendingMessage } from "@/lib/whatsapp-sender";
 import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { checkCartStock } from "@/lib/stock";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request) {
+  const ip = getClientIp(request);
+  const rl = rateLimit({ key: `transfer:${ip}`, max: 10, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: `Demasiados intentos. Esperá ${rl.resetIn} segundos.` },
+      { status: 429 },
+    );
+  }
+
   try {
     const payload = await request.json();
+
+    // Verificar stock
+    const stockError = await checkCartStock(payload.items);
+    if (stockError) {
+      return NextResponse.json({ error: stockError.error }, { status: 409 });
+    }
+
     const order = await createOrder({ paymentMethod: "transfer", payload });
 
     // MercadoPago es opcional para transferencia — si no está configurado o falla, igual se crea el pedido

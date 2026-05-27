@@ -44,7 +44,13 @@ function getBranchLabel(localName) {
 
 // ─── Componente MP Bricks ────────────────────────────────────────────────────
 
-function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
+const INSTALLMENT_OPTIONS = [
+  { value: 1,  label: "1 cuota",  surcharge: 0,    desc: "Sin recargo" },
+  { value: 3,  label: "3 cuotas", surcharge: 0.25, desc: "25% de recargo" },
+  { value: 6,  label: "6 cuotas", surcharge: 0.25, desc: "25% de recargo" },
+];
+
+function MercadoPagoBrick({ amount, email, identification, cardholderName, maxInstallments, onSuccess, onError }) {
   const containerRef = useRef(null);
   const brickRef = useRef(null);
   const [ready, setReady] = useState(false);
@@ -58,9 +64,15 @@ function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
     function initBrick() {
       if (destroyed || !window.MercadoPago) return;
       const mp = new window.MercadoPago(publicKey, { locale: "es-AR" });
+
+      const payer = { email: email || "" };
+      if (identification?.number) {
+        payer.identification = { type: identification.type || "DNI", number: identification.number };
+      }
+
       mp.bricks()
         .create("cardPayment", "mp-card-brick", {
-          initialization: { amount, payer: { email: email || "" } },
+          initialization: { amount, payer },
           callbacks: {
             onReady: () => setReady(true),
             onSubmit: async (formData) => {
@@ -71,10 +83,17 @@ function MercadoPagoBrick({ amount, email, onSuccess, onError }) {
                 return Promise.reject(err);
               }
             },
-            onError: (err) => onError(err?.message || "Error en el formulario de pago."),
+            onError: (err) => {
+              const cause = err?.cause?.[0]?.code || err?.message || "";
+              if (cause === "empty_installments" || String(cause).includes("installment")) {
+                onError("No se pudo obtener información de esta tarjeta. Verificá que los datos sean correctos o intentá con otra tarjeta.");
+              } else {
+                onError(err?.message || "Error en el formulario de pago.");
+              }
+            },
           },
           customization: {
-            paymentMethods: { creditCard: "all", debitCard: "all" },
+            paymentMethods: { creditCard: "all", debitCard: "all", maxInstallments: maxInstallments || 12 },
             visual: {
               style: { theme: "default", customVariables: { formPadding: "0px" } },
               hideFormTitle: true,
@@ -312,7 +331,7 @@ export function CheckoutFlow({ initialCustomer }) {
   const [authError, setAuthError] = useState("");
 
   // Personal data (editable after login)
-  const [personalData, setPersonalData] = useState({ nombre: "", apellido: "", telefono: "", email: "" });
+  const [personalData, setPersonalData] = useState({ nombre: "", apellido: "", telefono: "", email: "", dni: "" });
   const [personalEdited, setPersonalEdited] = useState(false);
 
   // Shipping
@@ -331,6 +350,7 @@ export function CheckoutFlow({ initialCustomer }) {
   const [paymentBusy, setPaymentBusy] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [completedOrder, setCompletedOrder] = useState(null);
+  const [selectedInstallments, setSelectedInstallments] = useState(1);
 
   // Transfer payment polling
   const [pollingActive, setPollingActive] = useState(false);
@@ -388,6 +408,7 @@ export function CheckoutFlow({ initialCustomer }) {
         apellido: customer.apellido || "",
         telefono: customer.telefono || "",
         email: customer.email || "",
+        dni: customer.dni || "",
       });
     }
   }, [customer, personalEdited]);
@@ -620,6 +641,7 @@ export function CheckoutFlow({ initialCustomer }) {
             shippingModeId: shippingMode,
             customer: buildCustomerPayload(),
             selectedBranch,
+            surchargeAmount,
           }),
         });
         const data = await res.json();
@@ -638,7 +660,7 @@ export function CheckoutFlow({ initialCustomer }) {
         setPaymentBusy(false);
       }
     },
-    [cart, shippingMode, selectedBranch, personalData, distanceKm, deliveryAddress],
+    [cart, shippingMode, selectedBranch, personalData, distanceKm, deliveryAddress, surchargeAmount],
   );
 
   // ── Payment: WhatsApp ─────────────────────────────────────────────────────
@@ -720,6 +742,9 @@ export function CheckoutFlow({ initialCustomer }) {
   const subtotal = calcSubtotal(cart);
   const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
   const total = subtotal + shippingCost;
+  const installmentOpt = INSTALLMENT_OPTIONS.find((o) => o.value === selectedInstallments) || INSTALLMENT_OPTIONS[0];
+  const surchargeAmount = paymentMethod === "card" ? Math.round(total * installmentOpt.surcharge) : 0;
+  const totalWithSurcharge = total + surchargeAmount;
 
   // ── Empty cart ────────────────────────────────────────────────────────────
 
@@ -1110,7 +1135,7 @@ export function CheckoutFlow({ initialCustomer }) {
               {/* Total siempre visible — especialmente útil en mobile */}
               <div className="cf-total-bar">
                 <span>Total a pagar</span>
-                <strong>{currencyFmt.format(total)}</strong>
+                <strong>{currencyFmt.format(paymentMethod === "card" ? totalWithSurcharge : total)}</strong>
               </div>
 
               <button
@@ -1171,18 +1196,55 @@ export function CheckoutFlow({ initialCustomer }) {
                     <p className="cf-card-title">Pago con tarjeta</p>
                     <button
                       className="cf-link-btn"
-                      onClick={() => setPaymentMethod("")}
+                      onClick={() => { setPaymentMethod(""); setSelectedInstallments(1); }}
                       type="button"
                     >
                       Cambiar método
                     </button>
                   </div>
+
+                  {/* Installment selector */}
+                  <div className="cf-installment-selector">
+                    <p className="cf-installment-label">Cantidad de cuotas</p>
+                    <div className="cf-installment-options">
+                      {INSTALLMENT_OPTIONS.map((opt) => {
+                        const optTotal = total * (1 + opt.surcharge);
+                        const isActive = selectedInstallments === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            className={`cf-installment-btn${isActive ? " active" : ""}`}
+                            onClick={() => setSelectedInstallments(opt.value)}
+                            type="button"
+                          >
+                            <span className="cf-inst-label">{opt.label}</span>
+                            <span className="cf-inst-desc">{opt.desc}</span>
+                            <span className="cf-inst-total">{currencyFmt.format(optTotal)}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Surcharge breakdown */}
+                  {surchargeAmount > 0 && (
+                    <div className="cf-surcharge-breakdown">
+                      <div><span>Precio base</span><span>{currencyFmt.format(total)}</span></div>
+                      <div><span>Recargo {selectedInstallments} cuotas (25%)</span><span className="cf-surcharge-plus">+{currencyFmt.format(surchargeAmount)}</span></div>
+                      <div className="cf-surcharge-total"><span>Total a cobrar</span><strong>{currencyFmt.format(totalWithSurcharge)}</strong></div>
+                    </div>
+                  )}
+
                   {paymentBusy ? (
                     <p className="cf-muted">Procesando pago...</p>
                   ) : (
                     <MercadoPagoBrick
-                      amount={total}
-                      email={customer?.email || ""}
+                      key={selectedInstallments}
+                      amount={totalWithSurcharge}
+                      email={personalData.email || customer?.email || ""}
+                      identification={personalData.dni ? { type: "DNI", number: personalData.dni } : undefined}
+                      cardholderName={`${personalData.nombre} ${personalData.apellido}`.trim() || undefined}
+                      maxInstallments={selectedInstallments}
                       onSuccess={handleCardSubmit}
                       onError={(msg) => setPaymentError(msg)}
                     />

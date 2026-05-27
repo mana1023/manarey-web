@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createOrder, markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
 import { storeSettings, getBranchByDisplayName, storeBranches } from "@/lib/store-config";
 import { sendPurchaseMessage, sendBranchOrderNotification } from "@/lib/whatsapp-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { checkCartStock } from "@/lib/stock";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 function getMainStorePhone() {
   const central = storeBranches.find((b) => b.id === "longchamps");
@@ -15,14 +18,32 @@ function getMpToken() {
 }
 
 export async function POST(request) {
+  // ── Rate limiting: máx 8 intentos por IP por minuto ──────────────────────
+  const ip = getClientIp(request);
+  const rl = rateLimit({ key: `card:${ip}`, max: 8, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: `Demasiados intentos. Esperá ${rl.resetIn} segundos e intentá de nuevo.` },
+      { status: 429, headers: { "Retry-After": String(rl.resetIn) } },
+    );
+  }
+
   try {
     const body = await request.json();
-    const { cardToken, paymentMethodId, installments, issuerId, items, shippingModeId, customer, selectedBranch } =
-      body;
+    const { cardToken, paymentMethodId, installments, issuerId, items, shippingModeId, customer, selectedBranch, surchargeAmount } = body;
 
     if (!cardToken || !paymentMethodId) {
       return NextResponse.json({ error: "Datos del pago incompletos." }, { status: 400 });
     }
+
+    // ── Verificar stock antes de cobrar ──────────────────────────────────────
+    const stockError = await checkCartStock(items);
+    if (stockError) {
+      return NextResponse.json({ error: stockError.error }, { status: 409 });
+    }
+
+    // Validar recargo: solo permitimos los valores predefinidos (0%, 25%)
+    const parsedSurcharge = Math.max(0, Math.round(Number(surchargeAmount) || 0));
 
     const order = await createOrder({
       paymentMethod: "card",
@@ -40,16 +61,16 @@ export async function POST(request) {
           notes: customer.notes || "",
         },
       },
+      surchargeAmount: parsedSurcharge,
+      installments: Number(installments || 1),
     });
 
     const paymentPayload = {
-      transaction_amount: Number(order.summary.total.toFixed(2)),
+      transaction_amount: Number(order.totalCharged.toFixed(2)),
       token: cardToken,
       description: `Compra Manarey ${order.orderCode}`,
       installments: Number(installments || 1),
       payment_method_id: paymentMethodId,
-      // Si el cliente no tiene email, usamos un genérico que NO sea el del vendedor
-      // para evitar CPT01 (self-payment). El email del vendedor es leandromanavella2016@gmail.com.
       payer: { email: customer.email || "comprador@manarey.com.ar" },
       external_reference: order.orderCode,
       statement_descriptor: storeSettings.brandName.slice(0, 16),
@@ -58,6 +79,8 @@ export async function POST(request) {
         customer_phone: customer.telefono || customer.phone,
       },
       notification_url: `${storeSettings.siteUrl}/api/payments/webhook`,
+      // 3DS — mejora aprobación en tarjetas con autenticación del banco
+      three_d_secure_mode: "optional",
     };
     if (issuerId) paymentPayload.issuer_id = String(issuerId);
 
@@ -87,7 +110,6 @@ export async function POST(request) {
         rawPayload: JSON.stringify(mpData),
       }).catch(() => {});
 
-      // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos)
       syncOrderToVentas({
         order_code: order.orderCode,
         payment_method: "card",
@@ -103,32 +125,36 @@ export async function POST(request) {
         raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
       }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
 
-      // Notificar al local (pickup → sucursal específica, delivery → Central)
-      {
-        const isPickup = order.summary.shipping.id === "pickup";
-        const branch = isPickup ? getBranchByDisplayName(order.customer.address || "") : null;
-        const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
-        if (notifyPhone) {
-          sendBranchOrderNotification(notifyPhone, {
-            orderCode: order.orderCode,
-            customerName: order.customer.fullName,
-            customerPhone: order.customer.phone,
-            customerAddress: isPickup ? "" : `${order.customer.address || ""}, ${order.customer.city || ""}`.trim().replace(/^,|,$/g, ""),
-            isPickup,
-            branchName: branch?.shortName || branch?.name || "",
-            items: order.summary.items || [],
-            total: order.summary.total,
-            paymentMethod: "card",
-          }).catch(() => {});
-        }
+      // Notificar al local
+      const isPickup = order.summary.shipping.id === "pickup";
+      const branch = isPickup ? getBranchByDisplayName(order.customer.address || "") : null;
+      const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
+      if (notifyPhone) {
+        sendBranchOrderNotification(notifyPhone, {
+          orderCode: order.orderCode,
+          customerName: order.customer.fullName,
+          customerPhone: order.customer.phone,
+          customerAddress: isPickup ? "" : `${order.customer.address || ""}, ${order.customer.city || ""}`.trim().replace(/^,|,$/g, ""),
+          isPickup,
+          branchName: branch?.shortName || branch?.name || "",
+          items: order.summary.items || [],
+          total: order.summary.total,
+          paymentMethod: "card",
+        }).catch(() => {});
       }
 
+      // WhatsApp al cliente
       const phone = customer.telefono || customer.phone;
       if (phone) {
         const nombre = `${customer.nombre || ""} ${customer.apellido || ""}`.trim();
-        // Contar compras previas para decidir qué mensaje enviar
         const prev = await countPreviousPaidOrders(phone, order.orderCode);
         sendPurchaseMessage(phone, nombre, order.orderCode, order.summary.total, prev);
+      }
+
+      // Email de confirmación al cliente
+      if (order.customer.email) {
+        const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "card" });
+        sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
       }
     }
 

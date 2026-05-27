@@ -46,6 +46,16 @@ export async function ensureOrdersTables() {
         add column if not exists shipping_distance_km numeric not null default 0
       `);
 
+      // Recargo por cuotas (card surcharge)
+      await query(`
+        alter table public.web_orders
+        add column if not exists surcharge_amount numeric not null default 0
+      `).catch(() => {});
+      await query(`
+        alter table public.web_orders
+        add column if not exists installments integer not null default 1
+      `).catch(() => {});
+
       await query(`
         create table if not exists public.web_order_items (
           id bigserial primary key,
@@ -112,11 +122,13 @@ export async function validateCheckoutPayload(payload = {}) {
   return { customer, summary };
 }
 
-export async function createOrder({ paymentMethod, payload }) {
+export async function createOrder({ paymentMethod, payload, surchargeAmount = 0, installments = 1 }) {
   await ensureOrdersTables();
 
   const { customer, summary } = await validateCheckoutPayload(payload);
   const orderCode = buildOrderCode();
+  const surcharge = Math.max(0, Math.round(Number(surchargeAmount) || 0));
+  const totalCharged = summary.total + surcharge;
 
   const result = await query(
     `
@@ -135,9 +147,11 @@ export async function createOrder({ paymentMethod, payload }) {
         shipping_cost,
         subtotal,
         total,
+        surcharge_amount,
+        installments,
         raw_payload
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb)
       returning id, order_code
     `,
     [
@@ -154,8 +168,10 @@ export async function createOrder({ paymentMethod, payload }) {
       summary.shipping.distanceKm || 0,
       summary.shipping.cost,
       summary.subtotal,
-      summary.total,
-      JSON.stringify({ customer, summary }),
+      summary.total,       // precio base sin recargo
+      surcharge,           // recargo por cuotas
+      installments,
+      JSON.stringify({ customer, summary, surchargeAmount: surcharge, installments }),
     ],
   );
 
@@ -196,6 +212,9 @@ export async function createOrder({ paymentMethod, payload }) {
     orderCode: order.order_code,
     customer,
     summary,
+    surchargeAmount: surcharge,
+    installments,
+    totalCharged,  // total + recargo = lo que se cobra realmente
   };
 }
 

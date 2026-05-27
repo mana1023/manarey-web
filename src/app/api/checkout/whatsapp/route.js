@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createOrder, syncOrderToVentas } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
 import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { checkCartStock } from "@/lib/stock";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 function buildWhatsAppUrl(message) {
   if (!storeSettings.whatsappNumber) {
@@ -12,12 +14,28 @@ function buildWhatsAppUrl(message) {
 }
 
 export async function POST(request) {
+  const ip = getClientIp(request);
+  const rl = rateLimit({ key: `whatsapp:${ip}`, max: 10, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: `Demasiados intentos. Esperá ${rl.resetIn} segundos.` },
+      { status: 429 },
+    );
+  }
+
   try {
     if (!storeSettings.whatsappNumber) {
       throw new Error("Falta configurar NEXT_PUBLIC_WHATSAPP_NUMBER.");
     }
 
     const payload = await request.json();
+
+    // Verificar stock
+    const stockError = await checkCartStock(payload.items);
+    if (stockError) {
+      return NextResponse.json({ error: stockError.error }, { status: 409 });
+    }
+
     const order = await createOrder({ paymentMethod: "whatsapp", payload });
     const message = [
       `Hola ${storeSettings.brandName}, quiero cerrar la compra ${order.orderCode}.`,
