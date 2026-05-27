@@ -5536,12 +5536,33 @@ details[open] .cf-transfer-manual-toggle::before {
   font-size: 0.88rem;
 }
 
+@keyframes stock-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
 .branch-stock-loading {
   color: var(--muted);
-  font-size: 1.1rem;
-  letter-spacing: 2px;
-  animation: cfSpin 1s linear infinite;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
   display: inline-block;
+}
+.branch-stock-loading--pulse {
+  animation: stock-pulse 1.2s ease-in-out infinite;
+}
+.branch-stock-loading--retry {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 7px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--muted);
+  transition: color 0.15s, border-color 0.15s;
+}
+.branch-stock-loading--retry:hover {
+  color: var(--text);
+  border-color: var(--text);
 }
 
 /* ── Banner de stock por sucursal (admin) ───────────────────────────── */
@@ -5555,6 +5576,10 @@ details[open] .cf-transfer-manual-toggle::before {
   border-radius: 14px;
   padding: 12px 18px;
   margin-bottom: 4px;
+}
+.branch-stock-banner--loading {
+  opacity: 0.7;
+  animation: stock-pulse 1.4s ease-in-out infinite;
 }
 .branch-stock-banner-local {
   font-weight: 800;

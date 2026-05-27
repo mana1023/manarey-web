@@ -327,6 +327,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [migrateResult, setMigrateResult] = useState(null);
   const [featuredBusy, setFeaturedBusy] = useState(false);
   const [branchStockCache, setBranchStockCache] = useState({}); // { [productKey]: [{ local, stock }] }
+  const [branchStockLoading, setBranchStockLoading] = useState(false); // true mientras carga el batch
   const [stockUpdating, setStockUpdating] = useState({}); // { [productKey+local]: true }
   const [catalogPage, setCatalogPage] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({}); // { [variantGroupKey]: productKey }
@@ -524,6 +525,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   // Carga masiva de stock al entrar al modo admin (una sola consulta para todos los productos)
   useEffect(() => {
     if (!session.isAdmin) return;
+    setBranchStockLoading(true);
     fetch("/api/products/branch-stock-all")
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
@@ -531,8 +533,23 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           setBranchStockCache(data.cache);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setBranchStockLoading(false));
   }, [session.isAdmin]);
+
+  // Fallback: si el batch tardó o falló, cargar stock individualmente para los productos visibles
+  useEffect(() => {
+    if (!session.isAdmin || !adminBranchFilter || branchStockLoading) return;
+    // Solo disparar si hay productos visibles sin stock cargado
+    const missing = pagedGroups
+      .map((g) => g.variants[0]?.productKey)
+      .filter(Boolean)
+      .filter((key) => !branchStockCache[key]);
+    if (missing.length === 0) return;
+    // Cargar de a lotes de 5 para no saturar
+    missing.slice(0, 5).forEach((key) => loadBranchStock(key));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminBranchFilter, branchStockLoading, pagedGroups.length, session.isAdmin]);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -1673,7 +1690,15 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 ) : null}
 
                 {/* Banner de stock por sucursal */}
-                {session.isAdmin && adminBranchFilter && Object.keys(branchStockCache).length > 0 ? (() => {
+                {session.isAdmin && adminBranchFilter ? (() => {
+                  if (branchStockLoading && Object.keys(branchStockCache).length === 0) {
+                    return (
+                      <div className="branch-stock-banner branch-stock-banner--loading">
+                        <span className="branch-stock-banner-local">📦 {adminBranchFilter}</span>
+                        <span className="branch-stock-banner-stat">Cargando stock…</span>
+                      </div>
+                    );
+                  }
                   const conStock = filteredGroups.filter((g) =>
                     (branchStockCache[g.variants[0]?.productKey]?.find((b) => b.local === adminBranchFilter)?.stock ?? 0) > 0
                   ).length;
@@ -1815,8 +1840,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                                   </span>
                                   <button className="stock-btn" disabled={stockUpdating[`${product.productKey}::${adminBranchFilter}`]} onClick={() => updateBranchStock(product.productKey, adminBranchFilter, 1)} type="button">+</button>
                                 </>
+                              ) : branchStockLoading ? (
+                                <span className="branch-stock-loading branch-stock-loading--pulse">cargando</span>
                               ) : (
-                                <span className="branch-stock-loading">···</span>
+                                <button
+                                  className="branch-stock-loading branch-stock-loading--retry"
+                                  onClick={() => loadBranchStock(product.productKey)}
+                                  type="button"
+                                >↻ cargar</button>
                               )}
                             </div>
                           )}

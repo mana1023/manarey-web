@@ -2,20 +2,9 @@ import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { storeBranches } from "@/lib/store-config";
 
-// Cache en memoria: 30 segundos (suficiente para que el admin no pegue N requests)
-const g = globalThis;
-const CACHE_TTL = 30_000;
-
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  // Servir del cache si está fresco
-  if (g._branchStockAllCache && Date.now() - g._branchStockAllCache.ts < CACHE_TTL) {
-    return NextResponse.json({ cache: g._branchStockAllCache.data }, {
-      headers: { "X-Cache": "HIT" },
-    });
-  }
-
   const dbToDisplay = {};
   for (const b of storeBranches) {
     dbToDisplay[b.dbName] = b.name;
@@ -24,8 +13,8 @@ export async function GET() {
   try {
     const dbNames = storeBranches.map((b) => b.dbName);
 
-    // ⚠️ Fórmula NUEVA: igual que getCatalogProducts en lib/products.js
-    //    md5(nombre | medida | color)  — sin categoria ni precio_venta
+    // Fórmula NUEVA: igual que getCatalogProducts en lib/products.js
+    // md5(nombre | medida | color)  — sin categoria ni precio_venta
     const result = await query(
       `SELECT
          md5(concat_ws('|',
@@ -58,9 +47,6 @@ export async function GET() {
         stock: byDisplay[b.name] ?? 0,
       }));
     }
-
-    // Guardar en cache global
-    g._branchStockAllCache = { data: cache, ts: Date.now() };
 
     return NextResponse.json({ cache });
   } catch (err) {
