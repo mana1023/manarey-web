@@ -335,7 +335,7 @@ export function CheckoutFlow({ initialCustomer }) {
   const [personalEdited, setPersonalEdited] = useState(false);
 
   // Shipping
-  const [shippingMode, setShippingMode] = useState("pickup"); // pickup | delivery
+  const [shippingMode, setShippingMode] = useState("delivery"); // pickup | delivery
   const [selectedBranch, setSelectedBranch] = useState("");
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
