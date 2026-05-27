@@ -599,6 +599,15 @@ export function CheckoutFlow({ initialCustomer }) {
     setStep("payment");
   }
 
+  // ── Totales y recargos (deben calcularse ANTES de useCallback) ──────────────
+
+  const subtotal = calcSubtotal(cart);
+  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
+  const total = subtotal + shippingCost;
+  const installmentOpt = INSTALLMENT_OPTIONS.find((o) => o.value === selectedInstallments) || INSTALLMENT_OPTIONS[0];
+  const surchargeAmount = paymentMethod === "card" ? Math.round(total * installmentOpt.surcharge) : 0;
+  const totalWithSurcharge = total + surchargeAmount;
+
   // ── Build cart payload for APIs ───────────────────────────────────────────
 
   function buildCustomerPayload() {
@@ -738,13 +747,6 @@ export function CheckoutFlow({ initialCustomer }) {
       "noopener,noreferrer",
     );
   }
-
-  const subtotal = calcSubtotal(cart);
-  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
-  const total = subtotal + shippingCost;
-  const installmentOpt = INSTALLMENT_OPTIONS.find((o) => o.value === selectedInstallments) || INSTALLMENT_OPTIONS[0];
-  const surchargeAmount = paymentMethod === "card" ? Math.round(total * installmentOpt.surcharge) : 0;
-  const totalWithSurcharge = total + surchargeAmount;
 
   // ── Empty cart ────────────────────────────────────────────────────────────
 
