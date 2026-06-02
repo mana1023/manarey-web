@@ -707,13 +707,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       try {
         const data = await response.json();
         if (data.session?.isAdmin) {
-          if (data.session.destination === "bi") {
-            // "Administrador" → panel de BI con handoff token para auto-login
-            const base = "https://manarey-admin.vercel.app";
-            const url = data.handoffToken
-              ? `${base}/api/auth/handoff?token=${data.handoffToken}`
-              : base;
-            window.location.href = url;
+          if (data.session.destination === "bi" && data.handoffUrl) {
+            // Redirige directo al dashboard con URL firmada
+            window.location.href = data.handoffUrl;
+          } else if (data.session.destination === "bi") {
+            // Fallback sin URL firmada
+            window.location.href = "https://manarey-admin.vercel.app";
           } else {
             // Email admin → editor web
             window.location.reload();
@@ -721,7 +720,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           return;
         }
       } catch {
-        // Si no se puede leer el JSON, recarga normal
+        window.location.reload();
       }
       window.location.reload();
       return;
