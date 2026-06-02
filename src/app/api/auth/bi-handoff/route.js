@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
-import { createClient } from "@supabase/supabase-js";
+import { query } from "@/lib/db";
 import crypto from "crypto";
 
 export async function POST() {
@@ -11,19 +11,16 @@ export async function POST() {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
     const token = crypto.randomBytes(32).toString("hex");
-    await supabase.from("handoff_tokens").insert({
-      token,
-      username: "Administrador",
-      role: "admin",
-    });
+    await query(
+      `INSERT INTO public.handoff_tokens (token, username, role)
+       VALUES ($1, $2, $3)`,
+      [token, "Administrador", "admin"]
+    );
 
     return NextResponse.json({ token });
-  } catch {
+  } catch (err) {
+    console.error("[bi-handoff] error:", err?.message ?? err);
     return NextResponse.json({ error: "Error generando token" }, { status: 500 });
   }
 }

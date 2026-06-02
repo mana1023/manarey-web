@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { authenticateUser, createSessionToken, SESSION_COOKIE_NAME, useSecureCookies } from "@/lib/session";
+import { query } from "@/lib/db";
 import crypto from "crypto";
-import { createClient } from "@supabase/supabase-js";
 
 const attemptsByIp = globalThis.manareyLoginAttempts || new Map();
 if (!globalThis.manareyLoginAttempts) globalThis.manareyLoginAttempts = attemptsByIp;
@@ -25,21 +25,18 @@ function registerFailedAttempt(ip) {
 }
 function clearAttempts(ip) { attemptsByIp.delete(ip); }
 
-// Genera un token de handoff en Supabase para auto-login en manarey-admin
+// Usa la conexión PostgreSQL directa (DATABASE_URL) que ya tiene la web
 async function createHandoffToken() {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
     const token = crypto.randomBytes(32).toString("hex");
-    await supabase.from("handoff_tokens").insert({
-      token,
-      username: "Administrador",
-      role: "admin",
-    });
+    await query(
+      `INSERT INTO public.handoff_tokens (token, username, role)
+       VALUES ($1, $2, $3)`,
+      [token, "Administrador", "admin"]
+    );
     return token;
-  } catch {
+  } catch (err) {
+    console.error("[handoff] error creando token:", err?.message ?? err);
     return null;
   }
 }
@@ -73,7 +70,6 @@ export async function POST(request) {
     const response = NextResponse.json({ session, handoffToken });
 
     // Solo guardar sesión en la web si es el admin del editor (email)
-    // "Administrador" (panel BI) no deja sesión en manarey.com.ar
     if (session.destination !== "bi") {
       response.cookies.set(SESSION_COOKIE_NAME, createSessionToken(session), {
         httpOnly: true,
@@ -85,7 +81,8 @@ export async function POST(request) {
     }
 
     return response;
-  } catch {
+  } catch (err) {
+    console.error("[login] error:", err?.message ?? err);
     return NextResponse.json({ error: "No se pudo iniciar sesion." }, { status: 500 });
   }
 }
