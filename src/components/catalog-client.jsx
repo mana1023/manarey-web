@@ -296,6 +296,14 @@ const PAYMENT_METHODS = [
 export function CatalogClient({ initialProducts, session, catalogError }) {
   const whatsappNumber = storeSettings.whatsappNumber;
   const contactEmail = storeSettings.supportEmail;
+
+  // Si ya hay sesión de "Administrador" (BI), redirigir directamente al panel
+  useEffect(() => {
+    if (session?.isAdmin && session?.destination === "bi") {
+      window.location.href = "https://manarey-admin.vercel.app";
+    }
+  }, [session]);
+
   const [products, setProducts] = useState(initialProducts);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("todas");
