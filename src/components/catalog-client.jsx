@@ -700,6 +700,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       body: JSON.stringify(loginData),
     });
     if (response.ok) {
+      // Si es administrador → redirigir al panel de BI
+      try {
+        const data = await response.json();
+        if (data.session?.isAdmin) {
+          window.location.href = "https://manarey-admin.vercel.app";
+          return;
+        }
+      } catch {
+        // Si no se puede leer el JSON, recarga normal
+      }
       window.location.reload();
       return;
     }

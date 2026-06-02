@@ -82,12 +82,17 @@ export async function authenticateUser({ username, password }) {
     return null;
   }
 
+  const adminPassword = (process.env.ADMIN_PASSWORD || "").trim();
+  const adminEmail    = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+  const usernameLC    = normalizedUsername.toLowerCase();
+
+  // Acepta el email admin O el usuario "administrador" con la misma contraseña
   if (
-    normalizedUsername.toLowerCase() === (process.env.ADMIN_EMAIL || "").trim().toLowerCase() &&
-    normalizedPassword === (process.env.ADMIN_PASSWORD || "").trim()
+    normalizedPassword === adminPassword &&
+    (usernameLC === adminEmail || usernameLC === "administrador")
   ) {
     return {
-      username: normalizedUsername,
+      username: "Administrador",
       role: "admin",
       isAdmin: true,
     };
