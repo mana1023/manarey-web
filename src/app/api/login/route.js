@@ -1,26 +1,20 @@
 import { NextResponse } from "next/server";
 import { authenticateUser, createSessionToken, SESSION_COOKIE_NAME, useSecureCookies } from "@/lib/session";
+import crypto from "crypto";
+import { createClient } from "@supabase/supabase-js";
 
 const attemptsByIp = globalThis.manareyLoginAttempts || new Map();
-
-if (!globalThis.manareyLoginAttempts) {
-  globalThis.manareyLoginAttempts = attemptsByIp;
-}
+if (!globalThis.manareyLoginAttempts) globalThis.manareyLoginAttempts = attemptsByIp;
 
 function getClientIp(request) {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 }
-
 function isRateLimited(ip) {
   const entry = attemptsByIp.get(ip);
   if (!entry) return false;
-  if (Date.now() > entry.resetAt) {
-    attemptsByIp.delete(ip);
-    return false;
-  }
+  if (Date.now() > entry.resetAt) { attemptsByIp.delete(ip); return false; }
   return entry.count >= 5;
 }
-
 function registerFailedAttempt(ip) {
   const current = attemptsByIp.get(ip);
   if (!current || Date.now() > current.resetAt) {
@@ -29,18 +23,33 @@ function registerFailedAttempt(ip) {
   }
   attemptsByIp.set(ip, { ...current, count: current.count + 1 });
 }
+function clearAttempts(ip) { attemptsByIp.delete(ip); }
 
-function clearAttempts(ip) {
-  attemptsByIp.delete(ip);
+// Genera un token de handoff en Supabase para auto-login en manarey-admin
+async function createHandoffToken() {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+    const token = crypto.randomBytes(32).toString("hex");
+    await supabase.from("handoff_tokens").insert({
+      token,
+      username: "Administrador",
+      role: "admin",
+    });
+    return token;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request) {
   const ip = getClientIp(request);
-
   if (isRateLimited(ip)) {
     return NextResponse.json(
       { error: "Demasiados intentos. Espera unos minutos." },
-      { status: 429 },
+      { status: 429 }
     );
   }
 
@@ -50,14 +59,18 @@ export async function POST(request) {
 
     if (!session) {
       registerFailedAttempt(ip);
-      return NextResponse.json(
-        { error: "Usuario o contrasena incorrectos." },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Usuario o contraseña incorrectos." }, { status: 401 });
     }
 
     clearAttempts(ip);
-    const response = NextResponse.json({ session });
+
+    // Si es admin de BI → crear handoff token para auto-login en el panel
+    let handoffToken = null;
+    if (session.destination === "bi") {
+      handoffToken = await createHandoffToken();
+    }
+
+    const response = NextResponse.json({ session, handoffToken });
     response.cookies.set(SESSION_COOKIE_NAME, createSessionToken(session), {
       httpOnly: true,
       sameSite: "lax",
@@ -67,9 +80,6 @@ export async function POST(request) {
     });
     return response;
   } catch {
-    return NextResponse.json(
-      { error: "No se pudo iniciar sesion." },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "No se pudo iniciar sesion." }, { status: 500 });
   }
 }

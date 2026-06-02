@@ -297,10 +297,22 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const whatsappNumber = storeSettings.whatsappNumber;
   const contactEmail = storeSettings.supportEmail;
 
-  // Si ya hay sesión de "Administrador" (BI), redirigir directamente al panel
+  // Si ya hay sesión de "Administrador" (BI), crear handoff y redirigir
   useEffect(() => {
     if (session?.isAdmin && session?.destination === "bi") {
-      window.location.href = "https://manarey-admin.vercel.app";
+      // Crear un nuevo handoff token para auto-login
+      fetch("/api/auth/bi-handoff", { method: "POST" })
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          const base = "https://manarey-admin.vercel.app";
+          const url = data?.token
+            ? `${base}/api/auth/handoff?token=${data.token}`
+            : base;
+          window.location.href = url;
+        })
+        .catch(() => {
+          window.location.href = "https://manarey-admin.vercel.app";
+        });
     }
   }, [session]);
 
@@ -713,10 +725,14 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         const data = await response.json();
         if (data.session?.isAdmin) {
           if (data.session.destination === "bi") {
-            // "Administrador" → panel de Business Intelligence
-            window.location.href = "https://manarey-admin.vercel.app";
+            // "Administrador" → panel de BI con handoff token para auto-login
+            const base = "https://manarey-admin.vercel.app";
+            const url = data.handoffToken
+              ? `${base}/api/auth/handoff?token=${data.handoffToken}`
+              : base;
+            window.location.href = url;
           } else {
-            // Email admin → editor web (recarga y abre /admin)
+            // Email admin → editor web
             window.location.reload();
           }
           return;
