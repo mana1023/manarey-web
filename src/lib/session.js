@@ -86,15 +86,23 @@ export async function authenticateUser({ username, password }) {
   const adminEmail    = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
   const usernameLC    = normalizedUsername.toLowerCase();
 
-  // Acepta el email admin O el usuario "administrador" con la misma contraseña
-  if (
-    normalizedPassword === adminPassword &&
-    (usernameLC === adminEmail || usernameLC === "administrador")
-  ) {
+  // Email admin → abre el editor web (panel de productos)
+  if (normalizedPassword === adminPassword && usernameLC === adminEmail) {
+    return {
+      username: normalizedUsername,
+      role: "admin",
+      isAdmin: true,
+      destination: "web",   // ← queda en la web, abre /admin
+    };
+  }
+
+  // "Administrador" → redirige al panel de BI externo
+  if (normalizedPassword === adminPassword && usernameLC === "administrador") {
     return {
       username: "Administrador",
       role: "admin",
       isAdmin: true,
+      destination: "bi",    // ← redirige a manarey-admin.vercel.app
     };
   }
 

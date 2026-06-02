@@ -704,7 +704,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       try {
         const data = await response.json();
         if (data.session?.isAdmin) {
-          window.location.href = "https://manarey-admin.vercel.app";
+          if (data.session.destination === "bi") {
+            // "Administrador" → panel de Business Intelligence
+            window.location.href = "https://manarey-admin.vercel.app";
+          } else {
+            // Email admin → editor web (recarga y abre /admin)
+            window.location.reload();
+          }
           return;
         }
       } catch {
