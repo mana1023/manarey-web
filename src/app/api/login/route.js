@@ -71,13 +71,19 @@ export async function POST(request) {
     }
 
     const response = NextResponse.json({ session, handoffToken });
-    response.cookies.set(SESSION_COOKIE_NAME, createSessionToken(session), {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: useSecureCookies(),
-      path: "/",
-      maxAge: 60 * 60 * 24 * 14,
-    });
+
+    // Solo guardar sesión en la web si es el admin del editor (email)
+    // "Administrador" (panel BI) no deja sesión en manarey.com.ar
+    if (session.destination !== "bi") {
+      response.cookies.set(SESSION_COOKIE_NAME, createSessionToken(session), {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: useSecureCookies(),
+        path: "/",
+        maxAge: 60 * 60 * 24 * 14,
+      });
+    }
+
     return response;
   } catch {
     return NextResponse.json({ error: "No se pudo iniciar sesion." }, { status: 500 });

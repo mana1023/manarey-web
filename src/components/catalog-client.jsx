@@ -297,24 +297,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const whatsappNumber = storeSettings.whatsappNumber;
   const contactEmail = storeSettings.supportEmail;
 
-  // Si ya hay sesión de "Administrador" (BI), crear handoff y redirigir
-  useEffect(() => {
-    if (session?.isAdmin && session?.destination === "bi") {
-      // Crear un nuevo handoff token para auto-login
-      fetch("/api/auth/bi-handoff", { method: "POST" })
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => {
-          const base = "https://manarey-admin.vercel.app";
-          const url = data?.token
-            ? `${base}/api/auth/handoff?token=${data.token}`
-            : base;
-          window.location.href = url;
-        })
-        .catch(() => {
-          window.location.href = "https://manarey-admin.vercel.app";
-        });
-    }
-  }, [session]);
+  // "Administrador" nunca deja sesión en la web, no hay auto-redirect necesario
 
   const [products, setProducts] = useState(initialProducts);
   const [query, setQuery] = useState("");
