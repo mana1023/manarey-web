@@ -1108,7 +1108,7 @@ img {
 }
 
 .catalog-grid {
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   align-items: stretch;
 }
 
@@ -2461,19 +2461,15 @@ img {
     padding: 16px;
   }
 
-  /* ── Catálogo mobile 1 columna en pantallas muy pequeñas ── */
+  /* Catálogo: mantener 2 columnas incluso en pantallas pequeñas — portrait 4/5 luce bien */
   .catalog-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 
 /* ── Mejoras generales mobile ─────────────────────────────────────────────── */
 @media (max-width: 760px) {
-  /* Tarjeta de producto: imagen cuadrada más compacta */
-  .image-frame {
-    aspect-ratio: 4 / 3;
-  }
-
   /* Precio más pequeño en card mobile para que quepa */
   .price-tag {
     font-size: 1.5rem;
@@ -5505,6 +5501,60 @@ details[open] .cf-transfer-manual-toggle::before {
   transition: transform 0.2s, opacity 0.2s;
 }
 
+/* ── Card image inner — producto completo visible, sin recorte ── */
+.card-img-inner {
+  position: absolute;
+  inset: 6%;
+}
+
+.card-img-inner .product-image {
+  object-fit: contain !important;
+}
+
+/* Fondo oscuro igual que la tarjeta — el espacio vacío se funde y desaparece */
+.catalog-grid .image-frame {
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%);
+}
+
+/* ── Card carousel (mini carrusel swipeable en la grilla) ── */
+.card-carousel {
+  position: relative;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  outline: none;
+}
+
+.card-carousel-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card-carousel-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transition: background 0.18s, width 0.18s, border-radius 0.18s;
+  flex-shrink: 0;
+}
+
+.card-carousel-dot.active {
+  background: rgba(255, 255, 255, 0.95);
+  width: 14px;
+  border-radius: 3px;
+}
+
 /* Tap feedback táctil en mobile */
 @media (hover: none) and (pointer: coarse) {
   .image-frame-btn:active {
@@ -6721,9 +6771,9 @@ details[open] .cf-transfer-manual-toggle::before {
     box-shadow: 0 2px 12px rgba(89, 58, 24, 0.10);
   }
 
-  /* Imagen en formato 4:5 (portrait) — los muebles se ven mejor */
+  /* Imagen cuadrada con contain — el producto siempre se ve completo */
   .catalog-grid .image-frame {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1 / 1;
     border-radius: 0;
   }
 

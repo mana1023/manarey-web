@@ -78,15 +78,83 @@ function isVideoSrc(src) {
   return typeof src === "string" && (src.startsWith("data:video") || VIDEO_EXT_RE.test(src));
 }
 
-// Comprime imágenes en el navegador antes de enviarlas (max 1200px, JPEG 82%)
-// Esto reduce fotos de celular de 5-8MB a menos de 300KB
+// Mini-carrusel swipeable para las tarjetas del catálogo
+function CardCarousel({ photos, alt, initial, badges, onClick }) {
+  const [idx, setIdx] = useState(0);
+  const touchStartX = useRef(null);
+  const didSwipe = useRef(false);
+
+  const visiblePhotos = photos.filter((p) => p && !isVideoSrc(p));
+  const total = visiblePhotos.length;
+  const current = visiblePhotos[Math.min(idx, total - 1)] || null;
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    didSwipe.current = false;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) > 38) {
+      didSwipe.current = true;
+      if (dx < 0 && idx < total - 1) setIdx((i) => i + 1);
+      else if (dx > 0 && idx > 0) setIdx((i) => i - 1);
+    }
+  };
+
+  const handleClick = () => {
+    if (!didSwipe.current) onClick();
+    didSwipe.current = false;
+  };
+
+  return (
+    <div
+      className="image-frame card-carousel"
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick(); }}
+      aria-label={`Ver detalle de ${alt}`}
+    >
+      {current ? (
+        <div className="card-img-inner">
+          <ProductImage
+            src={current}
+            alt={alt}
+            className="product-image"
+            fill
+            sizes="(max-width: 540px) 47vw, (max-width: 900px) 33vw, 22vw"
+          />
+        </div>
+      ) : (
+        <div className="image-placeholder card-no-image">
+          <span className="card-initial">{initial}</span>
+        </div>
+      )}
+      {total > 1 && (
+        <div className="card-carousel-dots" aria-hidden="true">
+          {visiblePhotos.map((_, i) => (
+            <span key={i} className={`card-carousel-dot${i === idx ? " active" : ""}`} />
+          ))}
+        </div>
+      )}
+      {badges}
+    </div>
+  );
+}
+
+// Comprime imágenes en el navegador antes de enviarlas (max 1600px, JPEG 90%)
 async function compressImageFile(file) {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(url);
-      const MAX = 1200;
+      const MAX = 1600;
       let { width, height } = img;
       if (width > MAX || height > MAX) {
         if (width >= height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -96,7 +164,7 @@ async function compressImageFile(file) {
       canvas.width = width;
       canvas.height = height;
       canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
+      resolve(canvas.toDataURL("image/jpeg", 0.90));
     };
     img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
     img.src = url;
@@ -1753,42 +1821,32 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     const branchStock = adminBranchFilter ? branchStockCache[product.productKey] : null;
                     const initial = (product.nombre || "M").charAt(0).toUpperCase();
 
+                    const cardPhotos = product.imagesData?.length
+                      ? product.imagesData
+                      : (product.imageData ? [product.imageData] : []);
+
                     return (
                       <article className={`product-card${product.isSoldOut ? " sold-out-card" : ""}`} key={group.key}>
-                        {/* Imagen */}
-                        <button
-                          className="image-frame image-frame-btn"
+                        {/* Imagen con mini-carrusel swipeable */}
+                        <CardCarousel
+                          photos={cardPhotos}
+                          alt={product.nombre}
+                          initial={initial}
                           onClick={() => openProductDetail(product)}
-                          type="button"
-                          aria-label={`Ver detalle de ${product.nombre}`}
-                        >
-                          {product.imageData && !isVideoSrc(product.imageData) ? (
-                            <ProductImage
-                              src={product.imageData}
-                              alt={product.nombre}
-                              className="product-image"
-                              fill
-                              sizes="(max-width: 480px) 50vw, (max-width: 900px) 33vw, 22vw"
-                            />
-                          ) : (
-                            <div className="image-placeholder card-no-image">
-                              <span className="card-initial">{initial}</span>
+                          badges={
+                            <div className="card-image-badges">
+                              {product.isFeatured && !product.isSoldOut && (
+                                <span className="card-badge card-badge-featured">⭐ Destacado</span>
+                              )}
+                              {product.isSoldOut && (
+                                <span className="card-badge card-badge-soldout">Sin stock</span>
+                              )}
+                              {session.isAdmin && !product.imageData && (
+                                <span className="card-badge card-badge-admin">Sin foto</span>
+                              )}
                             </div>
-                          )}
-
-                          {/* Badges sobre la imagen */}
-                          <div className="card-image-badges">
-                            {product.isFeatured && !product.isSoldOut && (
-                              <span className="card-badge card-badge-featured">⭐ Destacado</span>
-                            )}
-                            {product.isSoldOut && (
-                              <span className="card-badge card-badge-soldout">Sin stock</span>
-                            )}
-                            {session.isAdmin && !product.imageData && (
-                              <span className="card-badge card-badge-admin">Sin foto</span>
-                            )}
-                          </div>
-                        </button>
+                          }
+                        />
 
                         {/* Variantes de color */}
                         {hasVariants && (

@@ -79,7 +79,6 @@ export async function POST(request) {
         customer_phone: customer.telefono || customer.phone,
       },
       notification_url: `${storeSettings.siteUrl}/api/payments/webhook`,
-      // 3DS — mejora aprobación en tarjetas con autenticación del banco
       three_d_secure_mode: "optional",
     };
     if (issuerId) paymentPayload.issuer_id = String(issuerId);
@@ -96,9 +95,40 @@ export async function POST(request) {
 
     const mpData = await mpRes.json();
 
+    // Log completo para diagnóstico (visible en Vercel Functions logs)
+    console.log("[card-direct] MP response:", JSON.stringify({
+      status: mpData.status,
+      status_detail: mpData.status_detail,
+      id: mpData.id,
+      payment_method_id: mpData.payment_method_id,
+      issuer_id: mpData.issuer_id,
+      cause: mpData.cause,
+      message: mpData.message,
+    }));
+
     if (!mpRes.ok) {
       const detail = mpData?.message || mpData?.cause?.[0]?.description || "Pago rechazado";
-      return NextResponse.json({ error: detail, status: "rejected" }, { status: 400 });
+      return NextResponse.json({ error: detail, status: "rejected", statusDetail: mpData?.cause?.[0]?.code }, { status: 400 });
+    }
+
+    // Pago rechazado por el banco (MP devuelve 201 pero con status "rejected")
+    if (mpData.status === "rejected") {
+      const MP_REJECTION_MESSAGES = {
+        cc_rejected_insufficient_amount: "Fondos insuficientes. Verificá el saldo de tu tarjeta.",
+        cc_rejected_call_for_authorize: "Tu banco requiere que autorices este pago. Llamá al número del dorso de tu tarjeta o aprobalo desde el home banking.",
+        cc_rejected_card_disabled: "La tarjeta está deshabilitada. Contactá a tu banco para activarla.",
+        cc_rejected_duplicated_payment: "Ya existe un pago igual reciente. Esperá unos minutos e intentá de nuevo.",
+        cc_rejected_high_risk: "El pago fue rechazado por seguridad. Intentá con otra tarjeta o contactanos por WhatsApp.",
+        cc_rejected_bad_filled_security_code: "El código de seguridad (CVV) es incorrecto.",
+        cc_rejected_bad_filled_date: "La fecha de vencimiento es incorrecta.",
+        cc_rejected_bad_filled_card_number: "El número de tarjeta es incorrecto.",
+        cc_rejected_other_reason: "El banco rechazó el pago. Intentá con otra tarjeta o contactanos por WhatsApp.",
+        cc_rejected_card_type_not_allowed: "Este tipo de tarjeta no está permitido para esta operación.",
+        cc_rejected_max_attempts: "Superaste el máximo de intentos. Esperá un rato e intentá de nuevo.",
+      };
+      const statusDetail = mpData.status_detail || "";
+      const userMsg = MP_REJECTION_MESSAGES[statusDetail] || `Pago rechazado por el banco (${statusDetail || "razón desconocida"}). Intentá con otra tarjeta o pagá por transferencia.`;
+      return NextResponse.json({ error: userMsg, status: "rejected", statusDetail }, { status: 400 });
     }
 
     if (mpData.status === "approved") {
