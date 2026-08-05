@@ -28,6 +28,7 @@ function isBlobUrl(src) {
  * @param {number} [props.height]     - Alto en px (para next/image sin fill)
  * @param {boolean} [props.fill]      - next/image fill mode (parent must be relative)
  * @param {string} [props.sizes]      - sizes para next/image responsive
+ * @param {"cover"|"contain"} [props.objectFit] - ajuste de la imagen dentro del contenedor (solo fill mode)
  */
 export function ProductImage({
   src,
@@ -39,6 +40,7 @@ export function ProductImage({
   height,
   fill = false,
   sizes,
+  objectFit = "cover",
   ...rest
 }) {
   if (!src) return null;
@@ -53,7 +55,7 @@ export function ProductImage({
           sizes={sizes || "(max-width: 600px) 50vw, (max-width: 1200px) 25vw, 20vw"}
           className={className}
           priority={priority}
-          style={{ objectFit: "cover" }}
+          style={{ objectFit }}
           {...rest}
         />
       );

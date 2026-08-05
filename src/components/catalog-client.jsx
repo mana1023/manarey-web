@@ -15,14 +15,138 @@ const currencyFormatter = new Intl.NumberFormat("es-AR", {
 
 const PAGE_SIZE = 24;
 
+/**
+ * Interpreta el campo `medida`, que en la base es texto libre.
+ *
+ * En los muebles la medida es el ANCHO del mueble, no la profundidad: se ve
+ * en la escalera de precios (alacena de pino 40cm $55.500 → 2m $144.500) y
+ * es como se compran estos muebles. La profundidad es prácticamente fija
+ * (unos 40 cm en la línea de pino), por eso no está cargada por producto.
+ *
+ * Formatos que hay en la base:
+ *   "1,20m" "80cm" "2m" "0,60"   → ancho
+ *   "1 plaza" "2 1/2 plazas"     → plazas (camas y colchones)
+ *   "Rodado 26\"" "20\""         → rodado (bicicletas)
+ *   "80l" "55l"                  → capacidad
+ *   "90x90" "1,40x80" "70 x 70"  → ancho x profundidad
+ *   "ab101" "e-260"              → código de modelo, no es una medida
+ */
 function getMeasureMeta(rawMeasure) {
   if (!rawMeasure) return null;
   const medida = rawMeasure.trim();
-  if (!medida) return null;
-  if (/rodado/i.test(medida)) return { label: "Rodado", value: medida };
-  if (/plaza/i.test(medida)) return { label: "Plazas", value: medida };
-  if (/kg/i.test(medida)) return { label: "Capacidad", value: medida };
-  return { label: "Medida", value: medida };
+  if (!medida || medida === "-") return null;
+
+  if (/rodado|"|''|pulg/i.test(medida)) return { label: "Rodado", value: medida, tipo: "rodado" };
+  if (/plaza/i.test(medida)) return { label: "Plazas", value: medida, tipo: "plazas" };
+  if (/^\s*[\d.,]+\s*l\s*$/i.test(medida)) return { label: "Capacidad", value: medida, tipo: "capacidad" };
+  if (/kg/i.test(medida)) return { label: "Capacidad", value: medida, tipo: "capacidad" };
+
+  // Dos dimensiones: "90x90", "1,40x80", "70 x 70" → ancho x profundidad
+  if (/^\s*[\d.,]+\s*(m|cm)?\s*x\s*[\d.,]+\s*(m|cm)?\s*$/i.test(medida)) {
+    return { label: "Ancho x prof.", value: medida, tipo: "ancho" };
+  }
+
+  // Una sola dimensión lineal → ancho
+  if (/^\s*[\d.,]+\s*(m|cm)?\s*$/i.test(medida)) {
+    return { label: "Ancho", value: medida, tipo: "ancho" };
+  }
+
+  if (/unidad|juego|set/i.test(medida)) return null;
+
+  // Códigos de modelo tipo "ab101": no son una medida, no se muestran
+  if (/^[a-z]+[-\s]?\d+$/i.test(medida)) return null;
+
+  return { label: "Medida", value: medida, tipo: "otro" };
+}
+
+/**
+ * Convierte una medida a centímetros para poder ordenar las variantes.
+ * "80cm" → 80 · "1,20m" → 120 · "2m" → 200 · "0,60" → 60 · "90x90" → 90
+ * Lo que no es lineal (plazas, rodado) cae al final, ordenado por el número.
+ */
+function measureToCm(rawMeasure) {
+  const medida = (rawMeasure || "").trim().toLowerCase();
+  if (!medida) return Number.MAX_SAFE_INTEGER;
+
+  // Plazas: hay que resolver la fracción o "1 plaza" y "1 1/2 plaza" empatan
+  // y las camas quedan en cualquier orden.
+  if (/plaza/.test(medida)) {
+    const m = medida.match(/(\d+)\s*(?:(\d+)\s*\/\s*(\d+))?/);
+    if (m) {
+      const entero = Number(m[1]);
+      const frac = m[2] && m[3] ? Number(m[2]) / Number(m[3]) : 0;
+      return entero + frac;
+    }
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  // Rodado: el número está después de la palabra ('Rodado 26"')
+  if (/rodado|"|''/.test(medida)) {
+    const m = medida.match(/(\d+)/);
+    return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
+  }
+
+  // Se toma la primera dimensión: en "1,40x80" el ancho es 1,40
+  const primera = medida.split(/x/i)[0].trim();
+  const num = parseFloat(primera.replace(",", "."));
+  if (Number.isNaN(num)) return Number.MAX_SAFE_INTEGER;
+  if (/cm/.test(primera)) return num;
+  if (/m/.test(primera)) return num * 100;
+  // Sin unidad: por debajo de 10 se asume metros ("0,60" = 60cm, "1,50" = 150cm)
+  return num < 10 ? num * 100 : num;
+}
+
+// ── Swatches de color reales ──────────────────────────────────────────────
+// Los colores en la base son nombres libres: unos son colores comunes
+// ("negro", "gris oscuro") y otros son nombres de melamina ("venezia",
+// "avellana", "nebraska"), que son tonos de madera. Se traducen a un color
+// real para que el puntito del swatch signifique algo en vez de ser dorado
+// siempre. Lo que no se reconoce cae en un dorado neutro.
+const COLOR_SWATCHES = {
+  negro: "#1c1c1e", negra: "#1c1c1e",
+  blanco: "#fdfcf8", blanca: "#fdfcf8", hueso: "#f2ebdc",
+  gris: "#9aa0a6", grei: "#9aa0a6", grey: "#9aa0a6",
+  "gris oscuro": "#55595e", "gris claro": "#c8ccd0",
+  "gris plata": "#b9bfc4", "gris topo": "#8d857c", piedra: "#a49c91",
+  azul: "#2f5da8", celeste: "#7fb6e0", "agua marina": "#5fb3ad", turquesa: "#3fb5ac",
+  rojo: "#b8362e", roja: "#b8362e", bordo: "#6f1f28",
+  verde: "#4a7c52", amarillo: "#e2b62c", amarilla: "#e2b62c", naranja: "#dd7a2a",
+  rosa: "#e2a2b0", rosada: "#e2a2b0", violeta: "#7c5aa6",
+  marron: "#6b452a", "marrón": "#6b452a",
+  acero: "#b4b8bb", "acero inoxidable": "#b4b8bb", vidrio: "#cfe0e3",
+  // Tonos madera / melamina
+  wengue: "#4a3226", chocolate: "#5a3a24", roble: "#b4884f",
+  avellana: "#c39a6b", bambu: "#cbab74", nebraska: "#a87f56",
+  "nebraska nature": "#a87f56", "nebraska gris": "#8e8479",
+  venezia: "#8d6743", venecia: "#8d6743", malta: "#c9a97e",
+  orinoco: "#7a5636", tissa: "#b99a72", mendra: "#9c7250",
+  beige: "#ddc9a6", natural: "#d9bf95", pino: "#e0c391",
+};
+
+// Devuelve un `background` CSS para el punto del swatch. Los colores
+// compuestos ("blanco y venezia", "azul,gris") se muestran en diagonal.
+function getSwatchBackground(rawColor) {
+  const name = (rawColor || "").trim().toLowerCase();
+  if (!name || name === "-") return null;
+  if (COLOR_SWATCHES[name]) return COLOR_SWATCHES[name];
+
+  const parts = name
+    .split(/\s*(?:\sy\s|,|\/|\+)\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const hits = [];
+  for (const part of parts) {
+    const hit = COLOR_SWATCHES[part] || COLOR_SWATCHES[part.split(/\s+/)[0]];
+    if (hit && !hits.includes(hit)) hits.push(hit);
+  }
+  if (hits.length >= 2) return `linear-gradient(135deg, ${hits[0]} 0 50%, ${hits[1]} 50% 100%)`;
+  if (hits.length === 1) return hits[0];
+
+  // Última chance: alguna palabra suelta del nombre
+  for (const word of name.split(/\s+/)) {
+    if (COLOR_SWATCHES[word]) return COLOR_SWATCHES[word];
+  }
+  return null;
 }
 
 function isSilla(product) {
@@ -127,6 +251,7 @@ function CardCarousel({ photos, alt, initial, badges, onClick }) {
             alt={alt}
             className="product-image"
             fill
+            objectFit="contain"
             sizes="(max-width: 540px) 47vw, (max-width: 900px) 33vw, 22vw"
           />
         </div>
@@ -371,6 +496,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("todas");
   const [sortBy, setSortBy] = useState("relevancia");
+  // Panel con todas las categorías en grilla — el riel horizontal sirve para
+  // las primeras, pero con 15 categorías hay que poder verlas todas de una.
+  const [allCatsOpen, setAllCatsOpen] = useState(false);
+  const categoryRailRef = useRef(null);
   // Admin login (para gestionar productos)
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -487,16 +616,39 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     [visibleProducts],
   );
 
+  // Cuántos productos hay en cada categoría — se muestra al lado del nombre
+  // para que no haya que entrar a una categoría para descubrir que está vacía.
+  const categoryCounts = useMemo(() => {
+    const counts = { todas: visibleProducts.length };
+    for (const item of visibleProducts) {
+      if (!item.categoria) continue;
+      counts[item.categoria] = (counts[item.categoria] || 0) + 1;
+    }
+    return counts;
+  }, [visibleProducts]);
+
   const inStockCount = useMemo(
     () => visibleProducts.filter((product) => !product.isSoldOut).length,
     [visibleProducts],
   );
 
+  // Traer el chip activo a la vista: si se elige una categoría del panel, en
+  // el riel puede quedar fuera de pantalla y parece que no pasó nada.
   useEffect(() => {
-    if (!homeCategory) {
-      setHomeCategory(categories.find((item) => item !== "todas") || "todas");
+    const rail = categoryRailRef.current;
+    if (!rail) return;
+    const active = rail.querySelector(".category-pill.active");
+    if (active?.scrollIntoView) {
+      active.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
-  }, [categories, homeCategory]);
+  }, [category]);
+
+  // Antes acá se autoseleccionaba la primera categoría de la lista, o sea la
+  // primera alfabéticamente. Resultado: la sección estrella del inicio
+  // mostraba "Baño" porque empieza con B, y si esa categoría tenía pocos
+  // productos la grilla quedaba con huecos. Sin categoría elegida la sección
+  // es "Selección Manarey" y toma productos de todo el catálogo; los tabs
+  // siguen funcionando para filtrar a mano.
 
   useEffect(() => {
     try {
@@ -542,17 +694,6 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     if (selectedProductKey) {
       const grid = document.querySelector(".detail-grid");
       if (grid) grid.scrollTop = 0;
-    }
-  }, [selectedProductKey]);
-
-  // Habilitar zoom del viewport SOLO cuando hay un producto abierto (para hacer zoom en las fotos)
-  useEffect(() => {
-    const meta = document.querySelector("meta[name='viewport']");
-    if (!meta) return;
-    if (selectedProductKey) {
-      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover");
-    } else {
-      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover");
     }
   }, [selectedProductKey]);
 
@@ -645,7 +786,19 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       if (!groupMap.has(key)) groupMap.set(key, []);
       groupMap.get(key).push(product);
     }
-    const groups = [...groupMap.entries()].map(([key, variants]) => ({ key, variants }));
+    // Dentro de cada grupo las variantes van de menor a mayor medida: la
+    // tarjeta arranca en la más chica (la más barata) y el cliente sube desde
+    // ahí. A igual medida, primero las que tienen stock.
+    const groups = [...groupMap.entries()].map(([key, variants]) => ({
+      key,
+      variants: [...variants].sort((a, b) => {
+        const da = measureToCm(a.medida);
+        const db = measureToCm(b.medida);
+        if (da !== db) return da - db;
+        if (a.isSoldOut !== b.isSoldOut) return a.isSoldOut ? 1 : -1;
+        return (a.color || "").localeCompare(b.color || "", "es");
+      }),
+    }));
 
     // Si hay filtro de sucursal activo y el caché ya cargó, ordenar: primero los que tienen stock > 0 en ese local
     if (adminBranchFilter && Object.keys(branchStockCache).length > 0) {
@@ -684,29 +837,74 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminBranchFilter, branchStockLoading, pagedGroups.length, session.isAdmin]);
 
+  // El inicio necesita 6 productos: 1 para el hero, 1 para la tarjeta grande
+  // de destacados y 4 para la grilla lateral (que es de 2 columnas).
+  const HOME_SLOTS = 6;
+
   const homeProducts = useMemo(() => {
+    // Toma de a uno evitando repetir nombre: en la base hay varios productos
+    // que se llaman igual y difieren en la medida ("Vanitory 2p" aparece 3
+    // veces). Sin esto el inicio mostraba el mismo nombre en los dos paneles
+    // grandes, uno al lado del otro, y parecía un error.
+    const tomarVariados = (lista, cupo) => {
+      const nombres = new Set();
+      const elegidos = [];
+      for (const p of lista) {
+        const nombre = (p.nombre || "").trim().toLowerCase();
+        if (nombres.has(nombre)) continue;
+        nombres.add(nombre);
+        elegidos.push(p);
+        if (elegidos.length === cupo) break;
+      }
+      // Si no alcanzan los nombres distintos, se completa con lo que haya
+      if (elegidos.length < cupo) {
+        const yaEstan = new Set(elegidos.map((p) => p.productKey));
+        for (const p of lista) {
+          if (yaEstan.has(p.productKey)) continue;
+          elegidos.push(p);
+          if (elegidos.length === cupo) break;
+        }
+      }
+      return elegidos;
+    };
+
     // Si hay productos marcados como destacados (y no hay filtro de categoría activo), priorizarlos
     const manualFeatured = visibleProducts
       .filter((p) => p.isFeatured)
       .sort((a, b) => (a.featuredOrder ?? 999) - (b.featuredOrder ?? 999));
 
     if (manualFeatured.length > 0 && !homeCategory) {
-      return manualFeatured.slice(0, 5);
+      // Si el admin marcó menos de 6, se completa con el resto del catálogo:
+      // de lo contrario la grilla lateral queda con huecos (con 3 destacados
+      // quedaba una sola tarjeta en un grid de dos columnas).
+      const yaIncluidos = new Set(manualFeatured.map((p) => p.productKey));
+      const relleno = visibleProducts.filter((p) => !yaIncluidos.has(p.productKey) && !p.isSoldOut);
+      return tomarVariados([...manualFeatured, ...relleno], HOME_SLOTS);
     }
 
-    // Fallback: primeros productos de la categoría elegida
-    const selectedCategory = homeCategory || categories.find((item) => item !== "todas") || "todas";
-    return visibleProducts
-      .filter((product) =>
-        selectedCategory === "todas"
-          ? true
-          : product.categoria?.toLowerCase() === selectedCategory.toLowerCase(),
-      )
-      .slice(0, 5);
-  }, [categories, homeCategory, visibleProducts]);
+    // Con una categoría elegida en los tabs, se muestra esa categoría.
+    // Sin categoría, se toma de todo el catálogo (antes caía en la primera
+    // categoría alfabética, que es una elección sin ningún sentido).
+    const candidatos = homeCategory
+      ? visibleProducts.filter(
+          (product) => product.categoria?.toLowerCase() === homeCategory.toLowerCase(),
+        )
+      : visibleProducts;
 
+    // Los que tienen stock primero: no tiene sentido que el inicio arranque
+    // con algo que no se puede comprar.
+    const conStock = candidatos.filter((p) => !p.isSoldOut);
+    const orden = [...conStock, ...candidatos.filter((p) => p.isSoldOut)];
+    return tomarVariados(orden, HOME_SLOTS);
+  }, [homeCategory, visibleProducts]);
+
+  // El hero y la tarjeta grande de destacados mostraban el MISMO producto:
+  // los dos espacios más grandes del inicio gastados en uno solo, y la foto
+  // bajándose dos veces. Ahora la sección de destacados arranca en el
+  // siguiente (con fallback si el catálogo tiene un único producto).
   const featuredMainProduct = homeProducts[0] || null;
-  const featuredSideProducts = homeProducts.slice(1, 5);
+  const showcaseMainProduct = homeProducts[1] || homeProducts[0] || null;
+  const featuredSideProducts = homeProducts.slice(2, 6);
   const heroCategories = categories.filter((item) => item !== "todas").slice(0, 4);
 
   const selectedProduct = useMemo(
@@ -865,6 +1063,41 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   function getActiveVariant(variantGroupKey, variants) {
     const key = selectedVariants[variantGroupKey];
     return (key && variants.find((v) => v.productKey === key)) || variants[0];
+  }
+
+  /**
+   * Al cambiar de medida se intenta mantener el color elegido. Si esa medida
+   * no viene en ese color (pasa: la alacena de melamina viene en 7 colores en
+   * 1,20m pero en 3 en 1,40m), se cae a la primera variante con stock de esa
+   * medida.
+   */
+  function pickVariantByMeasure(variants, medida, colorActual) {
+    const mismasMedida = variants.filter((v) => (v.medida || "") === (medida || ""));
+    if (mismasMedida.length === 0) return null;
+    const mismoColor = mismasMedida.find((v) => (v.color || "") === (colorActual || ""));
+    if (mismoColor) return mismoColor;
+    return mismasMedida.find((v) => !v.isSoldOut) || mismasMedida[0];
+  }
+
+  /** Medidas únicas de un grupo, ya ordenadas (las variantes vienen ordenadas). */
+  function getGroupMeasures(variants) {
+    const vistas = new Set();
+    const medidas = [];
+    for (const v of variants) {
+      const meta = getMeasureMeta(v.medida);
+      if (!meta) continue;
+      const clave = v.medida || "";
+      if (vistas.has(clave)) continue;
+      vistas.add(clave);
+      medidas.push({ medida: clave, label: meta.value, tipo: meta.tipo, agotada: false });
+    }
+    // Una medida se marca agotada sólo si TODAS sus variantes están sin stock
+    for (const m of medidas) {
+      m.agotada = variants
+        .filter((v) => (v.medida || "") === m.medida)
+        .every((v) => v.isSoldOut);
+    }
+    return medidas.length > 1 ? medidas : [];
   }
 
   async function loadBranchStock(productKey) {
@@ -1095,7 +1328,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     <main className="page-shell">
       <header className="site-header">
         <div className="header-brand">
-          <button className="logo-link logo-button" onClick={() => navigateTo("inicio")} type="button">
+          <button className="logo-link logo-button" onClick={() => navigateTo("inicio")} type="button" aria-label="Ir al inicio">
             <BrandLogo compact />
           </button>
         </div>
@@ -1434,6 +1667,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       className="product-image"
                       fill
                       priority
+                      objectFit="contain"
                       sizes="(max-width: 900px) 100vw, 50vw"
                     />
                   ) : (
@@ -1485,19 +1719,26 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 <div className="showcase-grid">
                   <article className="showcase-main-card">
                     <div className="showcase-main-visual">
-                      {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (
-                        <img alt={featuredMainProduct.nombre} className="product-image" src={featuredMainProduct.imageData} />
+                      {showcaseMainProduct?.imageData && !isVideoSrc(showcaseMainProduct.imageData) ? (
+                        <ProductImage
+                          src={showcaseMainProduct.imageData}
+                          alt={showcaseMainProduct.nombre}
+                          className="product-image"
+                          fill
+                          objectFit="contain"
+                          sizes="(max-width: 900px) 100vw, 55vw"
+                        />
                       ) : (
                         <ProductPlaceholder title={homeCategory || "Destacado"} />
                       )}
                       <div className="showcase-overlay">
-                        <h3>{featuredMainProduct ? getDisplayName(featuredMainProduct.productKey, featuredMainProduct.nombre) : "Destacado"}</h3>
-                        {featuredMainProduct && (
-                          <p style={{ fontWeight: 700, fontSize: "1.2rem" }}>{currencyFormatter.format(featuredMainProduct.precioVenta)}</p>
+                        <h3>{showcaseMainProduct ? getDisplayName(showcaseMainProduct.productKey, showcaseMainProduct.nombre) : "Destacado"}</h3>
+                        {showcaseMainProduct && (
+                          <p style={{ fontWeight: 700, fontSize: "1.2rem" }}>{currencyFormatter.format(showcaseMainProduct.precioVenta)}</p>
                         )}
                         <div className="showcase-overlay-actions">
-                          {featuredMainProduct && (
-                            <button className="primary-button" onClick={() => openProductDetail(featuredMainProduct)} type="button">
+                          {showcaseMainProduct && (
+                            <button className="primary-button" onClick={() => openProductDetail(showcaseMainProduct)} type="button">
                               Ver producto
                             </button>
                           )}
@@ -1519,6 +1760,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                               alt={product.nombre}
                               className="product-image"
                               fill
+                              objectFit="contain"
                               sizes="(max-width: 600px) 45vw, 20vw"
                             />
                           ) : (
@@ -1636,18 +1878,37 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
 
                   {/* Categorías + ordenamiento */}
                   <div className="catalog-filter-row">
-                    <div className="category-rail">
-                      {categories.map((item) => (
-                        <button
-                          key={item}
-                          className={category === item ? "category-pill active" : "category-pill"}
-                          onClick={() => setCategory(item)}
-                          type="button"
-                        >
-                          {item === "todas" ? "Todas" : item}
-                        </button>
-                      ))}
+                    {/* Riel horizontal: una sola fila, se desliza con el dedo */}
+                    <div className="category-rail-wrap">
+                      <div className="category-rail" ref={categoryRailRef} role="group" aria-label="Filtrar por categoría">
+                        {categories.map((item) => (
+                          <button
+                            key={item}
+                            className={category === item ? "category-pill active" : "category-pill"}
+                            onClick={() => setCategory(item)}
+                            aria-pressed={category === item}
+                            type="button"
+                          >
+                            {item === "todas" ? "Todas" : item}
+                            <span className="category-pill-count">{categoryCounts[item] ?? 0}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
+
+                    <button
+                      className={`category-all-btn${allCatsOpen ? " open" : ""}`}
+                      onClick={() => setAllCatsOpen((v) => !v)}
+                      type="button"
+                      aria-expanded={allCatsOpen}
+                      aria-controls="category-panel"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                      </svg>
+                      <span className="category-all-btn-text">Categorías</span>
+                    </button>
 
                     <div className="sort-wrapper">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1667,13 +1928,58 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     </div>
                   </div>
 
-                  {query && (
-                    <div className="catalog-search-tag">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                      Resultados para <strong>"{query}"</strong>
-                      <button onClick={() => setQuery("")} type="button" aria-label="Quitar filtro">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                      </button>
+                  {/* Panel con todas las categorías: grilla, con el conteo a la vista */}
+                  {allCatsOpen && (
+                    <div className="category-panel" id="category-panel">
+                      {categories.map((item) => (
+                        <button
+                          key={item}
+                          className={`category-panel-item${category === item ? " active" : ""}`}
+                          onClick={() => { setCategory(item); setAllCatsOpen(false); }}
+                          type="button"
+                        >
+                          <span className="category-panel-name">{item === "todas" ? "Todas" : item}</span>
+                          <span className="category-panel-count">{categoryCounts[item] ?? 0}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Filtros activos — siempre a un toque de distancia de borrarlos */}
+                  {(query || category !== "todas") && (
+                    <div className="catalog-active-filters">
+                      <span className="catalog-active-label">Filtrando por:</span>
+
+                      {category !== "todas" && (
+                        <span className="catalog-search-tag">
+                          {category}
+                          <button onClick={() => setCategory("todas")} type="button" aria-label={`Quitar categoría ${category}`}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
+                        </span>
+                      )}
+
+                      {query && (
+                        <span className="catalog-search-tag">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                          "{query}"
+                          <button onClick={() => setQuery("")} type="button" aria-label="Quitar búsqueda">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
+                        </span>
+                      )}
+
+                      <span className="catalog-active-result">{filteredGroups.length} resultado{filteredGroups.length === 1 ? "" : "s"}</span>
+
+                      {query && category !== "todas" && (
+                        <button
+                          className="catalog-clear-all"
+                          onClick={() => { setQuery(""); setCategory("todas"); }}
+                          type="button"
+                        >
+                          Limpiar todo
+                        </button>
+                      )}
                     </div>
                   )}
                 </section>
@@ -1817,7 +2123,13 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     const measureMeta = getMeasureMeta(product.medida);
                     const editing = activeEditor?.productKey === product.productKey;
                     const shortDescription = (product.description || "").trim().slice(0, 110);
-                    const hasVariants = group.variants.length > 1 && group.variants.some((v) => v.color);
+                    const groupMeasures = getGroupMeasures(group.variants);
+                    // Los colores se listan sólo para la medida elegida: no
+                    // todas las medidas vienen en todos los colores.
+                    const colorVariants = group.variants.filter(
+                      (v) => (v.medida || "") === (product.medida || "") && v.color,
+                    );
+                    const hasVariants = colorVariants.length > 1;
                     const branchStock = adminBranchFilter ? branchStockCache[product.productKey] : null;
                     const initial = (product.nombre || "M").charAt(0).toUpperCase();
 
@@ -1848,21 +2160,58 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           }
                         />
 
-                        {/* Variantes de color */}
+                        {/* Medidas del mismo producto (el ancho, normalmente).
+                            Antes cada medida era una tarjeta suelta y no había
+                            forma de pasar de la alacena de 80cm a la de 1,20m. */}
+                        {groupMeasures.length > 0 && (
+                          <div className="measure-chips" role="group" aria-label="Elegir medida">
+                            {groupMeasures.map((m) => {
+                              const activa = (product.medida || "") === m.medida;
+                              return (
+                                <button
+                                  key={m.medida}
+                                  className={`measure-chip${activa ? " active" : ""}${m.agotada ? " agotada" : ""}`}
+                                  aria-pressed={activa}
+                                  aria-label={`Medida ${m.label}${m.agotada ? " (sin stock)" : ""}`}
+                                  onClick={() => {
+                                    const elegida = pickVariantByMeasure(group.variants, m.medida, product.color);
+                                    if (elegida) setSelectedVariants((prev) => ({ ...prev, [group.key]: elegida.productKey }));
+                                  }}
+                                  type="button"
+                                >
+                                  {m.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Variantes de color — en la grilla van como puntos:
+                            las pastillas con el nombre se partían en dos filas
+                            y descuadraban la altura de las tarjetas vecinas.
+                            El nombre completo está en el detalle. */}
                         {hasVariants && (
-                          <div className="color-swatches">
-                            {group.variants.map((v) => (
+                          <div className="color-swatches color-swatches--dots">
+                            {colorVariants.slice(0, 6).map((v) => (
                               <button
                                 key={v.productKey}
                                 className={`color-swatch${product.productKey === v.productKey ? " active" : ""}`}
                                 title={v.color || ""}
+                                aria-pressed={product.productKey === v.productKey}
+                                aria-label={`Ver en color ${v.color}`}
                                 onClick={() => setSelectedVariants((prev) => ({ ...prev, [group.key]: v.productKey }))}
                                 type="button"
                               >
-                                <span className="color-swatch-dot" />
+                                <span
+                                  className="color-swatch-dot"
+                                  style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
+                                />
                                 <span className="color-swatch-label">{v.color}</span>
                               </button>
                             ))}
+                            {colorVariants.length > 6 && (
+                              <span className="color-swatch-more">+{colorVariants.length - 6}</span>
+                            )}
                           </div>
                         )}
 
@@ -1872,15 +2221,29 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             {product.categoria && (
                               <p className="product-category">{product.categoria}</p>
                             )}
-                            <h2 className="product-name" onClick={() => openProductDetail(product)} style={{ cursor: "pointer" }}>
-                              {getDisplayName(product.productKey, product.nombre)}
+                            <h2 className="product-name-heading">
+                              <button className="product-name" onClick={() => openProductDetail(product)} type="button">
+                                {getDisplayName(product.productKey, product.nombre)}
+                              </button>
                             </h2>
                           </div>
 
-                          {/* Medida — solo visible para admin */}
-                          {session.isAdmin && measureMeta && (
-                            <p className="meta-line" style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                              <strong>{measureMeta.label} (DB):</strong> {measureMeta.value}
+                          {/* Señal de stock — dato real, sin inventar urgencia */}
+                          {!product.isSoldOut && (
+                            <p className={`card-stock${product.stockTotal <= 3 ? " card-stock--low" : ""}`}>
+                              <span className="card-stock-dot" aria-hidden="true" />
+                              {product.stockTotal <= 3 ? "Últimas unidades" : "En stock"}
+                            </p>
+                          )}
+
+                          {/* Medida — antes sólo la veía el admin, así que el
+                              cliente no sabía de qué ancho era el mueble que
+                              estaba mirando. Si hay chips de medida arriba no
+                              se repite acá. */}
+                          {measureMeta && groupMeasures.length === 0 && (
+                            <p className="card-measure">
+                              <span className="card-measure-label">{measureMeta.label}</span>
+                              {measureMeta.value}
                             </p>
                           )}
 
@@ -2353,6 +2716,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             className="product-image detail-carousel-img"
                             key={safeIndex}
                             fill
+                            objectFit="contain"
                             sizes="(max-width: 900px) 100vw, 50vw"
                             priority={safeIndex === 0}
                           />
@@ -2427,9 +2791,12 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 ) : null}
 
                 <div className="detail-specs">
-                  {session.isAdmin && getMeasureMeta(selectedProduct.medida) ? (
-                    <p className="meta-line" style={{ fontSize: "0.82rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                      <strong>{getMeasureMeta(selectedProduct.medida).label} (DB):</strong>{" "}
+                  {/* La medida ahora la ve el cliente, no sólo el admin. En
+                      los muebles es el ancho; la profundidad de la línea de
+                      pino ronda los 40 cm y no está cargada por producto. */}
+                  {getMeasureMeta(selectedProduct.medida) ? (
+                    <p className="meta-line">
+                      <strong>{getMeasureMeta(selectedProduct.medida).label}:</strong>{" "}
                       {getMeasureMeta(selectedProduct.medida).value}
                     </p>
                   ) : null}
@@ -2471,28 +2838,84 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </div>
 
                 {(() => {
-                  const group = filteredGroups.find((g) =>
-                    g.variants.some((v) => v.productKey === selectedProduct.productKey),
+                  // Las variantes se buscan sobre todo el catálogo y no sobre
+                  // filteredGroups: si el cliente llegó con un filtro puesto,
+                  // las otras medidas podían estar filtradas y desaparecían
+                  // del detalle.
+                  const hermanas = visibleProducts
+                    .filter((v) => v.variantGroupKey === selectedProduct.variantGroupKey)
+                    .sort((a, b) => {
+                      const da = measureToCm(a.medida);
+                      const db = measureToCm(b.medida);
+                      if (da !== db) return da - db;
+                      if (a.isSoldOut !== b.isSoldOut) return a.isSoldOut ? 1 : -1;
+                      return (a.color || "").localeCompare(b.color || "", "es");
+                    });
+                  if (hermanas.length <= 1) return null;
+
+                  const medidas = getGroupMeasures(hermanas);
+                  const coloresDeEstaMedida = hermanas.filter(
+                    (v) => (v.medida || "") === (selectedProduct.medida || "") && v.color,
                   );
-                  const hasModalVariants = group && group.variants.length > 1 && group.variants.some((v) => v.color);
-                  if (!hasModalVariants) return null;
+
                   return (
-                    <div className="modal-color-swatches">
-                      <p className="meta-line" style={{ marginBottom: 6 }}><strong>Color:</strong></p>
-                      <div className="color-swatches">
-                        {group.variants.map((v) => (
-                          <button
-                            key={v.productKey}
-                            className={`color-swatch${selectedProduct.productKey === v.productKey ? " active" : ""}`}
-                            title={v.color || ""}
-                            onClick={() => setSelectedProductKey(v.productKey)}
-                            type="button"
-                          >
-                            <span className="color-swatch-dot" />
-                            <span className="color-swatch-label">{v.color}</span>
-                          </button>
-                        ))}
-                      </div>
+                    <div className="modal-variants">
+                      {medidas.length > 0 && (
+                        <div className="modal-variant-block">
+                          <p className="modal-variant-title">
+                            {getMeasureMeta(selectedProduct.medida)?.label || "Medida"}
+                            <span className="modal-variant-current">{selectedProduct.medida}</span>
+                          </p>
+                          <div className="measure-chips measure-chips--modal">
+                            {medidas.map((m) => {
+                              const activa = (selectedProduct.medida || "") === m.medida;
+                              return (
+                                <button
+                                  key={m.medida}
+                                  className={`measure-chip${activa ? " active" : ""}${m.agotada ? " agotada" : ""}`}
+                                  aria-pressed={activa}
+                                  aria-label={`Medida ${m.label}${m.agotada ? " (sin stock)" : ""}`}
+                                  onClick={() => {
+                                    const elegida = pickVariantByMeasure(hermanas, m.medida, selectedProduct.color);
+                                    if (elegida) setSelectedProductKey(elegida.productKey);
+                                  }}
+                                  type="button"
+                                >
+                                  {m.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {coloresDeEstaMedida.length > 1 && (
+                        <div className="modal-variant-block">
+                          <p className="modal-variant-title">
+                            Color
+                            <span className="modal-variant-current">{selectedProduct.color}</span>
+                          </p>
+                          <div className="color-swatches">
+                            {coloresDeEstaMedida.map((v) => (
+                              <button
+                                key={v.productKey}
+                                className={`color-swatch${selectedProduct.productKey === v.productKey ? " active" : ""}`}
+                                title={v.color || ""}
+                                aria-pressed={selectedProduct.productKey === v.productKey}
+                                aria-label={`Ver en color ${v.color}`}
+                                onClick={() => setSelectedProductKey(v.productKey)}
+                                type="button"
+                              >
+                                <span
+                                  className="color-swatch-dot"
+                                  style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
+                                />
+                                <span className="color-swatch-label">{v.color}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })()}
@@ -2557,6 +2980,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             alt={product.nombre}
                             className="product-image"
                             fill
+                            objectFit="contain"
                             sizes="(max-width: 600px) 40vw, 15vw"
                           />
                         ) : (

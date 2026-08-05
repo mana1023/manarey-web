@@ -105,15 +105,25 @@ function mapProduct(row) {
     : precioOriginal;
   return {
     productKey: row.product_key,
+    // Clave de agrupación de variantes. Antes incluía medida y precio, así que
+    // cada ancho de una alacena era una tarjeta suelta y sin relación con las
+    // demás: el cliente no tenía forma de pasar de la de 80cm a la de 1,20m.
+    // Ahora agrupa por producto real y las medidas son variantes, igual que
+    // los colores. Se incluye el material porque hay nombres repetidos entre
+    // líneas distintas ("alacena" de pino y de melamina). Verificado contra la
+    // base: con esta clave no queda ninguna medida duplicada dentro de un
+    // grupo, o sea que no fusiona productos que no van juntos.
+    // OJO: productKey NO cambia — de él cuelgan las fotos, los precios
+    // override y las órdenes ya hechas.
     variantGroupKey: [
       nombre.toLowerCase().trim(),
       categoria.toLowerCase().trim(),
-      medida.toLowerCase().trim(),
-      String(precioOriginal), // clave basada en precio original para no romper el sistema
+      (row.material_sistema || "").toLowerCase().trim(),
     ].join("|"),
     nombre,
     categoria: row.categoria,
     medida: row.medida,
+    materialSistema: row.material_sistema || "",
     color: row.color,
     precioVenta,
     precioOriginal,
@@ -170,6 +180,10 @@ export async function getCatalogProducts() {
         nullif(min(trim(color)), '') as color,
         max(precio_venta) as precio_venta,
         sum(greatest(coalesce(cantidad, 0), 0))::integer as stock_total,
+        -- Material del sistema (no el de la metadata web): es lo que separa
+        -- dos productos que se llaman igual — "alacena" de pino y "alacena"
+        -- de melamina son muebles distintos, con escaleras de precio propias.
+        nullif(min(lower(trim(material))), '') as material_sistema,
         (array_remove(array_agg(nullif(trim(descripcion), '') order by length(nullif(trim(descripcion), '')) desc), null))[1] as raw_description
       from public.productos
       group by 1
@@ -182,6 +196,7 @@ export async function getCatalogProducts() {
       grouped.color,
       grouped.precio_venta,
       grouped.stock_total,
+      grouped.material_sistema,
       coalesce(meta.description, grouped.raw_description, '') as description,
       meta.image_data,
       meta.alto_cm,

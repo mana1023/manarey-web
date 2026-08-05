@@ -643,7 +643,9 @@ img {
 .brand-panel.editorial {
   min-height: 100%;
   border-radius: 28px;
-  background: linear-gradient(160deg, #15100b 0%, #322113 100%);
+  /* Crema — igual al fondo de estudio de las fotos de producto, así el
+     recorte "contain" se funde con la foto en vez de dejar un recuadro. */
+  background: linear-gradient(160deg, #f6efe0 0%, #fbf6ea 55%, #f6efe0 100%);
 }
 
 .brand-panel.editorial > :first-child {
@@ -2903,83 +2905,104 @@ img {
   transition: all 0.18s ease;
 }
 
-/* ─── TARJETAS OSCURAS — mismo marrón que el hero ────────────────────────── */
+/* ─── TARJETAS CLARAS — crema cálido, acento madera/dorado ───────────────── */
 .product-card {
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
-  border-color: rgba(210, 162, 62, 0.22) !important;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  background: linear-gradient(160deg, #fffaf0 0%, #f8ecd6 100%) !important;
+  border: 1.5px solid rgba(181, 133, 68, 0.32) !important;
+  box-shadow: 0 8px 24px rgba(120, 80, 40, 0.12);
 }
 .product-card:hover {
-  border-color: rgba(210, 162, 62, 0.5) !important;
-  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.38) !important;
+  border-color: rgba(210, 162, 62, 0.65) !important;
+  box-shadow: 0 20px 44px rgba(120, 80, 40, 0.2) !important;
 }
 
-/* Textos dentro de la card sobre fondo oscuro */
+/* Textos dentro de la card sobre fondo claro */
 .product-card .product-category {
-  color: rgba(210, 162, 62, 0.72);
+  color: var(--gold-strong);
 }
 .product-card .product-name {
-  color: rgba(255, 248, 228, 0.92);
+  color: var(--text);
 }
 .product-card .product-name:hover {
-  color: #f0c96a;
+  color: var(--gold-strong);
 }
 .product-card .price-tag {
-  color: #f0c96a !important;
+  color: var(--gold-strong) !important;
 }
 .product-card .meta-line,
 .product-card .pack-notice p,
 .product-card .product-desc-preview {
-  color: rgba(245, 222, 185, 0.52);
+  color: var(--muted);
 }
 .product-card .pack-badge {
-  background: rgba(210, 162, 62, 0.18);
-  color: #f0c96a;
+  background: var(--gold-soft);
+  color: var(--gold-strong);
+}
+.product-card .pack-total {
+  color: var(--gold-strong);
+  font-weight: 700;
 }
 
 /* Placeholder sin imagen */
 .product-card .card-no-image {
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: rgba(210, 162, 62, 0.08) !important;
 }
 .product-card .card-initial {
-  color: rgba(210, 162, 62, 0.45);
+  color: rgba(169, 115, 30, 0.4);
 }
 
-/* Botón fantasma sobre fondo oscuro */
+/* Botón fantasma — se distingue del fondo crema de la card */
 .product-card .ghost-button {
-  border-color: rgba(245, 222, 185, 0.22);
-  color: rgba(245, 222, 185, 0.78);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(181, 133, 68, 0.35);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.65);
 }
 .product-card .ghost-button:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(245, 222, 185, 0.45);
-  color: #f8ead4;
+  background: #fff;
+  border-color: rgba(210, 162, 62, 0.6);
+  color: var(--gold-strong);
 }
 
-/* Color swatches */
-.product-card .color-swatch-label {
-  color: rgba(245, 222, 185, 0.7);
+/* Pastillas de color — un toque más de blanco que la card para que se noten */
+.product-card .color-swatch,
+.related-card .color-swatch {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(181, 133, 68, 0.3);
+}
+.product-card .color-swatch:hover,
+.related-card .color-swatch:hover {
+  background: var(--gold-soft);
+  border-color: rgba(210, 162, 62, 0.55);
+}
+.product-card .color-swatch.active,
+.related-card .color-swatch.active {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+}
+.product-card .color-swatch-label,
+.related-card .color-swatch-label {
+  color: var(--text);
 }
 
-/* Related cards — mismo estilo oscuro */
+/* Related cards — mismo estilo claro que las cards del catálogo */
 .related-card {
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
-  border-color: rgba(210, 162, 62, 0.2) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(160deg, #fffaf0 0%, #f8ecd6 100%) !important;
+  border-color: rgba(181, 133, 68, 0.3) !important;
+  box-shadow: 0 6px 18px rgba(120, 80, 40, 0.1);
 }
 .related-card .product-name,
 .related-card .related-copy h4,
 .related-card .related-copy strong {
-  color: rgba(255, 248, 228, 0.92);
+  color: var(--text);
 }
 .related-card .price-tag,
 .related-card .related-price {
-  color: #f0c96a !important;
+  color: var(--gold-strong) !important;
 }
 .related-card .product-category,
 .related-card .related-copy p {
-  color: rgba(210, 162, 62, 0.65);
+  color: var(--gold-strong);
+  opacity: 0.85;
 }
 
 .price-tag {
@@ -5504,16 +5527,33 @@ details[open] .cf-transfer-manual-toggle::before {
 /* ── Card image inner — producto completo visible, sin recorte ── */
 .card-img-inner {
   position: absolute;
-  inset: 6%;
+  inset: 0;
 }
 
 .card-img-inner .product-image {
   object-fit: contain !important;
 }
 
-/* Fondo oscuro igual que la tarjeta — el espacio vacío se funde y desaparece */
+/* Fondo crema igual al de fondo de estudio de las fotos de producto — el
+   espacio vacío alrededor de la foto se funde en vez de verse como una caja
+   blanca pegada dentro de la tarjeta oscura. */
 .catalog-grid .image-frame {
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%);
+  background: linear-gradient(160deg, #f6efe0 0%, #fbf6ea 55%, #f6efe0 100%);
+  border-bottom: 1px solid rgba(181, 133, 68, 0.16);
+}
+
+/* ── Destacados / relacionados / hero: producto completo visible, sin recorte ──
+   Las fotos vienen con orientación mixta (horizontal, vertical, cuadrada) y
+   fondo de estudio blanco/crema, así que se usa contain + el mismo tono crema
+   para que el espacio vacío alrededor de la foto se funda con la foto misma. */
+.showcase-main-visual .product-image {
+  object-fit: contain;
+}
+
+.showcase-main-visual,
+.showcase-mini-visual,
+.related-visual {
+  background: linear-gradient(160deg, #f6efe0 0%, #fbf6ea 55%, #f6efe0 100%);
 }
 
 /* ── Card carousel (mini carrusel swipeable en la grilla) ── */
@@ -8281,4 +8321,1219 @@ body {
   .catalog-grid--admin .product-desc-preview { display: none; }
   .catalog-grid--admin .product-category { display: none; }
   .catalog-grid--admin .color-swatches { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NAVBAR — estilo mueblería: madera oscura por fuera, crema por dentro
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.site-header {
+  /* Pino real: base pálida crema/manteca (no ámbar), veta CASI HORIZONTAL
+     (las líneas de un pino corren a lo largo de la tabla) con leve ondulado,
+     y un nudo tipo "ojo de gato" con anillos concéntricos — como la muestra
+     de referencia, no un degradado ambarino en diagonal. */
+  background:
+    /* nudo — anillos concéntricos */
+    radial-gradient(11px 17px at 76% 55%, #8a5322 0%, #8a5322 12%, transparent 32%),
+    radial-gradient(15px 23px at 76% 55%, #c98f4c 0%, #c98f4c 8%, transparent 45%),
+    radial-gradient(20px 30px at 76% 55%, #f0dba8 0%, #f0dba8 6%, transparent 55%),
+    /* veta horizontal ondulada */
+    repeating-linear-gradient(
+      3deg,
+      rgba(255, 251, 240, 0.65) 0px,
+      rgba(255, 251, 240, 0.65) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    repeating-linear-gradient(
+      3deg,
+      rgba(190, 145, 85, 0.4) 0px,
+      rgba(190, 145, 85, 0.4) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    linear-gradient(3deg, #f7ead0 0%, #f0dcae 25%, #fbf1d9 50%, #eddaa8 72%, #f6e7c4 100%)
+    !important;
+  border: 1.5px solid rgba(150, 105, 45, 0.5) !important;
+  border-radius: 999px !important;
+  padding: 8px 10px 8px 22px;
+  box-shadow:
+    0 14px 34px rgba(120, 80, 30, 0.22),
+    0 1px 0 rgba(255, 253, 245, 0.8) inset,
+    0 -2px 0 rgba(120, 80, 30, 0.16) inset !important;
+}
+
+.header-brand .brand-logo-img.compact {
+  width: 150px;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.55)) drop-shadow(0 1px 4px rgba(90, 55, 15, 0.35));
+}
+
+/* Interior crema que agrupa los links, como una tablilla clara incrustada */
+.main-nav {
+  background: linear-gradient(135deg, #fffcf4 0%, #fbf6ea 100%);
+  border-radius: 999px;
+  padding: 5px;
+  gap: 2px;
+  flex: 0 1 auto;
+  box-shadow: inset 0 1px 4px rgba(89, 58, 24, 0.12), 0 1px 3px rgba(120, 80, 30, 0.18);
+}
+
+.main-nav .nav-pill {
+  background: transparent !important;
+  border: none !important;
+  color: #4a3216 !important;
+  font-weight: 600;
+  min-height: 34px !important;
+  padding: 6px 16px !important;
+  transition: background 0.15s, color 0.15s;
+}
+
+.main-nav .nav-pill:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.75) !important;
+}
+
+.main-nav .nav-pill.active {
+  background: linear-gradient(135deg, #6b4020, #4a2a13) !important;
+  color: #f8dfa0 !important;
+  box-shadow: 0 3px 10px rgba(74, 42, 19, 0.35) !important;
+}
+
+.header-actions .customer-login-btn {
+  background: rgba(255, 255, 255, 0.4) !important;
+  border: 1.5px solid rgba(120, 80, 30, 0.35) !important;
+  color: #4a2c14 !important;
+}
+.header-actions .customer-login-btn:hover {
+  background: rgba(255, 255, 255, 0.65) !important;
+  border-color: rgba(120, 80, 30, 0.55) !important;
+}
+.header-actions .customer-hello { color: #4a2c14; }
+.header-actions .customer-logout-btn { color: rgba(74, 44, 20, 0.7); }
+
+/* Carrito: botón dorado circular, el acento "llamativo" del header */
+.site-header .cart-button {
+  background: linear-gradient(135deg, #e8ac3e 0%, #a3651c 100%) !important;
+  border: 2px solid rgba(255, 250, 235, 0.85) !important;
+  color: #fff9ef !important;
+  border-radius: 50% !important;
+  width: 44px;
+  height: 44px;
+  box-shadow: 0 4px 16px rgba(120, 80, 30, 0.45), 0 0 0 3px rgba(163, 101, 28, 0.14) !important;
+}
+.site-header .cart-button:hover {
+  background: linear-gradient(135deg, #f0bb52 0%, #b8792a 100%) !important;
+  transform: translateY(-1px);
+}
+.site-header .cart-badge {
+  background: #2e1a0d;
+  color: #f3cd7c;
+  border: 1.5px solid #ecc06a;
+}
+
+.mobile-nav-toggle span {
+  background: #4a2c14 !important;
+}
+
+@media (max-width: 1100px) {
+  .site-header { padding: 8px 10px 8px 18px; }
+  .main-nav { width: auto; }
+}
+
+/* Centrar los links respecto a TODA la barra (no solo el espacio libre entre
+   logo y acciones) — como logo y acciones no miden lo mismo, flex:1 +
+   justify-content:center corría la píldora hacia un lado. Con position:
+   absolute + left:50% queda centrada de verdad sobre el bar completo. */
+@media (min-width: 1101px) {
+  /* .site-header ya es position:sticky, que también sirve de contenedor
+     para el position:absolute de abajo — no hace falta position:relative. */
+  .main-nav {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    flex: 0 0 auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VITRINA — capa final de producto
+   ───────────────────────────────────────────────────────────────────────
+   Esta hoja está construida por capas: reglas viejas más arriba y ajustes
+   más abajo. Este bloque es la capa final del producto en sí (tarjetas del
+   catálogo, destacados, relacionados) y cierra con los ajustes de mobile,
+   que si no quedarían pisados por lo de acá arriba.
+
+   Muchos `!important` de acá no son capricho: las reglas de las líneas
+   ~2909 y ~8108 ya usan `!important` sobre las mismas propiedades, así que
+   es la única forma de ganarles sin ir a reescribir media hoja.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Tokens de la vitrina — un solo lugar donde tocar el acento */
+  --vitrina-borde: rgba(181, 133, 68, 0.34);
+  --vitrina-borde-hover: rgba(200, 150, 62, 0.85);
+  --vitrina-sombra: 0 10px 26px rgba(120, 80, 40, 0.13);
+  --vitrina-sombra-hover: 0 26px 54px rgba(104, 66, 24, 0.26);
+  --vitrina-oro: linear-gradient(135deg, #e0ab3c 0%, #a9731e 100%);
+  --vitrina-oro-hover: linear-gradient(135deg, #efbe52 0%, #b8801f 100%);
+  --verde-stock: #2f7d4f;
+  --ambar-stock: #a86a12;
+}
+
+/* ── Grilla: un poco más de aire, entrada escalonada ───────────────────── */
+.catalog-grid {
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 20px;
+}
+
+@keyframes vitrinaCardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.catalog-grid .product-card {
+  animation: vitrinaCardIn 0.5s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+/* El escalonado se reinicia cada 8 tarjetas para que la última fila de una
+   página de 24 no entre con un segundo de retraso. */
+.catalog-grid .product-card:nth-child(8n + 2) { animation-delay: 0.05s; }
+.catalog-grid .product-card:nth-child(8n + 3) { animation-delay: 0.10s; }
+.catalog-grid .product-card:nth-child(8n + 4) { animation-delay: 0.15s; }
+.catalog-grid .product-card:nth-child(8n + 5) { animation-delay: 0.20s; }
+.catalog-grid .product-card:nth-child(8n + 6) { animation-delay: 0.25s; }
+.catalog-grid .product-card:nth-child(8n + 7) { animation-delay: 0.30s; }
+.catalog-grid .product-card:nth-child(8n + 8) { animation-delay: 0.35s; }
+
+/* ── La tarjeta ────────────────────────────────────────────────────────── */
+.product-card {
+  position: relative;
+  border-radius: 22px !important;
+  border: 1.5px solid var(--vitrina-borde) !important;
+  background: linear-gradient(168deg, #fffdf6 0%, #fdf6e8 46%, #f7ecd6 100%) !important;
+  box-shadow: var(--vitrina-sombra) !important;
+  transition:
+    transform 0.26s cubic-bezier(0.22, 0.9, 0.3, 1),
+    box-shadow 0.26s ease,
+    border-color 0.26s ease !important;
+}
+
+/* Filo de luz superior — le da volumen al borde sin dibujar otro borde */
+.product-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.product-card:hover {
+  transform: translateY(-6px) !important;
+  border-color: var(--vitrina-borde-hover) !important;
+  box-shadow: var(--vitrina-sombra-hover), 0 0 0 1px rgba(210, 162, 62, 0.35) !important;
+}
+
+/* ── El escenario de la foto ───────────────────────────────────────────── */
+/* Las fotos vienen con fondo de estudio claro. El degradado radial imita una
+   luz cenital y el viñeteado del ::after disimula la costura entre el fondo
+   de la foto y el de la tarjeta. */
+.catalog-grid .image-frame,
+.showcase-mini-visual,
+.related-visual,
+.brand-panel.editorial,
+.showcase-main-visual {
+  background: radial-gradient(118% 86% at 50% 2%, #fffefa 0%, #fdf8ec 46%, #f4e9d4 100%);
+}
+
+.catalog-grid .image-frame {
+  border-bottom: 1px solid rgba(181, 133, 68, 0.18);
+}
+
+.catalog-grid .image-frame::after,
+.showcase-mini-visual::after,
+.related-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(112% 88% at 50% 36%, transparent 56%, rgba(122, 84, 38, 0.09) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Los badges y los puntitos del carrusel van por encima del viñeteado */
+.card-image-badges { z-index: 3; }
+.card-carousel-dots { z-index: 3; }
+
+/* La foto respira un poco en vez de tocar los bordes */
+.catalog-grid .card-img-inner {
+  inset: 5% 6%;
+}
+
+.catalog-grid .product-image {
+  transition: transform 0.5s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+
+.product-card:hover .product-image,
+.showcase-mini-card:hover .product-image,
+.related-card:hover .product-image {
+  transform: scale(1.065);
+}
+
+/* Los puntitos del carrusel sobre fondo claro: los blancos no se veían */
+.card-carousel-dot {
+  background: rgba(120, 84, 38, 0.28);
+}
+.card-carousel-dot.active {
+  background: var(--gold-strong);
+}
+
+/* ── Badges sobre la foto ──────────────────────────────────────────────── */
+.card-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  backdrop-filter: blur(4px);
+}
+
+.card-badge-featured {
+  background: linear-gradient(100deg, #e8bb4a 0%, #f5da8e 45%, #d99f28 100%);
+  color: #46280a;
+  box-shadow: 0 2px 10px rgba(169, 115, 30, 0.35);
+}
+
+.card-badge-soldout {
+  background: rgba(43, 29, 19, 0.82);
+  color: #f3e6cf;
+}
+
+/* ── Señal de stock ────────────────────────────────────────────────────── */
+.card-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--verde-stock);
+}
+
+.card-stock-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(47, 125, 79, 0.16);
+  flex-shrink: 0;
+}
+
+.card-stock--low {
+  color: var(--ambar-stock);
+}
+.card-stock--low .card-stock-dot {
+  box-shadow: 0 0 0 3px rgba(168, 106, 18, 0.16);
+}
+
+/* ── Tipografía de la tarjeta ──────────────────────────────────────────── */
+/* El <h2> ahora sólo envuelve al botón del nombre: hay que apagarle los
+   estilos por defecto del navegador. */
+.product-name-heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.product-card .product-category {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--gold-strong);
+  opacity: 0.9;
+}
+
+.product-card .product-name {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.32;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 3px 0 0;
+}
+
+.product-card .price-tag {
+  font-size: 1.62rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-strong) !important;
+}
+
+.product-card .product-desc-preview {
+  font-size: 0.79rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* ── Pastillas de color ────────────────────────────────────────────────── */
+/* Faltaba el padding horizontal: .color-swatches es hermano de .product-copy
+   (que sí tiene padding), así que las pastillas quedaban pegadas al borde. */
+.product-card .color-swatches {
+  padding: 10px 18px 0;
+}
+
+.product-card .color-swatch {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(181, 133, 68, 0.3);
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+.product-card .color-swatch:hover {
+  transform: translateY(-1px);
+}
+.product-card .color-swatch.active {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  font-weight: 700;
+}
+
+/* El punto lleva el color real de la variante (lo pinta el componente); el
+   borde interior le da forma cuando el color es casi blanco o casi negro. */
+.color-swatch-dot {
+  width: 13px;
+  height: 13px;
+  border: 1px solid rgba(60, 40, 18, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+/* ── Acciones ──────────────────────────────────────────────────────────── */
+/* margin-top:auto vuelve: sin esto las tarjetas de una misma fila dejaban el
+   botón de comprar a distintas alturas según el largo del nombre. */
+.product-card .card-actions {
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.product-card .card-actions .primary-button {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 44px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--vitrina-oro);
+  box-shadow: 0 6px 16px rgba(169, 115, 30, 0.28);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.product-card .card-actions .primary-button:hover {
+  background: var(--vitrina-oro-hover);
+  box-shadow: 0 10px 24px rgba(169, 115, 30, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Destello que cruza el botón al pasar el mouse */
+.product-card .card-actions .primary-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.55s ease;
+}
+.product-card .card-actions .primary-button:hover::after {
+  left: 120%;
+}
+
+/* El secundario estaba al 75% de opacidad y casi no se leía */
+.product-card .card-actions .ghost-button {
+  width: 100%;
+  min-height: 38px;
+  opacity: 1;
+  font-size: 0.83rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border-color: rgba(181, 133, 68, 0.4);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.6);
+}
+.product-card .card-actions .ghost-button:hover {
+  color: var(--gold-strong);
+  border-color: var(--gold);
+  background: #fff;
+}
+
+/* ── Sin stock ─────────────────────────────────────────────────────────── */
+.sold-out-card {
+  opacity: 0.72;
+}
+.sold-out-card:hover {
+  opacity: 0.92;
+}
+.sold-out-card .image-frame {
+  filter: grayscale(55%);
+}
+
+/* ── Destacados y relacionados: mismo lenguaje ─────────────────────────── */
+.showcase-mini-card,
+.related-card {
+  border-radius: 20px !important;
+  transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.3, 1), box-shadow 0.26s ease, border-color 0.26s ease;
+}
+.showcase-mini-card:hover,
+.related-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--vitrina-borde-hover) !important;
+  box-shadow: var(--vitrina-sombra-hover) !important;
+}
+
+.showcase-mini-copy h4 {
+  font-size: 0.98rem !important;
+  line-height: 1.32;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.showcase-main-card {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.showcase-main-card:hover {
+  border-color: var(--vitrina-borde-hover) !important;
+  box-shadow: var(--vitrina-sombra-hover) !important;
+}
+
+/* ── Accesibilidad y pulido general ────────────────────────────────────── */
+/* Varias reglas de arriba hacen `outline: none` en inputs sin poner nada en
+   su lugar: quien navega con teclado se quedaba sin saber dónde está. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2.5px solid var(--gold-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.image-frame:focus-visible,
+.product-card .product-name:focus-visible {
+  outline: 2.5px solid var(--gold-strong);
+  outline-offset: -3px;
+}
+
+::selection {
+  background: rgba(210, 162, 62, 0.32);
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .product-card:hover,
+  .showcase-mini-card:hover,
+  .related-card:hover {
+    transform: none !important;
+  }
+}
+
+/* ── Mobile: va último para no quedar pisado por el bloque de arriba ───── */
+@media (max-width: 540px) {
+  /* El :not() es necesario: la grilla de admin es de 1 columna y se define
+     más arriba en la hoja, así que sin esto este bloque se la pisaría. */
+  .catalog-grid:not(.catalog-grid--admin) {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+
+  .product-card {
+    border-radius: 16px !important;
+    border-width: 1px !important;
+  }
+
+  /* En 2 columnas el escalonado por columnas se ve raro: sólo por filas */
+  .catalog-grid .product-card { animation-duration: 0.4s; }
+  .catalog-grid .product-card:nth-child(8n + 2) { animation-delay: 0s; }
+  .catalog-grid .product-card:nth-child(8n + 3),
+  .catalog-grid .product-card:nth-child(8n + 4) { animation-delay: 0.06s; }
+  .catalog-grid .product-card:nth-child(8n + 5),
+  .catalog-grid .product-card:nth-child(8n + 6) { animation-delay: 0.12s; }
+  .catalog-grid .product-card:nth-child(8n + 7),
+  .catalog-grid .product-card:nth-child(8n + 8) { animation-delay: 0.18s; }
+
+  .catalog-grid .card-img-inner { inset: 4% 5%; }
+
+  .product-card .product-name {
+    font-size: 0.83rem;
+    line-height: 1.34;
+    margin: 0 0 2px;
+  }
+
+  .product-card .price-tag {
+    font-size: 1.06rem;
+    letter-spacing: -0.02em;
+  }
+
+  .card-stock {
+    font-size: 0.66rem;
+    gap: 4px;
+  }
+  .card-stock-dot {
+    width: 6px;
+    height: 6px;
+    box-shadow: 0 0 0 2px rgba(47, 125, 79, 0.16);
+  }
+
+  .product-card .color-swatches {
+    padding: 5px 10px 0;
+  }
+
+  .product-card .card-actions {
+    padding-top: 6px;
+    gap: 0;
+  }
+  .product-card .card-actions .ghost-button {
+    display: none; /* tocar la foto ya abre el detalle */
+  }
+  .product-card .card-actions .primary-button {
+    min-height: 36px;
+    font-size: 0.76rem;
+    border-radius: 10px;
+  }
+
+  /* El destello del botón se saltea en mobile: no hay hover y gasta pintura */
+  .product-card .card-actions .primary-button::after { display: none; }
+}
+
+/* ── Stock por sucursal (admin): quedó en blanco sobre crema ───────────── */
+/* Esta fila se pintó de blanco cuando las tarjetas eran marrón oscuro; ahora
+   son crema y el número de stock era invisible. */
+.branch-stock-row {
+  color: var(--text);
+}
+.branch-stock-label {
+  color: var(--muted);
+}
+.branch-stock-count {
+  color: var(--text);
+}
+
+/* ── Admin en mobile: los colores asumían tarjetas oscuras ─────────────── */
+/* Las tarjetas ahora son crema, así que el botón "Destacar" y el separador
+   del panel quedaban en blanco sobre blanco. */
+@media (max-width: 768px) {
+  .catalog-grid--admin .admin-panel {
+    border-top: 1px solid rgba(181, 133, 68, 0.22);
+  }
+  .catalog-grid--admin .admin-featured-btn {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(181, 133, 68, 0.35) !important;
+    color: var(--muted) !important;
+  }
+  .catalog-grid--admin .admin-featured-btn.active {
+    background: var(--gold-soft) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold-strong) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BUSCADOR Y CATEGORÍAS
+   ───────────────────────────────────────────────────────────────────────
+   El riel de categorías estaba pensado como una sola fila deslizable
+   (`overflow-x: auto` en la línea ~1011), pero comparte una regla con
+   .main-nav y compañía (línea ~348) que le mete `flex-wrap: wrap`. Con 15
+   categorías el resultado eran dos filas apiladas que comen media pantalla
+   en el celular. Acá se restaura la fila única y se agrega el panel con
+   todas las categorías para cuando hace falta verlas juntas.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.catalog-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: visible;
+}
+
+.category-rail-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.category-rail {
+  flex-wrap: nowrap !important;
+  gap: 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 16px;
+  scroll-behavior: smooth;
+  padding: 3px 2px 6px;
+  /* Difuminado en los bordes: avisa que hay más categorías al costado */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+}
+
+.category-pill {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.category-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(120, 84, 38, 0.11);
+  color: rgba(74, 47, 16, 0.72);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.category-pill.active .category-pill-count {
+  background: rgba(246, 224, 166, 0.22);
+  color: #f6e0a6;
+}
+
+/* Botón que abre la grilla con todas las categorías */
+.category-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(210, 162, 62, 0.32);
+  background: linear-gradient(135deg, #241508 0%, #2e1a09 100%);
+  color: rgba(245, 222, 185, 0.85);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.category-all-btn:hover,
+.category-all-btn.open {
+  border-color: rgba(210, 162, 62, 0.7);
+  color: #f6e0a6;
+  background: linear-gradient(135deg, #2e1a09 0%, #3a2214 100%);
+}
+
+.category-all-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.category-all-btn.open svg {
+  transform: rotate(45deg);
+}
+
+/* Panel desplegable con todas las categorías */
+@keyframes catPanelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.category-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 8px;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background: linear-gradient(160deg, #fffdf6 0%, #fbf3e2 100%);
+  box-shadow: 0 14px 34px rgba(120, 80, 40, 0.16);
+  animation: catPanelIn 0.22s ease both;
+}
+
+.category-panel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(181, 133, 68, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+
+.category-panel-item:hover {
+  background: #fff;
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.category-panel-item.active {
+  background: linear-gradient(135deg, #23170f, #3a2617);
+  border-color: #23170f;
+  color: #f6e0a6;
+}
+
+.category-panel-count {
+  flex-shrink: 0;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(120, 84, 38, 0.11);
+  color: rgba(74, 47, 16, 0.7);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.category-panel-item.active .category-panel-count {
+  background: rgba(246, 224, 166, 0.2);
+  color: #f6e0a6;
+}
+
+/* Barra de filtros activos */
+.catalog-active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalog-active-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.catalog-search-tag {
+  text-transform: capitalize;
+}
+
+.catalog-active-result {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.catalog-clear-all {
+  margin-left: auto;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(181, 133, 68, 0.35);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.catalog-clear-all:hover {
+  color: var(--gold-strong);
+  border-color: var(--gold);
+  background: var(--gold-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ESCENARIO DE FOTO EN BLANCO
+   Las fotos vienen con fondo de estudio blanco, así que un escenario crema
+   dibujaba un recuadro visible alrededor de cada producto. En blanco casi
+   puro la foto se funde y lo que separa la imagen del cuerpo de la tarjeta
+   pasa a ser la línea de abajo, no un salto de color.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.catalog-grid .image-frame,
+.showcase-mini-visual,
+.related-visual,
+.brand-panel.editorial,
+.showcase-main-visual {
+  background: radial-gradient(120% 88% at 50% 0%, #ffffff 0%, #fffefb 58%, #fbf7ef 100%);
+}
+
+.catalog-grid .image-frame {
+  border-bottom: 1px solid rgba(181, 133, 68, 0.2);
+}
+
+/* El viñeteado también se suaviza: sobre blanco, el anterior se notaba */
+.catalog-grid .image-frame::after,
+.showcase-mini-visual::after,
+.related-visual::after {
+  background: radial-gradient(114% 90% at 50% 34%, transparent 62%, rgba(122, 84, 38, 0.055) 100%);
+}
+
+/* ── Swatches como puntos en la grilla ─────────────────────────────────── */
+.color-swatches--dots {
+  align-items: center;
+  gap: 7px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.color-swatches--dots::-webkit-scrollbar { display: none; }
+
+.product-card .color-swatches--dots .color-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.color-swatches--dots .color-swatch-label {
+  /* Oculto a la vista pero legible por lector de pantalla */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.color-swatches--dots .color-swatch-dot {
+  width: 17px;
+  height: 17px;
+}
+
+.product-card .color-swatches--dots .color-swatch:hover {
+  border-color: rgba(210, 162, 62, 0.5);
+  background: transparent;
+  transform: none;
+}
+
+.product-card .color-swatches--dots .color-swatch.active {
+  border-color: var(--gold-strong);
+  background: transparent;
+}
+
+.color-swatch-more {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  flex-shrink: 0;
+  padding-left: 2px;
+}
+
+/* ── Mobile: filtros pensados para el pulgar ───────────────────────────── */
+@media (max-width: 760px) {
+  .catalog-filter-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Fila 1: el riel a todo el ancho. Fila 2: los dos botones al 50%. */
+  .category-rail-wrap {
+    flex: 1 1 100%;
+    order: 1;
+  }
+  .category-all-btn {
+    order: 2;
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 46px;
+  }
+  .sort-wrapper {
+    order: 3;
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 46px;
+  }
+
+  /* Chips más altos: 40px es lo mínimo cómodo para tocar */
+  .category-pill {
+    min-height: 40px;
+    padding: 8px 15px;
+    font-size: 0.86rem;
+  }
+
+  .category-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+    gap: 7px;
+  }
+  .category-panel-item {
+    min-height: 46px;
+    font-size: 0.84rem;
+    padding: 9px 12px;
+  }
+
+  .catalog-clear-all {
+    margin-left: 0;
+    min-height: 38px;
+  }
+}
+
+@media (max-width: 540px) {
+  /* Los puntos de color un toque más grandes: se tocan con el dedo */
+  .product-card .color-swatches--dots .color-swatch {
+    width: 26px;
+    height: 26px;
+  }
+  .color-swatches--dots .color-swatch-dot {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FONDO DE LA PÁGINA
+   ───────────────────────────────────────────────────────────────────────
+   El degradado estaba puesto sobre <body>, así que se estiraba a lo largo
+   de TODO el documento: en el catálogo, que mide varias pantallas, lo que
+   se ve en cada momento es una franja mínima del degradado — o sea, un
+   amarillo plano y lavado.
+
+   La solución es un pseudo-elemento fijo al viewport: el degradado siempre
+   se dibuja del alto de la pantalla y se percibe como tal. Va en ::before
+   fijo en vez de `background-attachment: fixed` porque este último tiene
+   problemas conocidos de scroll en iOS.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+body {
+  background: #f4ecdc;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* luz cálida cayendo desde arriba */
+    radial-gradient(ellipse 92% 52% at 50% -8%, rgba(255, 228, 156, 0.55), transparent 68%),
+    /* reflejo lateral, rompe la simetría */
+    radial-gradient(ellipse 55% 58% at 104% 26%, rgba(196, 146, 66, 0.16), transparent 66%),
+    /* apoyo en la base, da profundidad */
+    radial-gradient(ellipse 78% 44% at -6% 92%, rgba(163, 118, 52, 0.13), transparent 68%),
+    linear-gradient(168deg, #f0e4cd 0%, #f6eedd 34%, #f9f3e7 66%, #fcf8f0 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CONTRASTE (WCAG AA)
+   ───────────────────────────────────────────────────────────────────────
+   Medido sobre el fondo real de cada elemento (componiendo transparencias
+   y promediando los stops de los degradados). Cada valor de acá abajo está
+   elegido para superar 4.5:1, con el ratio anotado al lado.
+
+   El patrón que se repite es dorado sobre marrón oscuro: son dos colores
+   de luminancia parecida, así que por más que se vea "elegante" nunca da
+   contraste. En esos casos el texto secundario pasa a un crudo cálido.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Botón principal — era el peor caso y es el CTA más importante del sitio:
+   blanco sobre dorado daba 2.74. Se mantiene el dorado brillante (es el
+   acento de la marca) y el texto pasa a espresso → 5.69. */
+.primary-button,
+.hero-buy-button,
+.upload-button,
+.big-action,
+.cart-checkout {
+  color: #2b1d13;
+  font-weight: 700;
+}
+
+/* Kicker de categoría en la tarjeta — 11px pide contraste de sobra: 3.82 → 5.43 */
+.product-card .product-category {
+  color: #8a5c14;
+}
+
+/* "Últimas unidades" — 4.16 → 5.18 */
+.card-stock--low {
+  color: #945c0e;
+}
+
+/* Contador de resultados sobre el fondo de página — 3.53 → 5.02 */
+.catalog-active-result {
+  color: #8a5c14;
+}
+
+/* "Ver productos →" de las tarjetas de categoría — 3.31 → 5.48 */
+.cat-card-cta {
+  color: #7d5310;
+}
+
+/* Dirección de sucursal: era dorado al 65% sobre marrón (3.92) → crudo, 10.17 */
+.home-branch-address {
+  color: #d6c2a2;
+}
+
+/* Texto de las tarjetas de ayuda: dorado al 62% sobre marrón (3.51) → 9.02.
+   Lleva !important porque la regla original (línea ~1408) también lo usa. */
+.help-card p {
+  color: #d2c0a4 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SELECTOR DE MEDIDAS
+   ───────────────────────────────────────────────────────────────────────
+   Antes cada ancho de un mismo mueble era una tarjeta suelta del catálogo,
+   sin ninguna relación entre sí: para pasar de la alacena de 80cm a la de
+   1,20m había que volver atrás y buscarla. Ahora son variantes de la misma
+   tarjeta, igual que los colores.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.measure-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 18px 0;
+}
+
+.measure-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 11px;
+  border-radius: 9px;
+  border: 1.5px solid rgba(181, 133, 68, 0.32);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+
+.measure-chip:hover:not(.active) {
+  background: #fff;
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.measure-chip.active {
+  background: linear-gradient(135deg, #23170f, #3a2617);
+  border-color: #23170f;
+  color: #f6e0a6;
+}
+
+/* Sin stock en esa medida: se muestra igual (sirve para saber que existe)
+   pero apagada y tachada. */
+.measure-chip.agotada:not(.active) {
+  opacity: 0.45;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* Medida cuando el producto no tiene variantes: sólo el dato */
+.card-measure {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.79rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.card-measure-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a5c14;
+}
+
+/* ── En el detalle ─────────────────────────────────────────────────────── */
+.modal-variants {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 4px;
+}
+
+.modal-variant-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.modal-variant-current {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.measure-chips--modal {
+  padding: 0;
+  gap: 8px;
+}
+
+.measure-chips--modal .measure-chip {
+  min-height: 42px;
+  padding: 9px 16px;
+  font-size: 0.92rem;
+  border-radius: 12px;
+}
+
+@media (max-width: 540px) {
+  .measure-chips {
+    padding: 7px 10px 0;
+    gap: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .measure-chips::-webkit-scrollbar { display: none; }
+
+  .measure-chip {
+    flex-shrink: 0;
+    min-height: 28px;
+    padding: 4px 9px;
+    font-size: 0.72rem;
+  }
+
+  .measure-chips--modal {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding: 0;
+  }
+  .measure-chips--modal .measure-chip {
+    min-height: 44px;
+    font-size: 0.88rem;
+  }
+
+  .card-measure { font-size: 0.7rem; }
+  .card-measure-label { font-size: 0.6rem; }
 }

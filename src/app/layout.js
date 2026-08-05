@@ -5,8 +5,11 @@ import Script from "next/script";
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // El zoom queda habilitado siempre: bloquearlo es una falla de
+  // accesibilidad (WCAG 1.4.4) para quien necesita agrandar el texto, y iOS
+  // lo ignora igual desde hace varias versiones.
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
@@ -67,7 +70,6 @@ const structuredData = {
   description: "Mueblería familiar con más de 8 años de trayectoria. Muebles y artículos del hogar con envío a domicilio o retiro en sucursales en el sur del Gran Buenos Aires.",
   telephone: "+5491164282270",
   priceRange: "$$",
-  servesCuisine: undefined,
   address: {
     "@type": "PostalAddress",
     streetAddress: "Av. Hipólito Yrigoyen 19.051",
