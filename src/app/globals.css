@@ -9621,3 +9621,161 @@ body::before {
     gap: 8px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AJUSTES DE LO QUE SE VIO EN PANTALLA
+   ───────────────────────────────────────────────────────────────────────
+   Correcciones sobre la web ya publicada, mirando el sitio real.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Los chips de medida se partían en dos filas cuando el mueble tiene muchos
+   anchos (la alacena de pino tiene 8). Eso hacía que unas tarjetas fueran
+   mucho más altas que otras y, como la grilla iguala alturas, las vecinas
+   quedaban con un hueco enorme entre el precio y los botones.
+   Ahora van en una sola fila que se desliza, igual que en el celular. */
+.measure-chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.measure-chips::-webkit-scrollbar { display: none; }
+.measure-chip { scroll-snap-align: start; }
+
+/* En el detalle sí conviene que se vean todas de una */
+.measure-chips--modal {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+/* El riel de categorías terminaba pegado al botón "Categorías": el
+   difuminado del borde se comía el último chip y parecía un corte. */
+.catalog-filter-row {
+  gap: 14px;
+}
+
+.category-rail {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 40px), transparent 100%);
+}
+
+/* Separar visualmente la foto del cuerpo de la tarjeta: antes el blanco del
+   escenario se fundía con el crema y quedaba una banda gris ambigua. */
+.catalog-grid .image-frame {
+  border-bottom: 1px solid rgba(181, 133, 68, 0.24);
+}
+
+/* El hueco entre el precio y los botones se achica dando un poco más de
+   respiro arriba y menos abajo. */
+.product-card .product-copy {
+  gap: 7px;
+  padding: 14px 18px 16px;
+}
+
+/* ── Redes en la bienvenida: iconos, no barras de color ────────────────── */
+/* Antes Instagram y Facebook eran dos botones del ancho completo con sus
+   colores de marca (degradado violeta-naranja y azul). Apilados debajo de
+   los otros dos, la portada entera era una columna de botones de colores:
+   parecía un árbol de links, no una mueblería. Además los colores peleaban
+   con la paleta dorada de la marca. */
+.welcome-social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.welcome-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 18px 9px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(245, 222, 185, 0.24);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(248, 234, 212, 0.9);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.15s;
+}
+
+.welcome-social-btn svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.welcome-social-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(245, 222, 185, 0.5);
+  color: #fff8ec;
+  transform: translateY(-1px);
+}
+
+/* El color de marca aparece sólo en el ícono, al pasar el mouse */
+.welcome-social-btn.welcome-btn-ig:hover svg { color: #e1306c; }
+.welcome-social-btn.welcome-btn-fb:hover svg { color: #1877f2; }
+
+.welcome-social-label {
+  white-space: nowrap;
+}
+
+/* ── El nudo del veteado del header parecía una mancha ─────────────────── */
+/* El degradado radial que simulaba el nudo de la madera se leía como una
+   manchita de suciedad sobre la barra. Se saca: las vetas solas alcanzan. */
+.site-header {
+  background:
+    repeating-linear-gradient(
+      3deg,
+      rgba(255, 251, 240, 0.65) 0px,
+      rgba(255, 251, 240, 0.65) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    repeating-linear-gradient(
+      3deg,
+      rgba(190, 145, 85, 0.4) 0px,
+      rgba(190, 145, 85, 0.4) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    linear-gradient(3deg, #f7ead0 0%, #f0dcae 25%, #fbf1d9 50%, #eddaa8 72%, #f6e7c4 100%)
+    !important;
+}
+
+/* El logo del header se leía muy apagado sobre la madera clara */
+.header-brand .brand-logo-img.compact {
+  filter:
+    drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 1px 3px rgba(90, 55, 15, 0.5))
+    contrast(1.15) saturate(1.1);
+}
+
+@media (max-width: 540px) {
+  .welcome-social {
+    gap: 8px;
+  }
+  .welcome-social-btn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* El degradado y el resplandor de color de los botones viejos de Instagram y
+   Facebook seguían aplicando por la clase, y dejaban un halo rosa y otro azul
+   debajo de los iconos nuevos. */
+.welcome-social-btn.welcome-btn-ig,
+.welcome-social-btn.welcome-btn-fb {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+  color: rgba(248, 234, 212, 0.9);
+}
+
+.welcome-social-btn.welcome-btn-ig:hover,
+.welcome-social-btn.welcome-btn-fb:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff8ec;
+}
