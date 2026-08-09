@@ -44,17 +44,16 @@ export const storeBranches = [
     hours: "Lunes a sábado: 9-18 hs",
     phone: process.env.BRANCH_PHONE_LONGCHAMPS || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   },
-  {
-    id: "glew",
-    dbName: "Glew",
-    name: "Manarey Glew",
-    shortName: "Glew",
-    city: "Buenos Aires",
-    address: process.env.NEXT_PUBLIC_BRANCH_ADDRESS_3 || "Av. Hipólito Yrigoyen 19.861, Glew",
-    mapsUrl: "https://maps.google.com/?q=Av+Hipolito+Yrigoyen+19861+Glew+Buenos+Aires",
-    hours: "Lun a Vie: 9-18 hs · Sáb: 9-14 hs",
-    phone: process.env.BRANCH_PHONE_GLEW || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
-  },
+  // "Manarey Glew" (Av. H. Yrigoyen 19.861) CERRÓ. Se saca de acá para que no
+  // aparezca en el inicio, en Sobre nosotros, en el pie ni —lo más importante—
+  // como opción de retiro en el checkout: un cliente podía pagar y viajar a un
+  // local que ya no existe. El conteo de "N sucursales" sale de este array, así
+  // que se actualiza solo.
+  //
+  // Queda pendiente en el sistema de escritorio: la sucursal todavía tiene 26
+  // unidades sueltas cargadas (colchones, respaldos, una estufa). Al no estar
+  // en este array, el panel web ya no las puede editar — hay que moverlas o
+  // darlas de baja desde el sistema.
   {
     id: "vidriera",
     dbName: "Vidriera",
