@@ -5,7 +5,7 @@ import { upload } from "@vercel/blob/client";
 import { BrandLogo } from "@/components/brand-logo";
 import { ProductImage } from "@/components/product-image";
 import { calculateItemsSubtotal } from "@/lib/shipping";
-import { storeBranches, storeSettings } from "@/lib/store-config";
+import { shippingZones, storeBranches, storeSettings } from "@/lib/store-config";
 
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -147,6 +147,21 @@ function getSwatchBackground(rawColor) {
     if (COLOR_SWATCHES[word]) return COLOR_SWATCHES[word];
   }
   return null;
+}
+
+// Monto a partir del cual el envío va bonificado. Sale de la config de zonas,
+// así que si se cambia el umbral, la etiqueta de las tarjetas acompaña sola.
+const ENVIO_GRATIS_DESDE = shippingZones[0]?.freeFrom ?? Infinity;
+
+/**
+ * Si el producto por sí solo ya alcanza para el envío gratis.
+ * Es la etiqueta que usan MercadoLibre y las grandes tiendas, y es lo primero
+ * que mira el cliente cuando compara precios contra otra publicación.
+ */
+function tieneEnvioGratis(product) {
+  if (!product || product.isSoldOut) return false;
+  const precio = isSillaPack(product) ? product.precioVenta * 6 : product.precioVenta;
+  return precio >= ENVIO_GRATIS_DESDE;
 }
 
 function isSilla(product) {
@@ -2270,6 +2285,18 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             </>
                           )}
 
+                          {/* Envío gratis — la etiqueta verde debajo del precio
+                              es el patrón de MercadoLibre, y es lo primero que
+                              mira el cliente cuando compara dos publicaciones. */}
+                          {tieneEnvioGratis(product) && (
+                            <p className="card-free-shipping">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                              </svg>
+                              Envío gratis
+                            </p>
+                          )}
+
                           {/* Stock por sucursal (admin) */}
                           {session.isAdmin && adminBranchFilter && (
                             <div className="branch-stock-row">
@@ -2770,9 +2797,52 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       : currencyFormatter.format(detailTotal)}
                   </p>
                   <span className={selectedProduct.isSoldOut ? "stock-pill sold-out" : "stock-pill in-stock"}>
-                    {selectedProduct.isSoldOut ? "Sin stock" : "Listo para consultar"}
+                    {selectedProduct.isSoldOut
+                      ? "Sin stock"
+                      : selectedProduct.stockTotal <= 3
+                        ? `Últimas ${selectedProduct.stockTotal} unidades`
+                        : "Disponible"}
                   </span>
                 </div>
+
+                {/* Bloque de entrega. Las tiendas grandes ponen esto arriba de
+                    todo porque es lo que define la compra: cuánto sale que me
+                    llegue y cuándo. Antes había que llegar al checkout para
+                    enterarse. */}
+                {!selectedProduct.isSoldOut && (
+                  <div className="detail-delivery">
+                    {tieneEnvioGratis(selectedProduct) ? (
+                      <p className="detail-delivery-row detail-delivery-free">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        <span><strong>Envío gratis</strong> a {shippingZones[0].detail.split(",")[0]} y alrededores</span>
+                      </p>
+                    ) : (
+                      <p className="detail-delivery-row">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        <span>
+                          Envío {currencyFormatter.format(shippingZones[0].cost)} ·{" "}
+                          <strong>gratis</strong> en compras desde {currencyFormatter.format(ENVIO_GRATIS_DESDE)}
+                        </span>
+                      </p>
+                    )}
+                    <p className="detail-delivery-row">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <span><strong>Retiro gratis</strong> en nuestras {storeBranches.length} sucursales</span>
+                    </p>
+                    <p className="detail-delivery-row">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                      </svg>
+                      <span>Tarjeta, transferencia o efectivo en el local</span>
+                    </p>
+                  </div>
+                )}
                 {isSillaPack(selectedProduct) && (
                   <div className="pack-notice pack-notice--detail">
                     <span className="pack-badge">Venta por pack de 6 · precio unitario {currencyFormatter.format(selectedProduct.precioVenta)}</span>

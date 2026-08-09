@@ -9537,3 +9537,87 @@ body::before {
   .card-measure { font-size: 0.7rem; }
   .card-measure-label { font-size: 0.6rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ENVÍO Y ENTREGA — patrón de las tiendas grandes
+   ───────────────────────────────────────────────────────────────────────
+   "Envío gratis" en verde debajo del precio es la señal que usa
+   MercadoLibre, y es lo primero que compara el cliente entre dos
+   publicaciones. En el detalle va un bloque con las tres cosas que definen
+   la compra: cuánto sale que llegue, que se puede retirar, y cómo se paga.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.card-free-shipping {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 0.79rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--verde-stock);
+}
+
+.card-free-shipping svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* ── Bloque de entrega en el detalle ───────────────────────────────────── */
+.detail-delivery {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 16px 0 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(181, 133, 68, 0.28);
+  background: linear-gradient(160deg, rgba(255, 253, 246, 0.9) 0%, rgba(250, 243, 229, 0.9) 100%);
+}
+
+.detail-delivery-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.detail-delivery-row svg {
+  flex-shrink: 0;
+  color: var(--gold-strong);
+}
+
+.detail-delivery-free {
+  color: var(--verde-stock);
+}
+
+.detail-delivery-free svg {
+  color: var(--verde-stock);
+}
+
+.detail-delivery-free strong {
+  font-weight: 800;
+}
+
+@media (max-width: 540px) {
+  .card-free-shipping {
+    font-size: 0.7rem;
+    gap: 4px;
+  }
+  .card-free-shipping svg {
+    width: 13px;
+    height: 13px;
+  }
+  .detail-delivery {
+    padding: 12px 13px;
+    gap: 8px;
+    margin: 14px 0 4px;
+  }
+  .detail-delivery-row {
+    font-size: 0.82rem;
+    gap: 8px;
+  }
+}

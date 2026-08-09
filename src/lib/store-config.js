@@ -109,20 +109,18 @@ export function getBranchByDisplayName(displayName) {
  */
 export const shippingZones = [
   {
-    id: "cercana",
-    label: "Zona cercana",
-    maxKm: 15,
+    id: "reparto",
+    label: "Zona de reparto",
+    // Hasta donde llega hoy el fletero: de Guernica a Burzaco. Más lejos no
+    // acepta porque, por el trabajo que da, no le cierra el viaje.
+    maxKm: 22,
+    // Lo que cobra el fletero por entrega.
     cost: 12000,
-    freeFrom: 60000,
-    detail: "Longchamps, Glew, Burzaco, Claypole, Monte Grande",
-  },
-  {
-    id: "media",
-    label: "Zona sur",
-    maxKm: 27,
-    cost: 18000,
-    freeFrom: 90000,
-    detail: "Guernica, Alejandro Korn, Lomas de Zamora, Lanús, Florencio Varela",
+    // Envío bonificado desde acá. El ticket promedio de los envíos que ya
+    // entraron por la web es de $64.173, así que el umbral queda un escalón
+    // arriba: el que está cerca agrega algo para llegar, y sube el ticket.
+    freeFrom: 80000,
+    detail: "Longchamps, Glew, Burzaco, Claypole, Guernica, Alejandro Korn",
   },
 ];
 
@@ -144,7 +142,7 @@ export const shippingModes = [
   {
     id: "delivery",
     label: "Envio a domicilio",
-    description: "Envio gratis en compras desde $60.000 (zona cercana) o $90.000 (zona sur).",
+    description: "Envio gratis en compras desde $80.000. Debajo de ese monto, $12.000.",
     eta: "Coordinacion segun ruta",
   },
 ];
