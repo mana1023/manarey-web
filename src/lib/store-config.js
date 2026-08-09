@@ -89,6 +89,51 @@ export function getBranchByDisplayName(displayName) {
   ) || null;
 }
 
+/**
+ * ZONAS DE ENVÍO
+ *
+ * Reemplaza la fórmula vieja de "$10.000 + $1.000 por km", que a 26 km daba
+ * $36.000 y a Capital $50.000 — números que dejaban a Manarey fuera de
+ * competencia contra fábricas que publican envío gratis.
+ *
+ * El envío lo hace un fletero con una F100 y cobra desde $12.000 por entrega.
+ * Acá se define cuánto se le cobra al cliente, no cuánto se le paga a él:
+ * arriba del mínimo Manarey absorbe el flete con su margen (39,5% mediano en
+ * pino), que es lo que permite competir con el "envío gratis" de los demás.
+ *
+ * `maxKm` es el límite superior de cada zona. Más allá de la última zona no se
+ * ofrece envío: el checkout ofrece retiro en sucursal o consultar por WhatsApp.
+ *
+ * Los importes son fáciles de tocar: si el fletero actualiza su tarifa, se
+ * cambian acá y listo.
+ */
+export const shippingZones = [
+  {
+    id: "cercana",
+    label: "Zona cercana",
+    maxKm: 15,
+    cost: 12000,
+    freeFrom: 60000,
+    detail: "Longchamps, Glew, Burzaco, Claypole, Monte Grande",
+  },
+  {
+    id: "media",
+    label: "Zona sur",
+    maxKm: 27,
+    cost: 18000,
+    freeFrom: 90000,
+    detail: "Guernica, Alejandro Korn, Lomas de Zamora, Lanús, Florencio Varela",
+  },
+];
+
+/** Más lejos que esto no se entrega (por ahora). */
+export const MAX_DELIVERY_KM = shippingZones[shippingZones.length - 1].maxKm;
+
+export function getShippingZoneByDistance(distanceKm) {
+  const km = Number(distanceKm) || 0;
+  return shippingZones.find((zone) => km <= zone.maxKm) || null;
+}
+
 export const shippingModes = [
   {
     id: "pickup",
@@ -99,7 +144,7 @@ export const shippingModes = [
   {
     id: "delivery",
     label: "Envio a domicilio",
-    description: "Base de $10.000 mas $1.500 por kilometro desde la sucursal mas cercana (Longchamps o Glew).",
+    description: "Envio gratis en compras desde $60.000 (zona cercana) o $90.000 (zona sur).",
     eta: "Coordinacion segun ruta",
   },
 ];

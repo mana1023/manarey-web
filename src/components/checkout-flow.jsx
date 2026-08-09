@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { storeBranches, storeSettings } from "@/lib/store-config";
+import { storeBranches } from "@/lib/store-config";
+import { calculateShippingCost } from "@/lib/shipping";
 
 const currencyFmt = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -16,12 +17,17 @@ function calcSubtotal(items = []) {
   return items.reduce((sum, i) => sum + i.quantity * (i.precioVenta + i.accessoryPrice), 0);
 }
 
-function calcShipping(mode, distanceKm = 0, shippingRates = null) {
-  if (mode !== "delivery") return 0;
-  const km = Math.max(0, Number(distanceKm) || 0);
-  const baseCost = shippingRates?.shippingBaseCost ?? storeSettings.shippingBaseCost;
-  const perKm = shippingRates?.shippingCostPerKm ?? storeSettings.shippingCostPerKm;
-  return baseCost + km * perKm;
+/**
+ * Envío por zona, bonificado a partir de cierto monto de compra.
+ * Usa la misma función que el servidor (`calculateShippingCost`), así el
+ * precio que ve el cliente y el que se guarda en la orden no pueden diferir.
+ */
+function calcShippingInfo(mode, distanceKm = 0, subtotal = 0) {
+  return calculateShippingCost(mode, distanceKm, null, subtotal);
+}
+
+function calcShipping(mode, distanceKm = 0, subtotal = 0) {
+  return calcShippingInfo(mode, distanceKm, subtotal).cost;
 }
 
 // Sucursales legibles (mismo orden que storeBranches)
@@ -275,9 +281,10 @@ function TransferInfo({ total, order, onWhatsApp }) {
 
 // ─── Resumen del Carrito ──────────────────────────────────────────────────────
 
-function CartSummary({ items, shippingMode, distanceKm, selectedBranch, shippingRates }) {
+function CartSummary({ items, shippingMode, distanceKm, selectedBranch }) {
   const subtotal = calcSubtotal(items);
-  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
+  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal);
+  const shippingCost = shippingInfo.cost;
   const total = subtotal + shippingCost;
 
   return (
@@ -363,9 +370,6 @@ export function CheckoutFlow({ initialCustomer }) {
   const [transferSubMethod, setTransferSubMethod] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
-  // Shipping rates (fetched from DB, fallback to env vars)
-  const [shippingRates, setShippingRates] = useState(null);
-
   // Step tracking
   const [step, setStep] = useState(initialCustomer ? "shipping" : "auth");
 
@@ -392,13 +396,9 @@ export function CheckoutFlow({ initialCustomer }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Fetch shipping rates from DB
-  useEffect(() => {
-    fetch("/api/shipping/settings")
-      .then((r) => r.json())
-      .then((data) => setShippingRates(data))
-      .catch(() => {}); // keep null → uses env var defaults
-  }, []);
+  // Antes acá se traían las tarifas de envío de la base (base + costo por km).
+  // Ese esquema se reemplazó por zonas con precio fijo definidas en
+  // store-config, así que ya no hace falta pedirlas al servidor.
 
   // Pre-fill personal data from customer
   useEffect(() => {
@@ -470,7 +470,11 @@ export function CheckoutFlow({ initialCustomer }) {
         const res = await fetch("/api/shipping/quote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: `${street} ${deliveryAddress.number}`.trim(), city }),
+          body: JSON.stringify({
+            address: `${street} ${deliveryAddress.number}`.trim(),
+            city,
+            subtotal: calcSubtotal(cart),
+          }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
@@ -602,7 +606,8 @@ export function CheckoutFlow({ initialCustomer }) {
   // ── Totales y recargos (deben calcularse ANTES de useCallback) ──────────────
 
   const subtotal = calcSubtotal(cart);
-  const shippingCost = calcShipping(shippingMode, distanceKm, shippingRates);
+  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal);
+  const shippingCost = shippingInfo.cost;
   const total = subtotal + shippingCost;
   const installmentOpt = INSTALLMENT_OPTIONS.find((o) => o.value === selectedInstallments) || INSTALLMENT_OPTIONS[0];
   const surchargeAmount = paymentMethod === "card" ? Math.round(total * installmentOpt.surcharge) : 0;
@@ -1091,9 +1096,18 @@ export function CheckoutFlow({ initialCustomer }) {
                   {shippingQuoting && <p className="cf-muted">Calculando costo de envío...</p>}
                   {shippingError && <p className="cf-error">{shippingError}</p>}
                   {distanceKm && !shippingQuoting && !shippingFallback && (
-                    <p className="cf-muted">
-                      {distanceKm} km desde la sucursal más cercana → Envío estimado: {currencyFmt.format(calcShipping("delivery", distanceKm, shippingRates))}
-                    </p>
+                    shippingInfo.outOfRange ? (
+                      <p className="cf-error">{shippingInfo.message}</p>
+                    ) : shippingInfo.waived ? (
+                      <p className="cf-muted">
+                        {shippingInfo.zoneLabel} ({distanceKm} km) → <strong>Envío gratis</strong> 🎉
+                      </p>
+                    ) : (
+                      <p className="cf-muted">
+                        {shippingInfo.zoneLabel} ({distanceKm} km) → Envío: {currencyFmt.format(shippingInfo.cost)}.{" "}
+                        Agregá {currencyFmt.format(shippingInfo.missingForFree)} más y te lo hacemos gratis.
+                      </p>
+                    )
                   )}
                   {distanceKm && !shippingQuoting && shippingFallback && (
                     <div className="cf-shipping-fallback">
@@ -1106,7 +1120,7 @@ export function CheckoutFlow({ initialCustomer }) {
                         </p>
                         <p className="cf-shipping-fallback-sub">
                           Se cotizó el punto más lejano de <strong>{deliveryAddress.city}</strong>:{" "}
-                          {distanceKm} km → {currencyFmt.format(calcShipping("delivery", distanceKm, shippingRates))}.
+                          {distanceKm} km → {shippingInfo.waived ? "envío gratis" : currencyFmt.format(shippingInfo.cost)}.
                           El envío sale desde Longchamps o Glew, lo que quede más cerca.
                           Si tu domicilio está más cerca, podemos ajustarlo al coordinar la entrega.
                         </p>
@@ -1341,7 +1355,6 @@ export function CheckoutFlow({ initialCustomer }) {
             shippingMode={shippingMode}
             distanceKm={distanceKm}
             selectedBranch={selectedBranch}
-            shippingRates={shippingRates}
           />
         )}
       </div>

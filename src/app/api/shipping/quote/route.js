@@ -8,6 +8,8 @@ export async function POST(request) {
     const body = await request.json();
     const address = String(body.address || "").trim();
     const city = String(body.city || "").trim();
+    // El subtotal define si el envío se bonifica; si no viene, se cobra entero.
+    const subtotal = Number(body.subtotal) || 0;
 
     if (!address || !city) {
       return NextResponse.json(
@@ -20,7 +22,7 @@ export async function POST(request) {
       resolveShippingDistance(address, city),
       getShippingSettings(),
     ]);
-    const shipping = calculateShippingCost("delivery", resolved.distanceKm, rates);
+    const shipping = calculateShippingCost("delivery", resolved.distanceKm, rates, subtotal);
 
     return NextResponse.json({
       distanceKm: resolved.distanceKm,
