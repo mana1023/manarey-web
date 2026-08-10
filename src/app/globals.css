@@ -9779,3 +9779,243 @@ body::before {
   background: rgba(255, 255, 255, 0.14);
   color: #fff8ec;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INICIO ESTILO TIENDA GRANDE
+   ───────────────────────────────────────────────────────────────────────
+   Lo que veía alguien al entrar era un logo circular gigante y cuatro
+   botones apilados: una pantalla entera sin un solo producto. MercadoLibre,
+   Frávega y Coto hacen lo contrario — muestran mercadería en el primer
+   scroll. Acá se comprime la bienvenida y se sube el pino, que es donde
+   Manarey gana por precio.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Bienvenida comprimida ─────────────────────────────────────────────── */
+.welcome-section {
+  min-height: 0 !important;
+}
+
+.welcome-content {
+  padding: 30px 30px 32px !important;
+}
+
+.welcome-logo-wrap {
+  width: 118px !important;
+  height: 118px !important;
+  margin-bottom: 14px !important;
+}
+
+.welcome-logo-img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.welcome-tagline {
+  font-size: 1.02rem !important;
+  margin-bottom: 2px !important;
+}
+
+.welcome-years {
+  margin-bottom: 16px !important;
+}
+
+/* Los dos botones principales pasan a estar uno al lado del otro: apilados
+   a lo ancho ocupaban media pantalla ellos solos. */
+.welcome-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.welcome-actions .welcome-btn {
+  flex: 1 1 240px;
+  min-height: 50px;
+  margin: 0 !important;
+}
+
+.welcome-branches {
+  margin-top: 12px;
+}
+
+/* ── Sección de muebles de pino ────────────────────────────────────────── */
+.pino-section {
+  padding: 30px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 250, 235, 0.95), transparent 60%),
+    linear-gradient(160deg, #fffdf6 0%, #faf2e0 100%);
+  box-shadow: 0 16px 44px rgba(120, 80, 40, 0.14);
+}
+
+.pino-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.pino-heading h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.pino-sub {
+  margin: 8px 0 0;
+  max-width: 46ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pino-ver-todos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(181, 133, 68, 0.4);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--gold-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s, transform 0.14s;
+}
+
+.pino-ver-todos:hover {
+  background: #fff;
+  border-color: var(--gold);
+  transform: translateX(2px);
+}
+
+.pino-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pino-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(120, 80, 40, 0.1);
+  transition: transform 0.24s cubic-bezier(0.22, 0.9, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+}
+
+.pino-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--vitrina-borde-hover);
+  box-shadow: var(--vitrina-sombra-hover);
+}
+
+.pino-card-visual {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: radial-gradient(120% 88% at 50% 0%, #ffffff 0%, #fffefb 58%, #fbf7ef 100%);
+  border-bottom: 1px solid rgba(181, 133, 68, 0.2);
+}
+
+.pino-card-visual .product-image {
+  transition: transform 0.5s cubic-bezier(0.22, 0.9, 0.3, 1);
+  padding: 7%;
+}
+
+.pino-card:hover .product-image {
+  transform: scale(1.07);
+}
+
+.pino-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+  flex: 1;
+}
+
+.pino-card-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.pino-card-medida {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pino-card-precio {
+  margin: 4px 0 0;
+  font-size: 1.42rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-strong);
+}
+
+.pino-card-envio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--verde-stock);
+}
+
+.pino-card-envio svg { flex-shrink: 0; }
+
+/* Resalta el envío gratis de la barra de arriba */
+.info-banner-destacado {
+  color: #7ee2a8 !important;
+}
+
+@media (max-width: 900px) {
+  .pino-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .pino-section {
+    padding: 22px 16px;
+    border-radius: 20px;
+  }
+  .pino-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .pino-card { border-radius: 16px; }
+  .pino-card-copy { padding: 10px 12px 12px; gap: 3px; }
+  .pino-card-copy h3 { font-size: 0.83rem; }
+  .pino-card-precio { font-size: 1.05rem; }
+  .pino-card-medida { font-size: 0.68rem; }
+  .pino-card-envio { font-size: 0.67rem; }
+  .pino-ver-todos { min-height: 42px; font-size: 0.85rem; }
+
+  .welcome-content { padding: 22px 18px 24px !important; }
+  .welcome-logo-wrap { width: 92px !important; height: 92px !important; }
+  .welcome-actions .welcome-btn { flex: 1 1 100%; }
+}

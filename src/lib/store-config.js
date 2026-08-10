@@ -120,10 +120,13 @@ export function getBranchByDisplayName(displayName) {
 export const shippingZones = [
   {
     id: "gratis",
-    label: "Zona de envío gratis",
+    label: "Zona cercana",
     maxKm: 22,
-    cost: 0,
-    freeFrom: 0, // gratis siempre, sin monto mínimo
+    // Debajo del mínimo se cobra el flete. Sin este piso, alguien de Glew
+    // podía pedir un taburete de $15.000 y hacerle gastar un viaje entero al
+    // fletero: la ganancia de esa venta no paga la entrega.
+    cost: 12000,
+    freeFrom: 80000,
     detail: "Longchamps, Glew, Burzaco, Claypole, Monte Grande, Alejandro Korn, Guernica",
   },
   {
@@ -158,7 +161,7 @@ export const shippingModes = [
   {
     id: "delivery",
     label: "Envio a domicilio",
-    description: "Entregas los lunes. Envio gratis hasta Burzaco y Guernica; $10.000 hasta Lanus y San Vicente.",
+    description: "Entregas los lunes. Envio gratis desde $80.000 hasta Burzaco y Guernica; $10.000 hasta Lanus y San Vicente.",
     eta: "Coordinacion segun ruta",
   },
 ];

@@ -930,6 +930,31 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
   const featuredSideProducts = homeProducts.slice(2, 6);
   const heroCategories = categories.filter((item) => item !== "todas").slice(0, 4);
 
+  /**
+   * Muebles de pino para la vidriera del inicio.
+   *
+   * Es donde Manarey gana la pelea de precio: comparado con MercadoLibre,
+   * los placards y bajo mesadas de 1,20m salen la mitad. Por eso el pino
+   * tiene sección propia en la portada en vez de quedar mezclado.
+   *
+   * Se muestran los más caros con stock, que son los que más margen dejan y
+   * los que más se lucen en foto (placards, roperos, bahiuts). Un nombre por
+   * mueble, para que no se repita el mismo tres veces en distinta medida.
+   */
+  const pineProducts = useMemo(() => {
+    const nombresVistos = new Set();
+    return visibleProducts
+      .filter((p) => p.materialSistema === "pino" && !p.isSoldOut && p.imageData)
+      .sort((a, b) => b.precioVenta - a.precioVenta)
+      .filter((p) => {
+        const nombre = (p.nombre || "").trim().toLowerCase();
+        if (nombresVistos.has(nombre)) return false;
+        nombresVistos.add(nombre);
+        return true;
+      })
+      .slice(0, 8);
+  }, [visibleProducts]);
+
   const selectedProduct = useMemo(
     () => visibleProducts.find((product) => product.productKey === selectedProductKey) || null,
     [selectedProductKey, visibleProducts],
@@ -1492,8 +1517,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               </svg>
             </div>
             <div className="info-banner-text">
-              <strong className="info-banner-destacado">Envío gratis los {DIA_DE_ENTREGA}</strong>
-              <span>Hasta Burzaco y Guernica · $10.000 hasta Lanús y San Vicente</span>
+              <strong className="info-banner-destacado">Envío gratis desde $80.000</strong>
+              <span>Entregas los {DIA_DE_ENTREGA} hasta Guernica y Burzaco · $10.000 hasta Lanús y San Vicente</span>
             </div>
           </div>
 
@@ -1725,6 +1750,74 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 </div>
               </div>
             </section>
+
+            {/* ── Muebles de pino ─────────────────────────────────────────────
+                Va antes que el resto porque es donde Manarey gana por precio:
+                los placards y bajo mesadas de 1,20m salen la mitad que en
+                MercadoLibre. Es lo primero que conviene que vea alguien que
+                entra sin conocer la marca. */}
+            {!catalogError && pineProducts.length >= 4 && (
+              <section className="pino-section reveal-block" data-reveal>
+                <div className="pino-heading">
+                  <div>
+                    <p className="eyebrow">Fabricación propia</p>
+                    <h2>Muebles de pino macizo</h2>
+                    <p className="pino-sub">
+                      Nuestra especialidad hace más de 8 años. Precios de fábrica, sin intermediarios.
+                    </p>
+                  </div>
+                  <button
+                    className="pino-ver-todos"
+                    onClick={() => { setQuery("pino"); setCategory("todas"); navigateTo("catalogo"); }}
+                    type="button"
+                  >
+                    Ver todos
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="pino-grid">
+                  {pineProducts.map((product) => (
+                    <button
+                      className="pino-card"
+                      key={product.productKey}
+                      onClick={() => openProductDetail(product)}
+                      type="button"
+                    >
+                      <div className="pino-card-visual">
+                        <ProductImage
+                          src={product.imageData}
+                          alt={product.nombre}
+                          className="product-image"
+                          fill
+                          objectFit="contain"
+                          sizes="(max-width: 600px) 45vw, 23vw"
+                        />
+                      </div>
+                      <div className="pino-card-copy">
+                        <h3>{getDisplayName(product.productKey, product.nombre)}</h3>
+                        {getMeasureMeta(product.medida) && (
+                          <p className="pino-card-medida">
+                            {getMeasureMeta(product.medida).label} {getMeasureMeta(product.medida).value}
+                          </p>
+                        )}
+                        <p className="pino-card-precio">{currencyFormatter.format(product.precioVenta)}</p>
+                        {product.precioVenta >= ZONA_GRATIS.freeFrom && (
+                          <p className="pino-card-envio">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                            Envío gratis
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* ── Destacados ──────────────────────────────────────────────── */}
             {!catalogError && (
