@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { storeBranches } from "@/lib/store-config";
+import { storeBranches, storeSettings } from "@/lib/store-config";
 import { calculateShippingCost } from "@/lib/shipping";
 
 const currencyFmt = new Intl.NumberFormat("es-AR", {

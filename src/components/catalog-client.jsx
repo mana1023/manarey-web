@@ -679,14 +679,18 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       if (storedCart) {
         setCart(JSON.parse(storedCart));
       }
-      const storedCheckout = window.localStorage.getItem("manarey-checkout");
-      if (storedCheckout) {
-        setCustomerData((current) => ({ ...current, ...JSON.parse(storedCheckout) }));
-      }
     } catch {
       window.localStorage.removeItem("manarey-cart");
-      window.localStorage.removeItem("manarey-checkout");
     }
+    // Antes acá se leía también "manarey-checkout" y se pasaba a
+    // setCustomerData, que no existe en este componente: tiraba
+    // ReferenceError. Como estaba dentro del try, el catch se lo comía y de
+    // paso BORRABA EL CARRITO. O sea que a un cliente que volvía con esa
+    // clave vieja guardada se le vaciaba el carrito al entrar.
+    // Ya nada escribe esa clave, así que se limpia y listo.
+    try {
+      window.localStorage.removeItem("manarey-checkout");
+    } catch { /* localStorage bloqueado, no importa */ }
   }, []);
 
   // Leer hash de la URL al montar para restaurar vista y categoría tras un refresh
