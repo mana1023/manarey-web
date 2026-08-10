@@ -122,10 +122,11 @@ export const shippingZones = [
     id: "gratis",
     label: "Zona cercana",
     maxKm: 22,
-    // Debajo del mínimo se cobra el flete. Sin este piso, alguien de Glew
-    // podía pedir un taburete de $15.000 y hacerle gastar un viaje entero al
-    // fletero: la ganancia de esa venta no paga la entrega.
-    cost: 12000,
+    // Lo que se cobra cuando NO aplica la bonificación: o porque la compra no
+    // llega al mínimo, o porque el cliente quiere la entrega otro día que no
+    // sea el de reparto. Sin este piso, alguien de Glew podía pedir un
+    // taburete de $15.000 y hacerle gastar un viaje entero al fletero.
+    cost: 10000,
     freeFrom: 80000,
     detail: "Longchamps, Glew, Burzaco, Claypole, Monte Grande, Alejandro Korn, Guernica",
   },

@@ -43,7 +43,7 @@ function normalizeDistanceKm(distanceKm) {
  * @param {number} subtotal - Total de los productos, para decidir la
  *   bonificación. Si no se pasa, se cobra el envío completo.
  */
-export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings = null, subtotal = 0) {
+export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings = null, subtotal = 0, otroDia = false) {
   const mode = getShippingModeById(modeId);
 
   if (mode.id === "pickup") {
@@ -66,13 +66,18 @@ export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings =
     };
   }
 
-  const freeShipping = Number(subtotal) >= zone.freeFrom;
+  // La bonificación aplica el día de reparto. Si el cliente pide otro día, el
+  // viaje se hace sólo para él, así que paga el flete igual que quien vive
+  // más lejos. Sin esto, la web daba a entender que sólo se puede comprar los
+  // lunes, que es justo lo contrario de lo que se quiere.
+  const freeShipping = !otroDia && Number(subtotal) >= zone.freeFrom;
 
   return {
     ...mode,
     distanceKm: normalizedDistanceKm,
     cost: freeShipping ? 0 : zone.cost,
     waived: freeShipping,
+    otroDia: Boolean(otroDia),
     outOfRange: false,
     zoneId: zone.id,
     zoneLabel: zone.label,

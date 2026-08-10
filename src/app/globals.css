@@ -10019,3 +10019,91 @@ body::before {
   .welcome-logo-wrap { width: 92px !important; height: 92px !important; }
   .welcome-actions .welcome-btn { flex: 1 1 100%; }
 }
+
+/* ── Elegir el día de entrega en el checkout ───────────────────────────── */
+/* El reparto sale los lunes y ese día el envío va bonificado. Se presenta
+   como una elección y no como un aviso: dicho de la otra forma parecía que
+   sólo se podía comprar los lunes. */
+.cf-dia-entrega {
+  margin-top: 14px;
+}
+
+.cf-dia-entrega-label {
+  margin: 0 0 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cf-dia-entrega-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cf-dia-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background: rgba(255, 255, 255, 0.75);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.cf-dia-btn:hover {
+  border-color: var(--gold);
+  background: #fff;
+}
+
+.cf-dia-btn.active {
+  border-color: var(--gold-strong);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(210, 162, 62, 0.18);
+}
+
+.cf-dia-btn-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.cf-dia-btn-sub {
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.cf-dia-btn.active .cf-dia-btn-sub {
+  color: #8a5c14;
+}
+
+/* Nota sobre el costo de las cuotas */
+.cf-cuotas-nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 4px 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(181, 133, 68, 0.28);
+  background: rgba(255, 251, 240, 0.9);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.cf-cuotas-nota svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--gold-strong);
+}
+
+@media (max-width: 540px) {
+  .cf-dia-entrega-opts { grid-template-columns: 1fr; }
+  .cf-cuotas-nota { font-size: 0.8rem; padding: 11px 12px; }
+}

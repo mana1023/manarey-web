@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { storeBranches, storeSettings } from "@/lib/store-config";
+import { DIA_DE_ENTREGA, storeBranches, storeSettings } from "@/lib/store-config";
 import { calculateShippingCost } from "@/lib/shipping";
 
 const currencyFmt = new Intl.NumberFormat("es-AR", {
@@ -22,12 +22,8 @@ function calcSubtotal(items = []) {
  * Usa la misma función que el servidor (`calculateShippingCost`), así el
  * precio que ve el cliente y el que se guarda en la orden no pueden diferir.
  */
-function calcShippingInfo(mode, distanceKm = 0, subtotal = 0) {
-  return calculateShippingCost(mode, distanceKm, null, subtotal);
-}
-
-function calcShipping(mode, distanceKm = 0, subtotal = 0) {
-  return calcShippingInfo(mode, distanceKm, subtotal).cost;
+function calcShippingInfo(mode, distanceKm = 0, subtotal = 0, otroDia = false) {
+  return calculateShippingCost(mode, distanceKm, null, subtotal, otroDia);
 }
 
 // Sucursales legibles (mismo orden que storeBranches)
@@ -50,11 +46,27 @@ function getBranchLabel(localName) {
 
 // ─── Componente MP Bricks ────────────────────────────────────────────────────
 
-const INSTALLMENT_OPTIONS = [
-  { value: 1,  label: "1 cuota",  surcharge: 0,    desc: "Sin recargo" },
-  { value: 3,  label: "3 cuotas", surcharge: 0.25, desc: "25% de recargo" },
-  { value: 6,  label: "6 cuotas", surcharge: 0.25, desc: "25% de recargo" },
-];
+/**
+ * Las cuotas las maneja Mercado Pago, no la web.
+ *
+ * Antes había un selector propio que sumaba un 25% fijo para 3 o 6 cuotas.
+ * Eso estaba mal por dos motivos:
+ *
+ * 1. El 25% no se parecía a lo que cobra Mercado Pago, y encima cambia según
+ *    la tarjeta. Consultado a la API sobre $100.000:
+ *
+ *      Visa / Master / Cabal .... 3 cuotas 19,7%  ·  6 cuotas 32,1%
+ *      Naranja X ................ 3 cuotas 24,3%  ·  6 cuotas 38,4%
+ *      Amex ..................... 3 cuotas 38,9%  ·  6 cuotas 69,8%
+ *
+ * 2. Peor: ese 25% se sumaba al monto que se le mandaba a Mercado Pago, y
+ *    MP después aplicaba SU tasa encima. Una compra de $100.000 en 3 cuotas
+ *    con Visa terminaba en ~$149.600 para el cliente.
+ *
+ * Ahora se le manda a MP el precio real y el formulario muestra las cuotas
+ * de verdad, las del banco del cliente, que es lo que va a pagar.
+ */
+const MAX_CUOTAS = 12;
 
 function MercadoPagoBrick({ amount, email, identification, cardholderName, maxInstallments, onSuccess, onError }) {
   const containerRef = useRef(null);
@@ -281,9 +293,9 @@ function TransferInfo({ total, order, onWhatsApp }) {
 
 // ─── Resumen del Carrito ──────────────────────────────────────────────────────
 
-function CartSummary({ items, shippingMode, distanceKm, selectedBranch }) {
+function CartSummary({ items, shippingMode, distanceKm, selectedBranch, entregaOtroDia }) {
   const subtotal = calcSubtotal(items);
-  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal);
+  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal, entregaOtroDia);
   const shippingCost = shippingInfo.cost;
   const total = subtotal + shippingCost;
 
@@ -343,6 +355,8 @@ export function CheckoutFlow({ initialCustomer }) {
 
   // Shipping
   const [shippingMode, setShippingMode] = useState("delivery"); // pickup | delivery
+  // false = el día de reparto (gratis desde el mínimo) · true = otro día (con cargo)
+  const [entregaOtroDia, setEntregaOtroDia] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState("");
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
@@ -357,7 +371,6 @@ export function CheckoutFlow({ initialCustomer }) {
   const [paymentBusy, setPaymentBusy] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [completedOrder, setCompletedOrder] = useState(null);
-  const [selectedInstallments, setSelectedInstallments] = useState(1);
 
   // Transfer payment polling
   const [pollingActive, setPollingActive] = useState(false);
@@ -606,12 +619,13 @@ export function CheckoutFlow({ initialCustomer }) {
   // ── Totales y recargos (deben calcularse ANTES de useCallback) ──────────────
 
   const subtotal = calcSubtotal(cart);
-  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal);
+  const shippingInfo = calcShippingInfo(shippingMode, distanceKm, subtotal, entregaOtroDia);
   const shippingCost = shippingInfo.cost;
   const total = subtotal + shippingCost;
-  const installmentOpt = INSTALLMENT_OPTIONS.find((o) => o.value === selectedInstallments) || INSTALLMENT_OPTIONS[0];
-  const surchargeAmount = paymentMethod === "card" ? Math.round(total * installmentOpt.surcharge) : 0;
-  const totalWithSurcharge = total + surchargeAmount;
+  // Sin recargo propio: el costo de las cuotas lo pone el banco del cliente y
+  // lo cobra Mercado Pago. Se deja la variable en 0 porque la orden la guarda.
+  const surchargeAmount = 0;
+  const totalWithSurcharge = total;
 
   // ── Build cart payload for APIs ───────────────────────────────────────────
 
@@ -1089,9 +1103,43 @@ export function CheckoutFlow({ initialCustomer }) {
                       onChange={(e) => setDeliveryAddress((a) => ({ ...a, houseNotes: e.target.value }))}
                     />
                   </div>
+                  {/* Elegir el día. El reparto sale los lunes y ese día el envío
+                      va bonificado; cualquier otro día implica un viaje sólo
+                      para ese pedido, así que se cobra. Está como opción y no
+                      como un aviso, para que no parezca que sólo se puede
+                      comprar los lunes. */}
+                  {!shippingInfo.outOfRange && (
+                    <div className="cf-dia-entrega">
+                      <p className="cf-dia-entrega-label">¿Cuándo querés recibirlo?</p>
+                      <div className="cf-dia-entrega-opts">
+                        <button
+                          className={`cf-dia-btn${!entregaOtroDia ? " active" : ""}`}
+                          onClick={() => setEntregaOtroDia(false)}
+                          type="button"
+                        >
+                          <span className="cf-dia-btn-title">El próximo {DIA_DE_ENTREGA}</span>
+                          <span className="cf-dia-btn-sub">
+                            {shippingInfo.zoneId === "gratis"
+                              ? `Envío gratis desde ${currencyFmt.format(shippingInfo.zoneFreeFrom)}`
+                              : `Envío ${currencyFmt.format(shippingInfo.zoneCost)}`}
+                          </span>
+                        </button>
+                        <button
+                          className={`cf-dia-btn${entregaOtroDia ? " active" : ""}`}
+                          onClick={() => setEntregaOtroDia(true)}
+                          type="button"
+                        >
+                          <span className="cf-dia-btn-title">Otro día</span>
+                          <span className="cf-dia-btn-sub">
+                            Envío {currencyFmt.format(shippingInfo.zoneCost)} · lo coordinamos por WhatsApp
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div className="cf-delivery-notice">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    Te avisaremos por WhatsApp cuando tu pedido salga para entrega. Los envíos se realizan de lunes a sábados de 16 a 18 hs aprox.
+                    Te avisaremos por WhatsApp cuando tu pedido salga para entrega.
                   </div>
                   {shippingQuoting && <p className="cf-muted">Calculando costo de envío...</p>}
                   {shippingError && <p className="cf-error">{shippingError}</p>}
@@ -1212,55 +1260,34 @@ export function CheckoutFlow({ initialCustomer }) {
                     <p className="cf-card-title">Pago con tarjeta</p>
                     <button
                       className="cf-link-btn"
-                      onClick={() => { setPaymentMethod(""); setSelectedInstallments(1); }}
+                      onClick={() => setPaymentMethod("")}
                       type="button"
                     >
                       Cambiar método
                     </button>
                   </div>
 
-                  {/* Installment selector */}
-                  <div className="cf-installment-selector">
-                    <p className="cf-installment-label">Cantidad de cuotas</p>
-                    <div className="cf-installment-options">
-                      {INSTALLMENT_OPTIONS.map((opt) => {
-                        const optTotal = total * (1 + opt.surcharge);
-                        const isActive = selectedInstallments === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            className={`cf-installment-btn${isActive ? " active" : ""}`}
-                            onClick={() => setSelectedInstallments(opt.value)}
-                            type="button"
-                          >
-                            <span className="cf-inst-label">{opt.label}</span>
-                            <span className="cf-inst-desc">{opt.desc}</span>
-                            <span className="cf-inst-total">{currencyFmt.format(optTotal)}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                  {/* Las cuotas y su costo los muestra el formulario de Mercado
+                      Pago, con los valores reales del banco de esa tarjeta. */}
+                  <div className="cf-cuotas-nota">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <span>
+                      Pagás <strong>{currencyFmt.format(total)}</strong> en 1 pago. Si elegís cuotas, el
+                      interés lo define tu banco y vas a ver el total exacto acá abajo antes de confirmar.
+                    </span>
                   </div>
-
-                  {/* Surcharge breakdown */}
-                  {surchargeAmount > 0 && (
-                    <div className="cf-surcharge-breakdown">
-                      <div><span>Precio base</span><span>{currencyFmt.format(total)}</span></div>
-                      <div><span>Recargo {selectedInstallments} cuotas (25%)</span><span className="cf-surcharge-plus">+{currencyFmt.format(surchargeAmount)}</span></div>
-                      <div className="cf-surcharge-total"><span>Total a cobrar</span><strong>{currencyFmt.format(totalWithSurcharge)}</strong></div>
-                    </div>
-                  )}
 
                   {paymentBusy ? (
                     <p className="cf-muted">Procesando pago...</p>
                   ) : (
                     <MercadoPagoBrick
-                      key={selectedInstallments}
-                      amount={totalWithSurcharge}
+                      amount={total}
                       email={personalData.email || customer?.email || ""}
                       identification={personalData.dni ? { type: "DNI", number: personalData.dni } : undefined}
                       cardholderName={`${personalData.nombre} ${personalData.apellido}`.trim() || undefined}
-                      maxInstallments={selectedInstallments}
+                      maxInstallments={MAX_CUOTAS}
                       onSuccess={handleCardSubmit}
                       onError={(msg) => setPaymentError(msg)}
                     />
@@ -1355,6 +1382,7 @@ export function CheckoutFlow({ initialCustomer }) {
             shippingMode={shippingMode}
             distanceKm={distanceKm}
             selectedBranch={selectedBranch}
+            entregaOtroDia={entregaOtroDia}
           />
         )}
       </div>

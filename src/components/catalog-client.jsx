@@ -1522,7 +1522,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
             </div>
             <div className="info-banner-text">
               <strong className="info-banner-destacado">Envío gratis desde $80.000</strong>
-              <span>Entregas los {DIA_DE_ENTREGA} hasta Guernica y Burzaco · $10.000 hasta Lanús y San Vicente</span>
+              <span>Repartimos los {DIA_DE_ENTREGA} hasta Guernica y Burzaco. Otro día o más lejos, $10.000</span>
             </div>
           </div>
 
@@ -2922,7 +2922,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         <rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
                       </svg>
                       <span>
-                        <strong>Envío gratis los {DIA_DE_ENTREGA}</strong> hasta Burzaco y Guernica
+                        <strong>Envío gratis</strong> desde {currencyFormatter.format(ZONA_GRATIS.freeFrom)} hasta
+                        Burzaco y Guernica, repartiendo los {DIA_DE_ENTREGA}
                       </span>
                     </p>
                     <p className="detail-delivery-row">
@@ -2930,7 +2931,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
                       </svg>
                       <span>
-                        {currencyFormatter.format(ZONA_EXTENDIDA.cost)} hasta Lanús, Quilmes y San Vicente
+                        {currencyFormatter.format(ZONA_EXTENDIDA.cost)} si lo querés otro día,
+                        o hasta Lanús, Quilmes y San Vicente
                       </span>
                     </p>
                     <p className="detail-delivery-row">
