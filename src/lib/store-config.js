@@ -107,22 +107,38 @@ export function getBranchByDisplayName(displayName) {
  * Los importes son fáciles de tocar: si el fletero actualiza su tarifa, se
  * cambian acá y listo.
  */
+/**
+ * Decidido con la familia: se reparte **los lunes**.
+ *
+ *   Hasta Burzaco y Guernica ...... envío gratis
+ *   De ahí hasta Lanús y San Vicente ... $10.000
+ *   Más lejos ..................... no se entrega (retiro o WhatsApp)
+ *
+ * Las distancias son las que ya tiene cargadas `geo.js`, medidas desde
+ * Longchamps: Burzaco 14 km, Guernica 22, Lanús 26, San Vicente 28.
+ */
 export const shippingZones = [
   {
-    id: "reparto",
-    label: "Zona de reparto",
-    // Hasta donde llega hoy el fletero: de Guernica a Burzaco. Más lejos no
-    // acepta porque, por el trabajo que da, no le cierra el viaje.
+    id: "gratis",
+    label: "Zona de envío gratis",
     maxKm: 22,
-    // Lo que cobra el fletero por entrega.
-    cost: 12000,
-    // Envío bonificado desde acá. El ticket promedio de los envíos que ya
-    // entraron por la web es de $64.173, así que el umbral queda un escalón
-    // arriba: el que está cerca agrega algo para llegar, y sube el ticket.
-    freeFrom: 80000,
-    detail: "Longchamps, Glew, Burzaco, Claypole, Guernica, Alejandro Korn",
+    cost: 0,
+    freeFrom: 0, // gratis siempre, sin monto mínimo
+    detail: "Longchamps, Glew, Burzaco, Claypole, Monte Grande, Alejandro Korn, Guernica",
+  },
+  {
+    id: "extendida",
+    label: "Zona extendida",
+    maxKm: 30,
+    cost: 10000,
+    // Nunca se bonifica: es el adicional fijo por salir del radio cercano.
+    freeFrom: Number.MAX_SAFE_INTEGER,
+    detail: "Lomas de Zamora, Lanús, Quilmes, Florencio Varela, San Vicente",
   },
 ];
+
+/** Día en que sale el reparto. Se muestra en el detalle y en el checkout. */
+export const DIA_DE_ENTREGA = "lunes";
 
 /** Más lejos que esto no se entrega (por ahora). */
 export const MAX_DELIVERY_KM = shippingZones[shippingZones.length - 1].maxKm;
@@ -142,7 +158,7 @@ export const shippingModes = [
   {
     id: "delivery",
     label: "Envio a domicilio",
-    description: "Envio gratis en compras desde $80.000. Debajo de ese monto, $12.000.",
+    description: "Entregas los lunes. Envio gratis hasta Burzaco y Guernica; $10.000 hasta Lanus y San Vicente.",
     eta: "Coordinacion segun ruta",
   },
 ];
