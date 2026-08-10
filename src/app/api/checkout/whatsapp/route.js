@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrder, syncOrderToVentas } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
-import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
 import { checkCartStock } from "@/lib/stock";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -83,6 +83,10 @@ export async function POST(request) {
       const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "whatsapp" });
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
+
+    // Aviso al local. Va fuera del if de arriba a proposito: el negocio
+    // tiene que enterarse aunque el cliente no haya dejado mail.
+    notificarAlLocal(order, "whatsapp", false);
 
     return NextResponse.json({
       orderCode: order.orderCode,

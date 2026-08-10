@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrder } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
-import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
 
 export async function POST(request) {
   try {
@@ -14,6 +14,10 @@ export async function POST(request) {
       const { subject, html } = buildOrderConfirmationEmail({ order, paymentMethod: "card" });
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
+
+    // Aviso al local. Va fuera del if de arriba a proposito: el negocio
+    // tiene que enterarse aunque el cliente no haya dejado mail.
+    notificarAlLocal(order, "card", false);
 
     return NextResponse.json({
       orderCode: order.orderCode,

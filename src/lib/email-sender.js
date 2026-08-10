@@ -9,6 +9,12 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "Manarey <noreply@manarey.com.ar>";
 
+const currencyFmt = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+});
+
 /**
  * Envía un email con Resend.
  * Si no hay API key configurada, loguea en consola y no falla.
@@ -219,4 +225,128 @@ export function buildPaymentApprovedEmail({ order }) {
 </body>
 </html>`,
   };
+}
+
+/**
+ * Aviso al local de que entró un pedido.
+ *
+ * Hasta ahora TODOS los mails iban al cliente: no había ni uno solo para
+ * Manarey. El único aviso al local era por WhatsApp, y esa API nunca se
+ * configuró (`WHATSAPP_API_TOKEN` no existe en producción), así que la
+ * función devolvía false en silencio.
+ *
+ * Resultado: entraba un pedido pagado y nadie se enteraba, salvo que
+ * alguien se acordara de mirar el panel. Un pedido que nadie contesta en el
+ * momento se enfría solo.
+ *
+ * El destinatario sale de ORDERS_EMAIL, y si no está, de ADMIN_EMAIL.
+ */
+export function buildNewOrderAlertEmail({ order, paymentMethod, isPaid }) {
+  const metodo = {
+    card: "Tarjeta",
+    transfer: "Transferencia / billetera",
+    whatsapp: "A coordinar por WhatsApp",
+  }[paymentMethod] || paymentMethod;
+
+  const envio = order.summary?.shipping || {};
+  const esRetiro = envio.id === "pickup";
+  const items = (order.summary?.items || [])
+    .map((i) => `
+      <tr>
+        <td style="padding:7px 0;border-bottom:1px solid #ede0c4;font-size:0.9rem;">
+          ${i.quantity} × ${i.nombre}${i.accessoryLabel ? ` <em>+ ${i.accessoryLabel}</em>` : ""}
+        </td>
+        <td style="padding:7px 0;border-bottom:1px solid #ede0c4;text-align:right;font-size:0.9rem;white-space:nowrap;">
+          ${currencyFmt.format((i.precioVenta + (i.accessoryPrice || 0)) * i.quantity)}
+        </td>
+      </tr>`)
+    .join("");
+
+  const telLimpio = String(order.customer?.phone || "").replace(/\D/g, "");
+
+  return {
+    subject: `${isPaid ? "💰 PAGADO" : "🔔 Nuevo pedido"} ${order.orderCode} — ${currencyFmt.format(order.summary?.total || 0)}`,
+    html: `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3e7cf;font-family:'Georgia',serif;color:#2b1d13;">
+  <div style="max-width:600px;margin:24px auto;background:#fff9ef;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(89,58,24,0.10);">
+
+    <div style="background:${isPaid ? "#1d5c37" : "#8a5c14"};padding:22px 28px;">
+      <p style="margin:0;font-size:1.15rem;font-weight:800;color:#fff;">
+        ${isPaid ? "💰 Pedido PAGADO" : "🔔 Nuevo pedido"}
+      </p>
+      <p style="margin:4px 0 0;font-size:0.88rem;color:rgba(255,255,255,0.85);">
+        ${order.orderCode} · ${metodo}${isPaid ? "" : " · falta confirmar el pago"}
+      </p>
+    </div>
+
+    <div style="padding:24px 28px;">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+        ${items}
+        <tr>
+          <td style="padding:10px 0 0;font-size:0.88rem;color:#6f5a46;">Envío${esRetiro ? " (retira en local)" : ""}</td>
+          <td style="padding:10px 0 0;text-align:right;font-size:0.88rem;color:#6f5a46;">
+            ${envio.cost > 0 ? currencyFmt.format(envio.cost) : "sin cargo"}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0 0;font-size:1.05rem;font-weight:800;">TOTAL</td>
+          <td style="padding:8px 0 0;text-align:right;font-size:1.15rem;font-weight:800;color:#8a5c14;">
+            ${currencyFmt.format(order.summary?.total || 0)}
+          </td>
+        </tr>
+      </table>
+
+      <div style="background:#f6eedd;border-radius:12px;padding:16px 18px;font-size:0.9rem;line-height:1.6;">
+        <strong style="font-size:0.95rem;">${order.customer?.fullName || "Sin nombre"}</strong><br>
+        📱 ${order.customer?.phone || "sin teléfono"}<br>
+        ${order.customer?.email ? `✉️ ${order.customer.email}<br>` : ""}
+        ${esRetiro
+          ? `🏬 Retira en <strong>${order.customer?.address || "sucursal"}</strong>`
+          : `📍 ${order.customer?.address || ""}, ${order.customer?.city || ""}${
+              order.customer?.betweenStreets ? `<br>Entre calles: ${order.customer.betweenStreets}` : ""
+            }${order.customer?.notes ? `<br>Nota: ${order.customer.notes}` : ""}`}
+      </div>
+
+      ${telLimpio ? `
+      <div style="text-align:center;margin-top:20px;">
+        <a href="https://wa.me/${telLimpio.startsWith("54") ? telLimpio : "549" + telLimpio}"
+           style="display:inline-block;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-weight:700;font-size:0.95rem;padding:13px 30px;border-radius:10px;text-decoration:none;">
+          💬 Escribirle al cliente
+        </a>
+      </div>` : ""}
+    </div>
+
+    <div style="background:#ede0c4;padding:16px 28px;text-align:center;font-size:0.78rem;color:#8a6a40;">
+      Aviso automático de la web de Manarey.
+    </div>
+  </div>
+</body>
+</html>`,
+  };
+}
+
+/** A quién se le avisa de los pedidos nuevos. */
+export function getOrdersNotifyEmail() {
+  return (process.env.ORDERS_EMAIL || process.env.ADMIN_EMAIL || "").trim();
+}
+
+/**
+ * Manda el aviso de pedido nuevo al local. No bloquea ni tira error: si no
+ * hay destinatario configurado o falla el envío, el checkout sigue igual.
+ */
+export function notificarAlLocal(order, paymentMethod, isPaid = false) {
+  const para = getOrdersNotifyEmail();
+  if (!para) {
+    console.warn("[email-sender] Sin ORDERS_EMAIL ni ADMIN_EMAIL: no se avisó del pedido", order?.orderCode);
+    return;
+  }
+  try {
+    const { subject, html } = buildNewOrderAlertEmail({ order, paymentMethod, isPaid });
+    sendEmail({ to: para, subject, html }).catch(() => {});
+  } catch (err) {
+    console.error("[email-sender] No se pudo armar el aviso al local:", err?.message || err);
+  }
 }
