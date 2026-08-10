@@ -8,10 +8,17 @@ import { sendEmail, buildPaymentApprovedEmail, notificarAlLocal } from "@/lib/em
 // ── Verificación de firma MP ─────────────────────────────────────────────────
 //
 // MP envía el header:  x-signature: ts=TIMESTAMP,v1=HMAC_SHA256_HEX
-// El mensaje a firmar: "id:PAYMENT_ID;request-date:TIMESTAMP;"
+// El mensaje a firmar: "id:PAYMENT_ID;request-id:X_REQUEST_ID;ts:TIMESTAMP;"
 // Secret: configurado en MP Developer Panel → Webhooks → tu webhook → Secret
 //
 // Documentación: https://www.mercadopago.com.ar/developers/es/docs/your-integrations/notifications/webhooks
+//
+// OJO — acá había un bug latente: el manifiesto se armaba con "request-date:"
+// en vez de "ts:". No rompía nada porque MERCADO_PAGO_WEBHOOK_SECRET no está
+// configurado en producción y, sin secret, la verificación se saltea. Pero el
+// día que alguien configurara el secret para "asegurar" el webhook, TODOS los
+// avisos de pago iban a rechazarse con 401 y los pedidos se hubieran quedado
+// en pendiente para siempre. Corregido antes de que pase.
 
 function verifyMpSignature(request, paymentId) {
   const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
@@ -38,11 +45,12 @@ function verifyMpSignature(request, paymentId) {
     return false;
   }
 
-  // Construir el mensaje
+  // Construir el mensaje. Si algún valor no viene en la notificación, se saca
+  // del manifiesto en vez de mandarlo vacío — así lo pide la documentación.
   const manifest = [
     paymentId ? `id:${paymentId};` : "",
     xRequestId ? `request-id:${xRequestId};` : "",
-    `request-date:${ts};`,
+    `ts:${ts};`,
   ]
     .filter(Boolean)
     .join("");
