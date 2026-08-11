@@ -31,6 +31,22 @@ const PAGE_SIZE = 24;
  *   "90x90" "1,40x80" "70 x 70"  → ancho x profundidad
  *   "ab101" "e-260"              → código de modelo, no es una medida
  */
+// El tipo de gas de una cocina viaja en el campo `color` ("negro gas natural"),
+// porque es lo que distingue una de otra a la hora de comprarla. Pero no es un
+// color: mostrado como punto quedaban dos círculos negros idénticos, imposible
+// saber cuál era cuál. Estas dos funciones lo detectan y le dan una etiqueta
+// legible, sin el color adelante ("Gas natural", no "negro gas natural").
+const RE_TIPO_GAS = /\bgas\s+(natural|envasado)\b/i;
+
+function esVarianteDeGas(color) {
+  return RE_TIPO_GAS.test(color || "");
+}
+
+function etiquetaDeVariante(color) {
+  const m = (color || "").match(RE_TIPO_GAS);
+  return m ? `Gas ${m[1].toLowerCase()}` : (color || "");
+}
+
 function getMeasureMeta(rawMeasure) {
   if (!rawMeasure) return null;
   const medida = rawMeasure.trim();
@@ -2322,24 +2338,34 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         {/* Variantes de color — en la grilla van como puntos:
                             las pastillas con el nombre se partían en dos filas
                             y descuadraban la altura de las tarjetas vecinas.
-                            El nombre completo está en el detalle. */}
+                            El nombre completo está en el detalle.
+                            Excepción: el tipo de gas de una cocina. Como no es
+                            un color, quedaban dos puntos negros idénticos y no
+                            había forma de saber cuál era cuál — ahí van con
+                            texto. */}
                         {hasVariants && (
-                          <div className="color-swatches color-swatches--dots">
+                          <div className={`color-swatches ${
+                            colorVariants.some((v) => esVarianteDeGas(v.color))
+                              ? "color-swatches--texto"
+                              : "color-swatches--dots"
+                          }`}>
                             {colorVariants.slice(0, 6).map((v) => (
                               <button
                                 key={v.productKey}
                                 className={`color-swatch${product.productKey === v.productKey ? " active" : ""}`}
                                 title={v.color || ""}
                                 aria-pressed={product.productKey === v.productKey}
-                                aria-label={`Ver en color ${v.color}`}
+                                aria-label={`Ver ${etiquetaDeVariante(v.color)}`}
                                 onClick={() => setSelectedVariants((prev) => ({ ...prev, [group.key]: v.productKey }))}
                                 type="button"
                               >
-                                <span
-                                  className="color-swatch-dot"
-                                  style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
-                                />
-                                <span className="color-swatch-label">{v.color}</span>
+                                {!esVarianteDeGas(v.color) && (
+                                  <span
+                                    className="color-swatch-dot"
+                                    style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
+                                  />
+                                )}
+                                <span className="color-swatch-label">{etiquetaDeVariante(v.color)}</span>
                               </button>
                             ))}
                             {colorVariants.length > 6 && (
@@ -2976,7 +3002,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       {getMeasureMeta(selectedProduct.medida).value}
                     </p>
                   ) : null}
-                  {selectedProduct.color ? (
+                  {/* En las cocinas el tipo de gas viaja dentro del color, y ya
+                      tiene su propio selector más abajo: repetirlo acá como
+                      "Color: negro gas envasado" sobraba y confundía. */}
+                  {selectedProduct.color && !esVarianteDeGas(selectedProduct.color) ? (
                     <p className="meta-line">
                       <strong>Color:</strong> {selectedProduct.color}
                     </p>
@@ -3068,8 +3097,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       {coloresDeEstaMedida.length > 1 && (
                         <div className="modal-variant-block">
                           <p className="modal-variant-title">
-                            Color
-                            <span className="modal-variant-current">{selectedProduct.color}</span>
+                            {coloresDeEstaMedida.some((v) => esVarianteDeGas(v.color)) ? "Tipo de gas" : "Color"}
+                            <span className="modal-variant-current">
+                              {etiquetaDeVariante(selectedProduct.color)}
+                            </span>
                           </p>
                           <div className="color-swatches">
                             {coloresDeEstaMedida.map((v) => (
@@ -3078,15 +3109,17 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                                 className={`color-swatch${selectedProduct.productKey === v.productKey ? " active" : ""}`}
                                 title={v.color || ""}
                                 aria-pressed={selectedProduct.productKey === v.productKey}
-                                aria-label={`Ver en color ${v.color}`}
+                                aria-label={`Ver ${etiquetaDeVariante(v.color)}`}
                                 onClick={() => setSelectedProductKey(v.productKey)}
                                 type="button"
                               >
-                                <span
-                                  className="color-swatch-dot"
-                                  style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
-                                />
-                                <span className="color-swatch-label">{v.color}</span>
+                                {!esVarianteDeGas(v.color) && (
+                                  <span
+                                    className="color-swatch-dot"
+                                    style={getSwatchBackground(v.color) ? { background: getSwatchBackground(v.color) } : undefined}
+                                  />
+                                )}
+                                <span className="color-swatch-label">{etiquetaDeVariante(v.color)}</span>
                               </button>
                             ))}
                           </div>

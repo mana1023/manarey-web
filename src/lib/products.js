@@ -94,8 +94,32 @@ export function invalidateProductsCache() {
   g._manareyProductsCache = null;
 }
 
+// Palabras que no se capitalizan salvo que abran el nombre.
+const CONECTORES = new Set(["de", "del", "la", "el", "y", "con", "sin", "para", "por", "a", "en"]);
+
+/**
+ * Capitaliza el nombre para mostrarlo, respetando los códigos de modelo.
+ *
+ * Antes esto lo hacía `initcap` en SQL, que capitaliza palabra por palabra a
+ * ciegas: servía cuando los nombres eran "alacena" o "mesada", pero desde que
+ * llevan el modelo del electrodoméstico rompía "CI070" → "Ci070" y
+ * "DL-3VA" → "Dl-3va". La regla es simple: si la palabra ya trae una mayúscula
+ * o un número, es un código o una marca y se deja como está.
+ */
+function titularNombre(raw) {
+  return (raw || "")
+    .trim()
+    .split(/\s+/)
+    .map((palabra, i) => {
+      if (/[A-Z0-9]/.test(palabra)) return palabra;
+      if (i > 0 && CONECTORES.has(palabra)) return palabra;
+      return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+    })
+    .join(" ");
+}
+
 function mapProduct(row) {
-  const nombre = row.nombre || "";
+  const nombre = titularNombre(row.nombre || "");
   const categoria = row.categoria || "";
   const medida = row.medida || "";
   const precioOriginal = Number(row.precio_venta || 0);
@@ -103,6 +127,16 @@ function mapProduct(row) {
   const precioVenta = row.precio_override !== null && row.precio_override !== undefined
     ? Number(row.precio_override)
     : precioOriginal;
+  // El tipo de gas de una cocina vive en la columna `material`, pero no es un
+  // material: es una variante del mismo producto. Si se lo dejara en la clave
+  // de grupo, la Candor de gas natural y la de envasado serían dos tarjetas
+  // sueltas y el cliente no podría elegir. Se saca del agrupamiento para que
+  // queden como dos opciones de una misma tarjeta. La medida y el color sí
+  // siguen distinguiendo el productKey, así que el stock y el pedido registran
+  // cuál eligió.
+  const materialSistema = (row.material_sistema || "").toLowerCase().trim();
+  const materialDeGrupo = materialSistema.startsWith("gas ") ? "" : materialSistema;
+
   return {
     productKey: row.product_key,
     // Clave de agrupación de variantes. Antes incluía medida y precio, así que
@@ -118,7 +152,7 @@ function mapProduct(row) {
     variantGroupKey: [
       nombre.toLowerCase().trim(),
       categoria.toLowerCase().trim(),
-      (row.material_sistema || "").toLowerCase().trim(),
+      materialDeGrupo,
     ].join("|"),
     nombre,
     categoria: row.categoria,
@@ -174,7 +208,7 @@ export async function getCatalogProducts() {
         -- SIN categoria en el key: cambiar categoría en el sistema desktop
         -- ya no rompe el vínculo con la metadata (imágenes, precios, descripciones)
         md5(concat_ws('|', lower(trim(nombre)), lower(coalesce(trim(medida), '')), lower(coalesce(trim(color), '')))) as product_key,
-        min(initcap(trim(nombre))) as nombre,
+        min(trim(nombre)) as nombre,
         nullif(min(initcap(trim(categoria))), '') as categoria,
         nullif(min(trim(medida)), '') as medida,
         nullif(min(trim(color)), '') as color,

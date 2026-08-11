@@ -10107,3 +10107,62 @@ body::before {
   .cf-dia-entrega-opts { grid-template-columns: 1fr; }
   .cf-cuotas-nota { font-size: 0.8rem; padding: 11px 12px; }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   VARIANTES QUE NO SON UN COLOR (tipo de gas de las cocinas)
+
+   La grilla muestra los colores como puntos, y está bien: el punto ES la
+   información. Pero el tipo de gas de una cocina viaja en el mismo campo y
+   como punto quedaban dos círculos negros iguales — el cliente no tenía forma
+   de elegir. Acá van como pastillas con el texto a la vista.
+   ────────────────────────────────────────────────────────────────────────── */
+.color-swatches--texto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 14px 10px;
+}
+
+.product-card .color-swatches--texto .color-swatch {
+  width: auto;
+  height: auto;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 84, 40, 0.28);
+  background: rgba(255, 253, 247, 0.85);
+  flex-shrink: 0;
+}
+
+.color-swatches--texto .color-swatch-label {
+  /* Al revés que en los puntos: acá el texto es lo único que informa. */
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #6b4a22;
+  white-space: nowrap;
+}
+
+.product-card .color-swatches--texto .color-swatch:hover {
+  border-color: rgba(210, 162, 62, 0.75);
+  background: #fffdf7;
+  transform: none;
+}
+
+.product-card .color-swatches--texto .color-swatch.active {
+  border-color: #a97b2c;
+  background: rgba(210, 162, 62, 0.16);
+}
+
+.color-swatches--texto .color-swatch.active .color-swatch-label {
+  color: #4d3415;
+}
+
+/* Sin bloque de modo oscuro a propósito: el sitio tiene un diseño claro fijo y
+   no usa prefers-color-scheme en ningún otro lado. Agregarlo acá dejaba texto
+   claro sobre la tarjeta clara cuando el navegador estaba en modo oscuro. */
