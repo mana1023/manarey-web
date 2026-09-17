@@ -3,7 +3,9 @@
 /**
  * ProductImage — renderiza imágenes de productos de forma optimizada.
  *
- * - URLs de Vercel Blob (https://*.public.blob.vercel-storage.com):
+ * - URLs de Cloudinary: <img> con srcset; Cloudinary hace la optimización.
+ * - URLs de Vercel Blob (https://*.public.blob.vercel-storage.com) y de
+ *   Supabase Storage (https://*.supabase.co/storage/v1/object/public/...):
  *   usa next/image con optimización automática (WebP/AVIF, resize, cache CDN).
  * - Data URIs (base64) o cualquier otro src:
  *   usa <img> normal porque next/image no soporta data: URLs.
@@ -15,9 +17,16 @@ import { BrandLogo } from "@/components/brand-logo";
 import { esUrlDeCloudinary, srcSetDeCloudinary, urlDeCloudinary } from "@/lib/cloudinary-url";
 
 const BLOB_HOST_RE = /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//i;
+const SUPABASE_HOST_RE = /^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/public\//i;
 
-function isBlobUrl(src) {
-  return typeof src === "string" && BLOB_HOST_RE.test(src);
+/**
+ * Fotos que conviene servir por el optimizador de Vercel: las achica, las pasa
+ * a WebP/AVIF y las guarda en caché un año (ver next.config.mjs). Con Supabase
+ * eso además cuida el tráfico gratis del proyecto, que comparte con la base de
+ * datos: cada foto se le pide una vez, no una por visita.
+ */
+function usaOptimizadorDeVercel(src) {
+  return typeof src === "string" && (BLOB_HOST_RE.test(src) || SUPABASE_HOST_RE.test(src));
 }
 
 /**
@@ -107,7 +116,7 @@ export function ProductImage({
     );
   }
 
-  if (isBlobUrl(src)) {
+  if (usaOptimizadorDeVercel(src)) {
     if (fill) {
       return (
         <NextImage

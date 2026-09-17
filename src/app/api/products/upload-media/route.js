@@ -4,6 +4,7 @@ import { put } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
 import { cloudinaryConfigurado, subirImagenACloudinary } from "@/lib/cloudinary";
+import { supabaseStorageConfigurado, subirImagenASupabase } from "@/lib/supabase-storage";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -76,11 +77,16 @@ export async function POST(request) {
       return NextResponse.json({ error: "La imagen no puede superar 20MB." }, { status: 400 });
     }
 
-    // Las fotos nuevas van a Cloudinary cuando está configurado: el plan
-    // gratis de Vercel Blob es de 1 GB y al pasarlo bloqueó toda la web.
-    // Sin configurar, sigue yendo a Vercel Blob como siempre.
+    // Dónde va la foto nueva, en orden: Cloudinary, Supabase Storage y, si no
+    // hay ninguno configurado, Vercel Blob como siempre. El plan gratis de
+    // Vercel Blob es de 1 GB y al pasarlo bloqueó las fotos de toda la web.
     if (cloudinaryConfigurado()) {
       const url = await subirImagenACloudinary(file);
+      return NextResponse.json({ url });
+    }
+
+    if (supabaseStorageConfigurado()) {
+      const url = await subirImagenASupabase(file);
       return NextResponse.json({ url });
     }
 

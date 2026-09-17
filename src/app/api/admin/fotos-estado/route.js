@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
 import { usoDeCloudinary } from "@/lib/cloudinary";
+import { usoDeSupabaseStorage } from "@/lib/supabase-storage";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Estado del almacenamiento de fotos: si Cloudinary quedó bien configurado y
- * cuánto de su plan gratis se está usando, y si Vercel Blob sigue bloqueado.
- * Sirve para no tener que subir una foto de prueba para saber si anda.
+ * Estado del almacenamiento de fotos: dónde van a parar las fotos nuevas, si
+ * las credenciales de Cloudinary y de Supabase andan, y si Vercel Blob sigue
+ * bloqueado. Sirve para no tener que subir una foto de prueba para saber si anda.
  */
 export async function GET() {
   const session = await getSessionFromCookies(await cookies());
@@ -17,6 +18,12 @@ export async function GET() {
   }
 
   const cloudinary = await usoDeCloudinary().catch((err) => ({
+    configurado: true,
+    ok: false,
+    error: err?.message || String(err),
+  }));
+
+  const supabase = await usoDeSupabaseStorage().catch((err) => ({
     configurado: true,
     ok: false,
     error: err?.message || String(err),
@@ -33,8 +40,9 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    dondeVanLasFotosNuevas: cloudinary.ok ? "Cloudinary" : "Vercel Blob",
+    dondeVanLasFotosNuevas: cloudinary.ok ? "Cloudinary" : supabase.ok ? "Supabase Storage" : "Vercel Blob",
     cloudinary,
+    supabase,
     vercelBlob,
   });
 }
