@@ -78,6 +78,11 @@ export async function subirImagenASupabase(archivo) {
     if (res.status === 401 || res.status === 403) {
       throw new Error("La clave de Supabase no es válida o no tiene permiso para subir fotos.");
     }
+    // El depósito acepta hasta 10 MB por foto. Con la compresión del navegador
+    // no debería pasar, pero si alguna llega cruda conviene decirlo en claro.
+    if (res.status === 413) {
+      throw new Error("La foto pesa demasiado (el máximo es 10 MB). Probá con otra o sacale peso.");
+    }
     throw new Error(`Supabase rechazó la foto (${res.status}).`);
   }
 
