@@ -333,10 +333,59 @@ async function fileToDataUrl(file) {
   });
 }
 
+// Lado mayor de las fotos que se suben. En la web se ven como mucho a ~800px,
+// así que 1600 alcanza incluso para pantallas de alta densidad.
+const LADO_MAXIMO_FOTO = 1600;
+
+/**
+ * Achica la foto en el navegador antes de subirla.
+ *
+ * Antes se subía tal cual salía del celular (PNG de 3 a 5 MB) y así se llenó
+ * el almacenamiento: al pasar el 1 GB del plan gratis, Vercel bloqueó todas
+ * las fotos de la web. A 1600px y en WebP una foto de producto pesa ~150-300 KB
+ * y se ve igual. WebP conserva la transparencia de las fotos recortadas; si el
+ * navegador no sabe generar WebP se usa JPEG con fondo blanco, que es el fondo
+ * de las tarjetas (en JPEG lo transparente quedaría negro).
+ * Si no se puede leer la imagen o no la achica, se sube el original.
+ */
+async function comprimirParaSubir(file) {
+  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") return file;
+  try {
+    const imagen = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const escala = Math.min(1, LADO_MAXIMO_FOTO / Math.max(imagen.width, imagen.height));
+    const ancho = Math.round(imagen.width * escala);
+    const alto = Math.round(imagen.height * escala);
+    const canvas = document.createElement("canvas");
+    canvas.width = ancho;
+    canvas.height = alto;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(imagen, 0, 0, ancho, alto);
+    imagen.close?.();
+
+    const aBlob = (tipo, calidad) => new Promise((listo) => canvas.toBlob(listo, tipo, calidad));
+    let salida = await aBlob("image/webp", 0.82);
+    let extension = "webp";
+    // Safari viejo devuelve PNG cuando no sabe hacer WebP.
+    if (!salida || salida.type !== "image/webp") {
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, ancho, alto);
+      salida = await aBlob("image/jpeg", 0.85);
+      extension = "jpg";
+    }
+    if (!salida || salida.size >= file.size) return file;
+
+    const nombre = (file.name || "foto").replace(/\.[^.]+$/, "");
+    return new File([salida], `${nombre}.${extension}`, { type: salida.type });
+  } catch {
+    return file;
+  }
+}
+
 // Sube una imagen a Vercel Blob via el servidor y devuelve la URL pública.
 async function uploadImageFile(file) {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", await comprimirParaSubir(file));
   const res = await fetch("/api/products/upload-media", { method: "POST", body: form });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || "No se pudo subir la imagen.");
@@ -346,6 +395,16 @@ async function uploadImageFile(file) {
 // Sube un video directamente desde el browser a Vercel Blob (sin pasar por
 // la función serverless) para evitar el límite de 4.5MB del body de la API.
 async function uploadVideoClientSide(file) {
+  // El plan gratis de Vercel tiene 1 GB para todo: fotos y videos. Un video
+  // del celular sin comprimir puede pesar cientos de MB y bloquear las fotos
+  // de toda la web. Se corta antes de subir, con un mensaje que se entienda.
+  const MAXIMO_MB = 50;
+  if (file.size > MAXIMO_MB * 1024 * 1024) {
+    throw new Error(
+      `El video pesa ${Math.round(file.size / 1024 / 1024)} MB y el máximo es ${MAXIMO_MB} MB. ` +
+        "Recortalo o mandalo por WhatsApp a vos mismo (WhatsApp lo achica) y subí ese.",
+    );
+  }
   const ext = file.name.split(".").pop() || "mp4";
   const blob = await upload(`productos/video-${Date.now()}.${ext}`, file, {
     access: "public",

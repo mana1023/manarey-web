@@ -7,6 +7,19 @@ import { getSessionFromCookies } from "@/lib/session";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+// Cuando se pasa el límite del plan gratis, Vercel bloquea el almacenamiento y
+// las subidas fallan con un error de "store suspended/blocked". Antes eso se
+// mostraba como "Verificá que Vercel Blob esté configurado", que no le dice
+// nada a quien está cargando fotos.
+function mensajeDeError(err, porDefecto) {
+  // Vercel tira BlobStoreSuspendedError: "Vercel Blob: This store has been suspended."
+  const texto = `${err?.name || ""} ${err?.constructor?.name || ""} ${err?.message || err || ""}`;
+  if (/suspended|blocked/i.test(texto)) {
+    return "El espacio para fotos de la web está lleno y Vercel lo bloqueó. Avisale a Lautaro: hay que liberar espacio antes de subir más.";
+  }
+  return porDefecto;
+}
+
 export async function POST(request) {
   const session = await getSessionFromCookies(await cookies());
   if (!session.isAdmin) {
@@ -26,7 +39,9 @@ export async function POST(request) {
         onBeforeGenerateToken: async (pathname) => {
           return {
             allowedContentTypes: ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/*"],
-            maximumSizeInBytes: 500 * 1024 * 1024, // 500MB
+            // 50 MB: el plan gratis tiene 1 GB para todas las fotos y videos,
+            // y un solo video grande puede bloquear las fotos de toda la web.
+            maximumSizeInBytes: 50 * 1024 * 1024,
             addRandomSuffix: true,
           };
         },
@@ -35,7 +50,10 @@ export async function POST(request) {
       return NextResponse.json(jsonResponse);
     } catch (err) {
       console.error("[upload-media] Error generando token:", err?.message || err);
-      return NextResponse.json({ error: err?.message || "No se pudo iniciar la subida." }, { status: 400 });
+      return NextResponse.json(
+        { error: mensajeDeError(err, err?.message || "No se pudo iniciar la subida.") },
+        { status: 400 },
+      );
     }
   }
 
@@ -69,7 +87,7 @@ export async function POST(request) {
   } catch (err) {
     console.error("[upload-media] Error:", err?.message || err);
     return NextResponse.json(
-      { error: "No se pudo subir el archivo. Verificá que Vercel Blob esté configurado." },
+      { error: mensajeDeError(err, "No se pudo subir la foto. Probá de nuevo en un rato.") },
       { status: 500 },
     );
   }
