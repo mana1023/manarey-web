@@ -20,6 +20,11 @@ export default async function HomePage() {
   let catalogError = false;
   try {
     productos = await getCatalogProducts();
+    // Los productos marcados como ocultos no van a la tienda. El admin sí los
+    // ve, con el cartel de "oculto", que es la única forma de volver a mostrarlos.
+    if (!session?.isAdmin) {
+      productos = productos.filter((producto) => !producto.oculto);
+    }
   } catch {
     catalogError = true;
   }

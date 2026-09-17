@@ -40,6 +40,9 @@ async function ensureMetadataTable() {
         "alter table public.productos_web_metadata add column if not exists is_featured boolean default false",
         "alter table public.productos_web_metadata add column if not exists featured_order integer",
         "alter table public.productos_web_metadata add column if not exists images_data text",
+        // Sacar un producto de la tienda sin borrarlo del sistema de escritorio:
+        // los productos de prueba, por ejemplo, seguían apareciendo a la venta.
+        "alter table public.productos_web_metadata add column if not exists oculto boolean default false",
       ];
       await Promise.all(newCols.map((sql) => query(sql).catch(() => {})));
       // Índices para acelerar la query principal del catálogo
@@ -188,6 +191,7 @@ function mapProduct(row) {
     material: row.material || null,
     capacidad: row.capacidad || null,
     isFeatured: row.is_featured === true || row.is_featured === "true",
+    oculto: row.oculto === true || row.oculto === "true",
     featuredOrder: row.featured_order !== null && row.featured_order !== undefined ? Number(row.featured_order) : null,
   };
 }
@@ -246,7 +250,8 @@ export async function getCatalogProducts() {
       meta.precio_override,
       meta.is_featured,
       meta.featured_order,
-      meta.images_data
+      meta.images_data,
+      meta.oculto
     from grouped
     left join public.productos_web_metadata meta on meta.product_key = grouped.product_key
     order by
@@ -302,11 +307,14 @@ export async function updateProductMetadata(productKey, payload) {
   const capacidad = (payload.capacidad || "").trim() || null;
   // precio_override: null = usar precio del sistema, número = precio personalizado
   const precioOverride = toNullableNumber(payload.precioVenta);
+  // oculto: el producto sigue en el sistema pero no se muestra ni se puede
+  // comprar en la web (productos de prueba, cosas que no se venden online).
+  const oculto = payload.oculto === true || payload.oculto === "true";
 
   await query(
     `
-      insert into public.productos_web_metadata (product_key, description, image_data, images_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, precio_override, updated_at)
-      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now())
+      insert into public.productos_web_metadata (product_key, description, image_data, images_data, alto_cm, ancho_cm, profundidad_cm, largo_cm, litros, watts, peso_kg, voltaje, material, capacidad, precio_override, oculto, updated_at)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,now())
       on conflict (product_key) do update set
         description = excluded.description,
         image_data = excluded.image_data,
@@ -322,9 +330,10 @@ export async function updateProductMetadata(productKey, payload) {
         material = excluded.material,
         capacidad = excluded.capacidad,
         precio_override = excluded.precio_override,
+        oculto = excluded.oculto,
         updated_at = now()
     `,
-    [productKey, description || null, imageData, imagesDataJson, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride],
+    [productKey, description || null, imageData, imagesDataJson, altoCm, anchoCm, profundidadCm, largoCm, litros, watts, pesoKg, voltaje, material, capacidad, precioOverride, oculto],
   );
 
   invalidateProductsCache();

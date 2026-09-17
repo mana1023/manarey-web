@@ -5,3 +5,7 @@ npm-debug.log*
 
 .vercel
 .env*.local
+
+# Respaldo de las URLs de fotos antes de comprimirlas (lo genera
+# scripts/comprimir-fotos-subidas.mjs). Es de esta máquina, no del repo.
+respaldo-fotos-*.json

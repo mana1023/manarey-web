@@ -7,7 +7,26 @@
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "Manarey <noreply@manarey.com.ar>";
+
+/**
+ * Resend sólo acepta el remitente como "mail@dominio" o "Nombre <mail@dominio>".
+ * La variable estaba cargada como "<noreply@manarey.com.ar>" —con los signos
+ * pero sin nombre— y Resend rechazaba TODOS los mails con un 422, así que no
+ * llegaba ni la confirmación al cliente ni el aviso de pedido al local. En vez
+ * de depender de cómo esté escrita la variable, se acomoda acá.
+ */
+function remitenteValido(valor) {
+  const texto = (valor || "").trim();
+  if (!texto) return "Manarey <noreply@manarey.com.ar>";
+  // "Nombre <mail@dominio>" ya está bien
+  if (/^[^<>]+<[^<>@\s]+@[^<>@\s]+>$/.test(texto)) return texto;
+  // "<mail@dominio>" o "mail@dominio": se le pone el nombre adelante
+  const soloMail = texto.replace(/^<|>$/g, "").trim();
+  if (/^[^<>@\s]+@[^<>@\s]+$/.test(soloMail)) return `Manarey <${soloMail}>`;
+  return "Manarey <noreply@manarey.com.ar>";
+}
+
+const FROM_EMAIL = remitenteValido(process.env.RESEND_FROM_EMAIL);
 
 const currencyFmt = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -25,23 +44,44 @@ export async function sendEmail({ to, subject, html }) {
     return { ok: false, reason: "no-api-key" };
   }
 
-  try {
+  async function intentar(remitente) {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html }),
+      body: JSON.stringify({ from: remitente, to: [to], subject, html }),
     });
+    return { res, err: res.ok ? null : await res.text() };
+  }
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[email-sender] Error enviando email: ${res.status} ${err}`);
-      return { ok: false, reason: err };
+  try {
+    const primero = await intentar(FROM_EMAIL);
+    if (primero.res.ok) return { ok: true };
+
+    // Mientras manarey.com.ar no esté verificado en Resend, cualquier mail
+    // desde ese dominio se rechaza con 403 y no llega NADA: ni la confirmación
+    // al cliente ni el aviso de pedido al local. El remitente de prueba de
+    // Resend sí funciona sin verificar, pero sólo hacia la casilla dueña de la
+    // cuenta, así que sirve para los avisos internos y no para los clientes.
+    // Es un parche: lo que corresponde es verificar el dominio.
+    if (primero.res.status === 403 && /not verified/i.test(primero.err || "")) {
+      console.error(
+        "[email-sender] El dominio no está verificado en Resend. " +
+          "Entrar a resend.com/domains, agregar manarey.com.ar y cargar los registros en Vercel → Domains → DNS.",
+      );
+      const respaldo = await intentar("Manarey <onboarding@resend.dev>");
+      if (respaldo.res.ok) {
+        console.warn(`[email-sender] Enviado con el remitente de prueba de Resend a ${to}.`);
+        return { ok: true, remitenteDePrueba: true };
+      }
+      console.error(`[email-sender] Tampoco salió con el remitente de prueba: ${respaldo.err}`);
+      return { ok: false, reason: respaldo.err };
     }
 
-    return { ok: true };
+    console.error(`[email-sender] Error enviando email: ${primero.res.status} ${primero.err}`);
+    return { ok: false, reason: primero.err };
   } catch (err) {
     console.error("[email-sender] Error de red:", err);
     return { ok: false, reason: String(err) };

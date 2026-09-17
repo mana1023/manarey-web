@@ -6387,6 +6387,49 @@ details[open] .cf-transfer-manual-toggle::before {
   background: rgba(171, 84, 67, 0.85);
   color: #fff;
 }
+/* Sólo lo ve el admin: el producto está en el sistema pero fuera de la tienda */
+.card-badge-oculto {
+  background: rgba(40, 40, 45, 0.88);
+  color: #fff;
+}
+
+/* Interruptor para sacar un producto de la tienda (editor del panel) */
+.admin-ocultar-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(120, 85, 60, 0.22);
+  border-radius: 12px;
+  background: rgba(250, 245, 236, 0.75);
+  cursor: pointer;
+}
+.admin-ocultar-toggle input {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #ab5443;
+}
+.admin-ocultar-toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.admin-ocultar-toggle strong {
+  font-size: 0.92rem;
+  color: #3b2a1c;
+}
+.admin-ocultar-toggle small {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #6b5744;
+}
+.admin-ocultar-toggle:has(input:checked) {
+  border-color: rgba(171, 84, 67, 0.55);
+  background: rgba(171, 84, 67, 0.09);
+}
 
 /* Tarjeta sin stock — apagada */
 .sold-out-card {
@@ -10330,4 +10373,81 @@ button.aop-back-btn:disabled {
   font-size: clamp(0.62rem, 1.6vw, 0.95rem);
   letter-spacing: 0.24em;
   color: #a8843a;
+}
+
+/* ── Botón de arrepentimiento (Resolución 424/2020) ──────────────────── */
+.arrepentimiento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+.arrepentimiento-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.arrepentimiento-form label > span {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #3b2a1c;
+}
+.arrepentimiento-form label em {
+  font-style: normal;
+  font-weight: 400;
+  opacity: 0.6;
+}
+.arrepentimiento-form input,
+.arrepentimiento-form textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(120, 85, 60, 0.28);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  color: #2c1e12;
+}
+.arrepentimiento-form input:focus,
+.arrepentimiento-form textarea:focus {
+  outline: 2px solid var(--gold-soft, #e8c547);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.arrepentimiento-form textarea {
+  resize: vertical;
+}
+.arrepentimiento-form button {
+  margin-top: 0.25rem;
+}
+.arrepentimiento-nota {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b5744;
+  text-align: center;
+}
+.arrepentimiento-error {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(171, 84, 67, 0.12);
+  color: #8c3a2c;
+  font-size: 0.86rem;
+}
+.arrepentimiento-ok {
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(90, 140, 90, 0.35);
+  background: rgba(120, 170, 110, 0.12);
+}
+.arrepentimiento-ok strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #2f5e2f;
+}
+.arrepentimiento-ok p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }

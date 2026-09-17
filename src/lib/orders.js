@@ -66,7 +66,9 @@ async function resolverItemsConCatalogo(items) {
 
   for (const item of items) {
     const producto = porClave.get(item.productKey);
-    if (!producto) {
+    // Oculto cuenta como no disponible: el carrito puede venir de antes de que
+    // se ocultara, o de alguien que armó el pedido a mano.
+    if (!producto || producto.oculto) {
       throw new CheckoutError(
         `"${item.nombre}" ya no está disponible en la web. Sacalo del carrito para seguir con la compra.`,
         { status: 409, extra: { productoNoDisponible: item.lineKey } },

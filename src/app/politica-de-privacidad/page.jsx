@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Política de privacidad | Manarey",
+  // El layout ya agrega "| Manarey" al final (template de metadata).
+  title: "Política de privacidad",
   description: "Conocé cómo Manarey protege y usa tus datos personales al comprar en nuestra tienda online.",
   robots: { index: true, follow: true },
 };

@@ -1377,6 +1377,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
         ? product.imagesData
         : product.imageData ? [product.imageData] : [],
       removeImage: false,
+      oculto: Boolean(product.oculto),
     });
     loadBranchStock(product.productKey);
     setAdminEditorOpen(true);
@@ -2387,6 +2388,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                               )}
                               {session.isAdmin && !product.imageData && (
                                 <span className="card-badge card-badge-admin">Sin foto</span>
+                              )}
+                              {/* Sólo el admin ve los ocultos: al cliente no le llegan */}
+                              {product.oculto && (
+                                <span className="card-badge card-badge-oculto">Oculto en la web</span>
                               )}
                             </div>
                           }
@@ -3539,6 +3544,30 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   </button>
                 </div>
               )}
+
+              {/* ── Mostrar u ocultar en la web ──────────────────────────── */}
+              <div className="admin-editor-section">
+                <p className="admin-editor-section-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  Mostrar en la tienda
+                </p>
+                <label className="admin-ocultar-toggle">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(activeEditor.oculto)}
+                    onChange={(event) =>
+                      setActiveEditor((prev) => (prev ? { ...prev, oculto: event.target.checked } : prev))
+                    }
+                  />
+                  <span>
+                    <strong>Ocultar este producto de la web</strong>
+                    <small>
+                      Deja de verse y no se puede comprar. Sigue en el sistema del local, con su stock.
+                      Sirve para productos de prueba o para lo que no quieras vender por internet.
+                    </small>
+                  </span>
+                </label>
+              </div>
             </div>
 
             {adminEditorError && (
@@ -4086,6 +4115,22 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               style={{ fontSize: "0.78rem", opacity: 0.55, color: "inherit", textDecoration: "underline", display: "block", marginTop: 6 }}
             >
               Política de privacidad
+            </a>
+            {/* Los pide la Resolución 424/2020 a toda tienda online argentina,
+                a la vista y en todas las páginas. */}
+            <a
+              href="/arrepentimiento"
+              style={{ fontSize: "0.78rem", opacity: 0.75, color: "inherit", textDecoration: "underline", display: "block", marginTop: 6 }}
+            >
+              Botón de arrepentimiento
+            </a>
+            <a
+              href="https://autogestion.produccion.gob.ar/consumidores"
+              target="_blank"
+              rel="noreferrer noopener"
+              style={{ fontSize: "0.78rem", opacity: 0.55, color: "inherit", textDecoration: "underline", display: "block", marginTop: 6 }}
+            >
+              Defensa del Consumidor
             </a>
           </div>
           <div>
