@@ -10,11 +10,37 @@
  */
 
 import NextImage from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 
 const BLOB_HOST_RE = /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//i;
 
 function isBlobUrl(src) {
   return typeof src === "string" && BLOB_HOST_RE.test(src);
+}
+
+/**
+ * Lo que se muestra cuando una foto no carga: el logo de Manarey sobre el
+ * fondo de la tarjeta, en vez del cuadro gris roto del navegador.
+ *
+ * Existe porque el almacenamiento de fotos (Vercel Blob, plan gratis) se
+ * bloqueó al pasar 1 GB y todas las URLs empezaron a devolver 403: la tienda
+ * entera parecía rota. Sirve igual para cualquier foto que falle en el futuro.
+ * Es SVG, así que no depende de ninguna descarga.
+ */
+function FotoNoDisponible({ fill, width, height }) {
+  return (
+    <div
+      className={`foto-no-disponible${fill ? " foto-no-disponible--fill" : ""}`}
+      style={fill ? undefined : { width: width || 400, height: height || 400 }}
+      role="img"
+      aria-label="Foto no disponible por el momento"
+    >
+      <div aria-hidden="true">
+        <BrandLogo />
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -43,7 +69,21 @@ export function ProductImage({
   objectFit = "cover",
   ...rest
 }) {
+  const [fallo, setFallo] = useState(false);
+  const imagenRef = useRef(null);
+
+  useEffect(() => {
+    setFallo(false);
+    // Si la foto falló antes de que React se conectara a la página, onError
+    // nunca se entera: se revisa a mano. "complete" con ancho 0 es una imagen
+    // rota; una que todavía no empezó a cargar (lazy) no da complete.
+    const img = imagenRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFallo(true);
+  }, [src]);
+
   if (!src) return null;
+  if (fallo) return <FotoNoDisponible fill={fill} width={width} height={height} />;
+  const alFallar = () => setFallo(true);
 
   if (isBlobUrl(src)) {
     if (fill) {
@@ -57,6 +97,8 @@ export function ProductImage({
           priority={priority}
           style={{ objectFit }}
           {...rest}
+          ref={imagenRef}
+          onError={alFallar}
         />
       );
     }
@@ -70,6 +112,8 @@ export function ProductImage({
         priority={priority}
         sizes={sizes || "(max-width: 600px) 50vw, 25vw"}
         {...rest}
+        ref={imagenRef}
+        onError={alFallar}
       />
     );
   }
@@ -83,6 +127,8 @@ export function ProductImage({
       className={className}
       loading={loading}
       {...rest}
+      ref={imagenRef}
+      onError={alFallar}
     />
   );
 }

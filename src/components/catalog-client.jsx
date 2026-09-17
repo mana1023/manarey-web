@@ -3751,7 +3751,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       <div className="cart-item" key={item.lineKey}>
                         <div className="cart-item-thumb">
                           {product?.imageData && !isVideoSrc(product.imageData)
-                            ? <img src={product.imageData} alt={item.nombre} />
+                            ? <img
+                                src={product.imageData}
+                                alt={item.nombre}
+                                onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
+                              />
                             : <span className="cart-thumb-letter">{item.nombre[0]}</span>}
                         </div>
                         <div className="cart-item-body">

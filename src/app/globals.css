@@ -10288,3 +10288,46 @@ button.aop-back-btn:disabled {
   .aop-avisos-botones { flex-direction: column; }
   .aop-avisos-btn { width: 100%; }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FOTO NO DISPONIBLE
+   Cuando una foto no carga se muestra el logo en dorado suave sobre el fondo
+   crema, en vez del cuadro gris roto del navegador. Nació cuando Vercel
+   bloqueó el almacenamiento de fotos y toda la tienda parecía rota.
+   ────────────────────────────────────────────────────────────────────────── */
+.foto-no-disponible {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, #fbf6ea 0%, #f1e6cf 100%);
+}
+
+.foto-no-disponible--fill {
+  position: absolute;
+  inset: 0;
+}
+
+.foto-no-disponible > div {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.foto-no-disponible .brand-logo {
+  /* Ancho completo: si se achica al contenido, el % del logo no tiene contra
+     qué calcularse. */
+  width: 100%;
+  gap: 6px;
+  opacity: 0.6;
+}
+
+.foto-no-disponible .brand-mark {
+  width: clamp(40px, 32%, 120px);
+  color: #b8913f;
+}
+
+.foto-no-disponible .brand-wording span {
+  font-size: clamp(0.62rem, 1.6vw, 0.95rem);
+  letter-spacing: 0.24em;
+  color: #a8843a;
+}
