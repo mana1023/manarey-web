@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import AvisosCelular from "./AvisosCelular";
 
 const STATUS_LABELS = {
   all:       { label: "Todos",       color: "#6f5a46" },
@@ -31,6 +32,10 @@ export default function AdminOrdersPanel() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null); // pedido expandido
   const [updating, setUpdating] = useState(null);
+  const [pruebaAviso, setPruebaAviso] = useState(null);
+  const [whatsappConfigurado, setWhatsappConfigurado] = useState(false);
+  // Pedido a abrir cuando se entra desde un aviso (/admin?pedido=CODIGO).
+  const pedidoDelAviso = useRef(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -49,6 +54,29 @@ export default function AdminOrdersPanel() {
   }, [status, page, search]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  // Al tocar un aviso se llega con ?pedido=CODIGO: se busca y se abre.
+  useEffect(() => {
+    const codigo = new URLSearchParams(window.location.search).get("pedido");
+    if (codigo) {
+      pedidoDelAviso.current = codigo;
+      setSearchInput(codigo);
+    }
+    // El botón de prueba de WhatsApp sólo tiene sentido con Meta configurado.
+    fetch("/api/admin/aviso-whatsapp-prueba")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setWhatsappConfigurado(Boolean(d?.configurado)))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!pedidoDelAviso.current) return;
+    const encontrado = orders.find((o) => o.order_code === pedidoDelAviso.current);
+    if (encontrado) {
+      setSelected(encontrado);
+      pedidoDelAviso.current = null;
+    }
+  }, [orders]);
 
   // Buscar con debounce
   useEffect(() => {
@@ -73,6 +101,27 @@ export default function AdminOrdersPanel() {
     }
   }
 
+  // Manda un pedido de ejemplo por WhatsApp a los números configurados, para
+  // confirmar que el aviso anda sin tener que hacer una compra de verdad.
+  async function probarAvisoWhatsApp() {
+    setPruebaAviso({ cargando: true, mensaje: "Mandando un pedido de prueba…" });
+    try {
+      const res = await fetch("/api/admin/aviso-whatsapp-prueba", { method: "POST" });
+      const data = await res.json();
+      const fallidos = (data.resultados || []).filter((r) => !r.ok);
+      if (data.error) {
+        setPruebaAviso({ ok: false, mensaje: data.error });
+      } else if (fallidos.length) {
+        setPruebaAviso({ ok: false, mensaje: fallidos.map((r) => `${r.numero}: ${r.error}`).join(" · ") });
+      } else {
+        const numeros = (data.resultados || []).map((r) => r.numero).join(", ");
+        setPruebaAviso({ ok: true, mensaje: `Meta aceptó el mensaje para ${numeros}. Fijate en ese WhatsApp.` });
+      }
+    } catch {
+      setPruebaAviso({ ok: false, mensaje: "No se pudo conectar con el servidor." });
+    }
+  }
+
   return (
     <div className="aop-shell">
       {/* Header */}
@@ -81,8 +130,30 @@ export default function AdminOrdersPanel() {
           <p className="aop-eyebrow">Panel de administración</p>
           <h1 className="aop-title">Pedidos</h1>
         </div>
-        <a href="/" className="aop-back-btn">← Volver a la tienda</a>
+        <div className="aop-header-actions">
+          {whatsappConfigurado && (
+            <button
+              type="button"
+              className="aop-back-btn"
+              onClick={probarAvisoWhatsApp}
+              disabled={Boolean(pruebaAviso?.cargando)}
+            >
+              📲 Probar aviso de WhatsApp
+            </button>
+          )}
+          <a href="/" className="aop-back-btn">← Volver a la tienda</a>
+        </div>
       </div>
+      {pruebaAviso && (
+        <p
+          className={`aop-aviso-prueba${pruebaAviso.cargando ? "" : pruebaAviso.ok ? " is-ok" : " is-error"}`}
+          role="status"
+        >
+          {pruebaAviso.mensaje}
+        </p>
+      )}
+
+      <AvisosCelular />
 
       {/* Filtros */}
       <div className="aop-toolbar">

@@ -650,6 +650,28 @@ export function CheckoutFlow({ initialCustomer }) {
     };
   }
 
+  // Los precios se cobran con los del catálogo, no con los guardados en el
+  // navegador. Si alguno cambió desde que se armó el carrito, el servidor
+  // corta y manda los nuevos: se actualiza el carrito acá para que el cliente
+  // vea el total real y pueda confirmar. Sin esto quedaría trabado
+  // reintentando con el precio viejo.
+  function aplicarCorreccionesDelServidor(data) {
+    const cambios = Array.isArray(data?.preciosActualizados) ? data.preciosActualizados : [];
+    if (!cambios.length) return;
+    setCart((actual) => {
+      const next = actual.map((item) => {
+        const cambio = cambios.find((c) => c.lineKey === item.lineKey);
+        return cambio
+          ? { ...item, precioVenta: cambio.precioVenta, accessoryPrice: cambio.accessoryPrice }
+          : item;
+      });
+      try {
+        window.localStorage.setItem("manarey-cart", JSON.stringify(next));
+      } catch { /* localStorage bloqueado: igual queda actualizado en pantalla */ }
+      return next;
+    });
+  }
+
   // ── Payment: Card via MP Bricks ───────────────────────────────────────────
 
   const handleCardSubmit = useCallback(
@@ -667,12 +689,14 @@ export function CheckoutFlow({ initialCustomer }) {
             issuerId: formData.issuer_id,
             items: cart,
             shippingModeId: shippingMode,
+            entregaOtroDia: shippingMode === "delivery" && entregaOtroDia,
             customer: buildCustomerPayload(),
             selectedBranch,
             surchargeAmount,
           }),
         });
         const data = await res.json();
+        aplicarCorreccionesDelServidor(data);
         if (data.status === "approved") {
           window.localStorage.removeItem("manarey-cart");
           window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}${selectedBranch ? `&branch=${encodeURIComponent(selectedBranch)}` : ""}`;
@@ -688,7 +712,7 @@ export function CheckoutFlow({ initialCustomer }) {
         setPaymentBusy(false);
       }
     },
-    [cart, shippingMode, selectedBranch, personalData, distanceKm, deliveryAddress, surchargeAmount],
+    [cart, shippingMode, selectedBranch, personalData, distanceKm, deliveryAddress, surchargeAmount, entregaOtroDia],
   );
 
   // ── Payment: WhatsApp ─────────────────────────────────────────────────────
@@ -704,11 +728,15 @@ export function CheckoutFlow({ initialCustomer }) {
         body: JSON.stringify({
           items: cart,
           shippingModeId: shippingMode,
+          entregaOtroDia: shippingMode === "delivery" && entregaOtroDia,
           customer: buildCustomerPayload(),
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) {
+        aplicarCorreccionesDelServidor(data);
+        throw new Error(data.error);
+      }
       window.localStorage.removeItem("manarey-cart");
       if (data.whatsappUrl) window.open(data.whatsappUrl, "_blank", "noopener,noreferrer");
       window.location.href = `/checkout/success?code=${encodeURIComponent(data.orderCode || "")}${selectedBranch ? `&branch=${encodeURIComponent(selectedBranch)}` : ""}`;
@@ -732,11 +760,15 @@ export function CheckoutFlow({ initialCustomer }) {
         body: JSON.stringify({
           items: cart,
           shippingModeId: shippingMode,
+          entregaOtroDia: shippingMode === "delivery" && entregaOtroDia,
           customer: buildCustomerPayload(),
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) {
+        aplicarCorreccionesDelServidor(data);
+        throw new Error(data.error);
+      }
       setCompletedOrder(data.orderCode);
       setTransferInitPoint(data.initPoint || data.sandboxInitPoint || null);
     } catch (err) {

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
-import { createOrder, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
+import { NextResponse, after } from "next/server";
+import { createOrder, syncOrderToVentas, countPreviousPaidOrders, respuestaDeErrorDeCheckout } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { sendTransferPendingMessage } from "@/lib/whatsapp-sender";
-import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { avisarPedidoAlLocal } from "@/lib/avisos-pedido";
 import { checkCartStock } from "@/lib/stock";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -73,9 +74,9 @@ export async function POST(request) {
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
 
-    // Aviso al local. Va fuera del if de arriba a proposito: el negocio
-    // tiene que enterarse aunque el cliente no haya dejado mail.
-    notificarAlLocal(order, "transfer", false);
+    // Aviso al local por mail y WhatsApp: todavía no pagó, así que el
+    // mensaje dice que no se prepare hasta que entre la plata.
+    after(() => avisarPedidoAlLocal(order, { metodo: "transfer", etapa: "nuevo" }));
 
     return NextResponse.json({
       orderCode: order.orderCode,
@@ -84,9 +85,7 @@ export async function POST(request) {
       sandboxInitPoint,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "No se pudo iniciar el pago por transferencia." },
-      { status: 400 },
-    );
+    const { status, body } = respuestaDeErrorDeCheckout(error, "No se pudo iniciar el pago por transferencia.");
+    return NextResponse.json(body, { status });
   }
 }

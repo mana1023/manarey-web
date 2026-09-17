@@ -1,15 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { query } from "@/lib/db";
 import { markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
-import { sendPurchaseMessage, sendBranchOrderNotification } from "@/lib/whatsapp-sender";
-import { getBranchByDisplayName, storeBranches } from "@/lib/store-config";
-
-/** Teléfono central para notificaciones de envíos a domicilio */
-function getMainStorePhone() {
-  // Usar el teléfono de la sucursal Central (Longchamps) o el número general
-  const central = storeBranches.find((b) => b.id === "longchamps");
-  return central?.phone || (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
-}
+import { sendPurchaseMessage } from "@/lib/whatsapp-sender";
+import { avisarPedidoAlLocal, pedidoDesdeFila } from "@/lib/avisos-pedido";
 
 function getMpToken() {
   const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
@@ -151,28 +144,14 @@ export async function POST() {
             sendPurchaseMessage(phone, nombre, rowOrderCode, total, prev);
           }
 
-          // Notificar al local (pickup → sucursal específica, delivery → Central)
-          {
-            const rawPayload = typeof row.raw_payload === "string" ? JSON.parse(row.raw_payload || "{}") : (row.raw_payload || {});
-            const customer = rawPayload.customer || {};
-            const summary = rawPayload.summary || {};
-            const isPickup = row.shipping_zone_id === "pickup";
-            const branch = isPickup ? getBranchByDisplayName(row.customer_address || customer.address || "") : null;
-            const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
-            if (notifyPhone) {
-              sendBranchOrderNotification(notifyPhone, {
-                orderCode: rowOrderCode,
-                customerName: row.customer_name || customer.fullName || "",
-                customerPhone: phone || "",
-                customerAddress: isPickup ? "" : `${row.customer_address || ""}, ${row.customer_city || ""}`.trim().replace(/^,|,$/g, ""),
-                isPickup,
-                branchName: branch?.shortName || branch?.name || "",
-                items: summary.items || [],
-                total,
-                paymentMethod: row.payment_method,
-              }).catch(() => {});
-            }
-          }
+          // Aviso al local por mail y WhatsApp: entró la transferencia.
+          after(() =>
+            avisarPedidoAlLocal(pedidoDesdeFila(row), {
+              metodo: row.payment_method || "transfer",
+              etapa: "pagado",
+              origen: "deteccion",
+            }),
+          );
         }
 
         matched++;
@@ -277,28 +256,14 @@ export async function GET(request) {
         sendPurchaseMessage(phone, fullOrder.customer_name || "", orderCode, Number(fullOrder.total || 0), prev);
       }
 
-      // Notificar al local (pickup → sucursal específica, delivery → Central)
-      {
-        const rawPL = typeof fullOrder.raw_payload === "string" ? JSON.parse(fullOrder.raw_payload || "{}") : (fullOrder.raw_payload || {});
-        const cust = rawPL.customer || {};
-        const summ = rawPL.summary || {};
-        const isPickup = fullOrder.shipping_zone_id === "pickup";
-        const branch = isPickup ? getBranchByDisplayName(fullOrder.customer_address || cust.address || "") : null;
-        const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
-        if (notifyPhone) {
-          sendBranchOrderNotification(notifyPhone, {
-            orderCode,
-            customerName: fullOrder.customer_name || cust.fullName || "",
-            customerPhone: phone || "",
-            customerAddress: isPickup ? "" : `${fullOrder.customer_address || ""}, ${fullOrder.customer_city || ""}`.trim().replace(/^,|,$/g, ""),
-            isPickup,
-            branchName: branch?.shortName || branch?.name || "",
-            items: summ.items || [],
-            total: Number(fullOrder.total || 0),
-            paymentMethod: fullOrder.payment_method,
-          }).catch(() => {});
-        }
-      }
+      // Aviso al local por mail y WhatsApp: entró la transferencia.
+      after(() =>
+        avisarPedidoAlLocal(pedidoDesdeFila(fullOrder), {
+          metodo: fullOrder.payment_method || "transfer",
+          etapa: "pagado",
+          origen: "deteccion",
+        }),
+      );
 
       return NextResponse.json({ isPaid: true, paymentId: match.id, justConfirmed: true });
     }

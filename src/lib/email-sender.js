@@ -241,6 +241,19 @@ export function buildPaymentApprovedEmail({ order }) {
  *
  * El destinatario sale de ORDERS_EMAIL, y si no está, de ADMIN_EMAIL.
  */
+/**
+ * Medida, color y material de un producto del pedido, para que el local sepa
+ * exactamente cuál es: "Alacena" sola no dice si es de 80 cm o 1,20 m, de pino
+ * o de melamina, ni si la cocina es de gas natural o envasado.
+ */
+function varianteDeItem(i) {
+  const partes = [i.medida, i.color].filter(Boolean);
+  const material = String(i.materialSistema || "").trim();
+  const yaDicho = [i.nombre, ...partes].join(" ").toLowerCase();
+  if (material && !yaDicho.includes(material.toLowerCase())) partes.push(material);
+  return partes.length ? ` <span style="color:#6f5a46;">(${partes.join(", ")})</span>` : "";
+}
+
 export function buildNewOrderAlertEmail({ order, paymentMethod, isPaid }) {
   const metodo = {
     card: "Tarjeta",
@@ -254,7 +267,7 @@ export function buildNewOrderAlertEmail({ order, paymentMethod, isPaid }) {
     .map((i) => `
       <tr>
         <td style="padding:7px 0;border-bottom:1px solid #ede0c4;font-size:0.9rem;">
-          ${i.quantity} × ${i.nombre}${i.accessoryLabel ? ` <em>+ ${i.accessoryLabel}</em>` : ""}
+          ${i.quantity} × ${i.nombre}${varianteDeItem(i)}${i.accessoryLabel ? ` <em>+ ${i.accessoryLabel}</em>` : ""}
         </td>
         <td style="padding:7px 0;border-bottom:1px solid #ede0c4;text-align:right;font-size:0.9rem;white-space:nowrap;">
           ${currencyFmt.format((i.precioVenta + (i.accessoryPrice || 0)) * i.quantity)}
@@ -331,22 +344,4 @@ export function buildNewOrderAlertEmail({ order, paymentMethod, isPaid }) {
 /** A quién se le avisa de los pedidos nuevos. */
 export function getOrdersNotifyEmail() {
   return (process.env.ORDERS_EMAIL || process.env.ADMIN_EMAIL || "").trim();
-}
-
-/**
- * Manda el aviso de pedido nuevo al local. No bloquea ni tira error: si no
- * hay destinatario configurado o falla el envío, el checkout sigue igual.
- */
-export function notificarAlLocal(order, paymentMethod, isPaid = false) {
-  const para = getOrdersNotifyEmail();
-  if (!para) {
-    console.warn("[email-sender] Sin ORDERS_EMAIL ni ADMIN_EMAIL: no se avisó del pedido", order?.orderCode);
-    return;
-  }
-  try {
-    const { subject, html } = buildNewOrderAlertEmail({ order, paymentMethod, isPaid });
-    sendEmail({ to: para, subject, html }).catch(() => {});
-  } catch (err) {
-    console.error("[email-sender] No se pudo armar el aviso al local:", err?.message || err);
-  }
 }

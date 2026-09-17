@@ -1,15 +1,17 @@
-import { NextResponse } from "next/server";
-import { createOrder, markOrderPayment, syncOrderToVentas, countPreviousPaidOrders } from "@/lib/orders";
-import { storeSettings, getBranchByDisplayName, storeBranches } from "@/lib/store-config";
-import { sendPurchaseMessage, sendBranchOrderNotification } from "@/lib/whatsapp-sender";
-import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
+import { NextResponse, after } from "next/server";
+import {
+  createOrder,
+  markOrderPayment,
+  syncOrderToVentas,
+  countPreviousPaidOrders,
+  respuestaDeErrorDeCheckout,
+} from "@/lib/orders";
+import { storeSettings } from "@/lib/store-config";
+import { sendPurchaseMessage } from "@/lib/whatsapp-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { avisarPedidoAlLocal } from "@/lib/avisos-pedido";
 import { checkCartStock } from "@/lib/stock";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-
-function getMainStorePhone() {
-  const central = storeBranches.find((b) => b.id === "longchamps");
-  return central?.phone || (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
-}
 
 function getMpToken() {
   const token = (process.env.MERCADO_PAGO_ACCESS_TOKEN || "").trim();
@@ -30,7 +32,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { cardToken, paymentMethodId, installments, issuerId, items, shippingModeId, customer, selectedBranch, surchargeAmount } = body;
+    const { cardToken, paymentMethodId, installments, issuerId, items, shippingModeId, customer, selectedBranch, surchargeAmount, entregaOtroDia } = body;
 
     if (!cardToken || !paymentMethodId) {
       return NextResponse.json({ error: "Datos del pago incompletos." }, { status: 400 });
@@ -50,6 +52,7 @@ export async function POST(request) {
       payload: {
         items,
         shippingModeId: shippingModeId || "pickup",
+        entregaOtroDia: Boolean(entregaOtroDia),
         customer: {
           fullName: `${customer.nombre} ${customer.apellido}`.trim(),
           email: customer.email || "",
@@ -155,24 +158,6 @@ export async function POST(request) {
         raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
       }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
 
-      // Notificar al local
-      const isPickup = order.summary.shipping.id === "pickup";
-      const branch = isPickup ? getBranchByDisplayName(order.customer.address || "") : null;
-      const notifyPhone = isPickup ? branch?.phone : getMainStorePhone();
-      if (notifyPhone) {
-        sendBranchOrderNotification(notifyPhone, {
-          orderCode: order.orderCode,
-          customerName: order.customer.fullName,
-          customerPhone: order.customer.phone,
-          customerAddress: isPickup ? "" : `${order.customer.address || ""}, ${order.customer.city || ""}`.trim().replace(/^,|,$/g, ""),
-          isPickup,
-          branchName: branch?.shortName || branch?.name || "",
-          items: order.summary.items || [],
-          total: order.summary.total,
-          paymentMethod: "card",
-        }).catch(() => {});
-      }
-
       // WhatsApp al cliente
       const phone = customer.telefono || customer.phone;
       if (phone) {
@@ -187,9 +172,9 @@ export async function POST(request) {
         sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
       }
 
-      // Aviso al local. Va fuera del if de arriba a propósito: el negocio
-      // tiene que enterarse aunque el cliente no haya dejado mail.
-      notificarAlLocal(order, "card", true);
+      // Aviso al local por mail y WhatsApp. En after() para que la función
+      // no se corte antes de terminar de mandarlo.
+      after(() => avisarPedidoAlLocal(order, { metodo: "card", etapa: "pagado" }));
     }
 
     return NextResponse.json({
@@ -198,9 +183,7 @@ export async function POST(request) {
       paymentId: mpData.id,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "No se pudo procesar el pago." },
-      { status: 500 },
-    );
+    const { status, body } = respuestaDeErrorDeCheckout(error, "No se pudo procesar el pago.", 500);
+    return NextResponse.json(body, { status });
   }
 }

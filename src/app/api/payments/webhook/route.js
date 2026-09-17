@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { fetchMercadoPagoPayment } from "@/lib/payments";
 import { markOrderPayment } from "@/lib/orders";
 import { query } from "@/lib/db";
-import { sendEmail, buildPaymentApprovedEmail, notificarAlLocal } from "@/lib/email-sender";
+import { sendEmail, buildPaymentApprovedEmail } from "@/lib/email-sender";
+import { avisarPedidoAlLocal, pedidoDesdeFila } from "@/lib/avisos-pedido";
 
 // ── Verificación de firma MP ─────────────────────────────────────────────────
 //
@@ -134,13 +135,11 @@ export async function POST(request) {
       rawPayload: JSON.stringify(payment),
     });
 
-    // Email de pago aprobado
+    // Pago aprobado: mail al cliente y aviso al local.
     if (mapped.paymentStatus === "approved") {
       try {
         const result = await query(
-          `SELECT customer_email, customer_name, customer_phone, customer_address, customer_city,
-                  order_code, payment_method, subtotal, shipping_cost, total, shipping_zone_id
-             FROM public.web_orders
+          `SELECT * FROM public.web_orders
             WHERE external_reference = $1 OR order_code = $1 LIMIT 1`,
           [payment.external_reference],
         );
@@ -150,33 +149,20 @@ export async function POST(request) {
           sendEmail({ to: row.customer_email, subject, html }).catch(() => {});
         }
 
-        // Aviso al local de que ESTE pedido ya está pagado. Es el momento que
-        // más importa: hasta acá el pedido podía quedarse sin cobrar, y ahora
-        // hay plata puesta y alguien esperando su mueble.
+        // Es el momento que más importa: hasta acá el pedido podía quedarse
+        // sin cobrar, y ahora hay plata puesta y alguien esperando su mueble.
+        // Si el pago con tarjeta ya avisó por la respuesta directa, no se
+        // repite: avisarPedidoAlLocal manda cada etapa una sola vez.
         if (row) {
-          notificarAlLocal(
-            {
-              orderCode: row.order_code,
-              customer: {
-                fullName: row.customer_name,
-                email: row.customer_email,
-                phone: row.customer_phone,
-                address: row.customer_address,
-                city: row.customer_city,
-              },
-              summary: {
-                items: [],
-                subtotal: Number(row.subtotal || 0),
-                shipping: { id: row.shipping_zone_id, cost: Number(row.shipping_cost || 0) },
-                total: Number(row.total || 0),
-              },
-            },
-            row.payment_method || "transfer",
-            true,
+          after(() =>
+            avisarPedidoAlLocal(pedidoDesdeFila(row), {
+              metodo: row.payment_method || "card",
+              etapa: "pagado",
+            }),
           );
         }
       } catch (err) {
-        // No bloquear el flujo por el email
+        // No bloquear el flujo por los avisos
         console.error("[webhook] Error avisando del pago:", err?.message || err);
       }
     }

@@ -10166,3 +10166,125 @@ body::before {
 /* Sin bloque de modo oscuro a propósito: el sitio tiene un diseño claro fijo y
    no usa prefers-color-scheme en ningún otro lado. Agregarlo acá dejaba texto
    claro sobre la tarjeta clara cuando el navegador estaba en modo oscuro. */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PANEL DE PEDIDOS — prueba del aviso de WhatsApp
+   ────────────────────────────────────────────────────────────────────────── */
+.aop-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+button.aop-back-btn {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.aop-back-btn:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.aop-aviso-prueba {
+  margin: 0;
+  padding: 10px 24px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.aop-aviso-prueba.is-ok { color: #2f6b45; }
+.aop-aviso-prueba.is-error { color: #a4412f; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PANEL DE PEDIDOS — avisos push en el celular
+   Lo usa quien atiende los pedidos desde su teléfono: texto grande, un botón
+   claro y nada más.
+   ────────────────────────────────────────────────────────────────────────── */
+.aop-avisos {
+  margin: 12px 24px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.aop-avisos--apagado {
+  border-color: #d2a23e;
+  background: #fff7e6;
+}
+
+.aop-avisos--activado {
+  border-color: #9cc5a9;
+  background: #f0f8f2;
+}
+
+.aop-avisos-titulo {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #2b1d13;
+}
+
+.aop-avisos-texto {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #5c4632;
+}
+
+.aop-avisos-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.aop-avisos-btn {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffdf8;
+  color: #3b2412;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.aop-avisos-btn--principal {
+  border-color: #3b2412;
+  background: #3b2412;
+  color: #fff8ec;
+}
+
+.aop-avisos-btn--suave {
+  color: #7a6450;
+}
+
+.aop-avisos-btn:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.aop-avisos-resultado {
+  margin: 10px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.aop-avisos-resultado.is-ok { color: #2f6b45; }
+.aop-avisos-resultado.is-error { color: #a4412f; }
+
+@media (max-width: 640px) {
+  .aop-avisos { margin: 10px 12px 0; padding: 14px; }
+  .aop-avisos-botones { flex-direction: column; }
+  .aop-avisos-btn { width: 100%; }
+}

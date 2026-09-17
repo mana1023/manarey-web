@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
-import { createOrder, syncOrderToVentas } from "@/lib/orders";
+import { NextResponse, after } from "next/server";
+import { createOrder, syncOrderToVentas, respuestaDeErrorDeCheckout } from "@/lib/orders";
 import { storeSettings } from "@/lib/store-config";
-import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
+import { avisarPedidoAlLocal } from "@/lib/avisos-pedido";
 import { checkCartStock } from "@/lib/stock";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -47,7 +48,7 @@ export async function POST(request) {
       "Productos:",
       ...order.summary.items.map(
         (item) =>
-          `- ${item.nombre} x${item.quantity}${item.accessoryLabel ? ` (${item.accessoryLabel})` : ""} - $${(
+          `- ${item.nombre}${[item.medida, item.color].filter(Boolean).length ? ` ${[item.medida, item.color].filter(Boolean).join(" ")}` : ""} x${item.quantity}${item.accessoryLabel ? ` (${item.accessoryLabel})` : ""} - $${(
             item.quantity *
             (item.precioVenta + item.accessoryPrice)
           ).toLocaleString("es-AR")}`,
@@ -84,9 +85,9 @@ export async function POST(request) {
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
 
-    // Aviso al local. Va fuera del if de arriba a proposito: el negocio
-    // tiene que enterarse aunque el cliente no haya dejado mail.
-    notificarAlLocal(order, "whatsapp", false);
+    // Aviso al local por mail y WhatsApp: no depende de que el cliente
+    // efectivamente mande el mensaje que se le abre.
+    after(() => avisarPedidoAlLocal(order, { metodo: "whatsapp", etapa: "nuevo" }));
 
     return NextResponse.json({
       orderCode: order.orderCode,

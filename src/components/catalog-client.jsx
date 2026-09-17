@@ -709,6 +709,30 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
     } catch { /* localStorage bloqueado, no importa */ }
   }, []);
 
+  // El carrito queda guardado en el navegador con el precio del día en que se
+  // agregó cada producto. Apenas está el catálogo se pone al día: si no, un
+  // cliente que armó el carrito antes de un aumento veía un total que después
+  // el servidor no le iba a aceptar. Va después de cargar el carrito para
+  // corregir lo que se acaba de leer del navegador.
+  useEffect(() => {
+    if (!products.length) return;
+    const porClave = new Map(products.map((p) => [p.productKey, p]));
+    setCart((actual) => {
+      let cambio = false;
+      const next = actual.map((item) => {
+        const producto = porClave.get(item.productKey);
+        if (!producto) return item;
+        const precioManijas = item.accessoryLabel && accessoryProduct
+          ? accessoryProduct.precioVenta
+          : item.accessoryPrice;
+        if (producto.precioVenta === item.precioVenta && precioManijas === item.accessoryPrice) return item;
+        cambio = true;
+        return { ...item, precioVenta: producto.precioVenta, accessoryPrice: precioManijas };
+      });
+      return cambio ? next : actual;
+    });
+  }, [products, accessoryProduct]);
+
   // Leer hash de la URL al montar para restaurar vista y categoría tras un refresh
   useEffect(() => {
     const hash = window.location.hash.slice(1);

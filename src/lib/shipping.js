@@ -11,6 +11,12 @@ export function sanitizeCheckoutItems(items = []) {
       lineKey: String(item.lineKey || ""),
       productKey: String(item.productKey || ""),
       nombre: String(item.nombre || "").trim(),
+      // Qué variante es. Sin esto el pedido decía "Alacena x1" sin medida ni
+      // color, y una cocina no decía si era de gas natural o envasado. En el
+      // servidor se pisan con los datos del catálogo (ver orders.js).
+      medida: String(item.medida || "").trim(),
+      color: String(item.color || "").trim(),
+      materialSistema: String(item.materialSistema || "").trim(),
       quantity: Math.max(1, Number(item.quantity || 1)),
       precioVenta: Number(item.precioVenta || 0),
       accessoryPrice: Number(item.accessoryPrice || 0),
@@ -93,11 +99,14 @@ export function calculateShippingCost(modeId, distanceKm = 0, overrideSettings =
  * Los settings deben venir del caller (server-side) vía getShippingSettings().
  * Así shipping.js queda libre de pg/dns y puede bundlearse para el cliente.
  */
-export function buildCheckoutSummary({ items, shippingModeId, distanceKm, settings = null }) {
+export function buildCheckoutSummary({ items, shippingModeId, distanceKm, settings = null, otroDia = false }) {
   const normalizedItems = sanitizeCheckoutItems(items);
   const subtotal = calculateItemsSubtotal(normalizedItems);
-  // El subtotal va al cálculo del envío: de él depende la bonificación.
-  const shipping = calculateShippingCost(shippingModeId, distanceKm, settings, subtotal);
+  // El subtotal va al cálculo del envío: de él depende la bonificación. Y el
+  // día también: si el cliente pide otro día que no sea el de reparto, paga el
+  // flete. Antes esto no llegaba al servidor, así que la pantalla mostraba
+  // $10.000 de envío pero se cobraba $0 y nadie se enteraba del día pedido.
+  const shipping = calculateShippingCost(shippingModeId, distanceKm, settings, subtotal, otroDia);
   const total = subtotal + shipping.cost;
 
   return {

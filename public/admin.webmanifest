@@ -1,0 +1,13 @@
+{
+  "name": "Pedidos Manarey",
+  "short_name": "Pedidos",
+  "description": "Panel de pedidos de la tienda online de Manarey",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "background_color": "#f6eedd",
+  "theme_color": "#3b2412",
+  "icons": [
+    { "src": "/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

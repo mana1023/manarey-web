@@ -1,8 +1,114 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
-import { buildCheckoutSummary } from "@/lib/shipping";
+import { buildCheckoutSummary, sanitizeCheckoutItems } from "@/lib/shipping";
 import { getShippingSettings } from "@/lib/settings-db";
 import { getBranchByDisplayName } from "@/lib/store-config";
+import { getCatalogProducts } from "@/lib/products";
+
+const pesos = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+});
+
+/**
+ * Error del checkout pensado para mostrarle al cliente tal cual, con su
+ * status HTTP y datos extra para que la pantalla pueda reaccionar.
+ */
+export class CheckoutError extends Error {
+  constructor(message, { status = 400, extra = {} } = {}) {
+    super(message);
+    this.name = "CheckoutError";
+    this.status = status;
+    this.extra = extra;
+  }
+}
+
+/** Convierte un error del checkout en { status, body } para responder. */
+export function respuestaDeErrorDeCheckout(error, mensajePorDefecto, statusPorDefecto = 400) {
+  if (error instanceof CheckoutError) {
+    return { status: error.status, body: { error: error.message, ...error.extra } };
+  }
+  return {
+    status: statusPorDefecto,
+    body: { error: error instanceof Error && error.message ? error.message : mensajePorDefecto },
+  };
+}
+
+const esManija = (p) =>
+  String(p.categoria || "").toLowerCase() === "accesorios" &&
+  String(p.nombre || "").toLowerCase().includes("manija");
+
+/**
+ * Precio, nombre y variante de cada producto, sacados del catálogo y no del
+ * navegador.
+ *
+ * El carrito vive en el navegador del cliente (localStorage), y hasta acá el
+ * servidor cobraba el precio que venía en él. Eso dejaba dos agujeros:
+ *   - cualquiera podía editar el carrito desde la consola y pagar $1 con
+ *     tarjeta por una cocina de $365.000, y el pedido quedaba PAGADO;
+ *   - sin mala intención, alguien que armó el carrito antes de un aumento
+ *     compraba al precio viejo.
+ * Se usa getCatalogProducts, la misma función que arma la vitrina, así que el
+ * precio que se cobra es por construcción el mismo que se muestra.
+ *
+ * Si un precio cambió no se cobra el nuevo en silencio: se corta con 409 y
+ * los precios nuevos, para que la pantalla actualice el carrito y el cliente
+ * confirme viendo el total real.
+ */
+async function resolverItemsConCatalogo(items) {
+  const catalogo = await getCatalogProducts();
+  const porClave = new Map(catalogo.map((p) => [p.productKey, p]));
+  const manijas = catalogo.find(esManija) || null;
+
+  const resueltos = [];
+  const cambios = [];
+
+  for (const item of items) {
+    const producto = porClave.get(item.productKey);
+    if (!producto) {
+      throw new CheckoutError(
+        `"${item.nombre}" ya no está disponible en la web. Sacalo del carrito para seguir con la compra.`,
+        { status: 409, extra: { productoNoDisponible: item.lineKey } },
+      );
+    }
+
+    const conManijas = Number(item.accessoryPrice) > 0 || Boolean(item.accessoryLabel);
+    const precioVenta = Number(producto.precioVenta || 0);
+    const accessoryPrice = conManijas ? Number(manijas?.precioVenta || 0) : 0;
+
+    if (
+      Math.round(precioVenta) !== Math.round(Number(item.precioVenta) || 0) ||
+      Math.round(accessoryPrice) !== Math.round(Number(item.accessoryPrice) || 0)
+    ) {
+      cambios.push({ lineKey: item.lineKey, nombre: producto.nombre, precioVenta, accessoryPrice });
+    }
+
+    resueltos.push({
+      ...item,
+      nombre: producto.nombre,
+      medida: producto.medida || "",
+      color: producto.color || "",
+      materialSistema: producto.materialSistema || "",
+      precioVenta,
+      accessoryPrice,
+      accessoryLabel: conManijas ? manijas?.nombre || item.accessoryLabel || "Manijas" : "",
+    });
+  }
+
+  if (cambios.length) {
+    const detalle = cambios
+      .map((c) => `${c.nombre}: ${pesos.format(c.precioVenta + c.accessoryPrice)}`)
+      .join(", ");
+    throw new CheckoutError(
+      `Cambió el precio de ${cambios.length === 1 ? "un producto" : "algunos productos"} de tu carrito ` +
+        `(${detalle}). Ya lo actualizamos: revisá el total y volvé a confirmar.`,
+      { status: 409, extra: { preciosActualizados: cambios } },
+    );
+  }
+
+  return resueltos;
+}
 
 let ordersReadyPromise;
 
@@ -55,6 +161,11 @@ export async function ensureOrdersTables() {
         alter table public.web_orders
         add column if not exists installments integer not null default 1
       `).catch(() => {});
+      // La respuesta de Mercado Pago va acá y no en raw_payload (ver markOrderPayment).
+      await query(`
+        alter table public.web_orders
+        add column if not exists payment_payload jsonb
+      `).catch(() => {});
 
       await query(`
         create table if not exists public.web_order_items (
@@ -96,11 +207,13 @@ export async function validateCheckoutPayload(payload = {}) {
   const customer = normalizeCustomer(payload.customer);
   let settings = null;
   try { settings = await getShippingSettings(); } catch { /* usar defaults */ }
+  const items = await resolverItemsConCatalogo(sanitizeCheckoutItems(payload.items));
   const summary = buildCheckoutSummary({
-    items: payload.items,
+    items,
     shippingModeId: payload.shippingModeId,
     distanceKm: customer.distanceKm,
     settings,
+    otroDia: payload.shippingModeId === "delivery" && Boolean(payload.entregaOtroDia),
   });
 
   if (!summary.items.length) {
@@ -249,6 +362,11 @@ export async function markOrderPayment({
 }) {
   await ensureOrdersTables();
 
+  // La respuesta de Mercado Pago se guarda en payment_payload. Antes pisaba
+  // raw_payload, que es donde está el pedido (cliente, productos, entre
+  // calles, notas, día de entrega). Cada pedido pagado perdía esos datos, y
+  // como la sincronización de abajo corre después y no repite ventas, las
+  // ventas con tarjeta llegaban al sistema de escritorio con 0 productos.
   await query(
     `
       update public.web_orders
@@ -256,7 +374,7 @@ export async function markOrderPayment({
         payment_reference = coalesce($2, payment_reference),
         payment_status = coalesce($3, payment_status),
         status = coalesce($4, status),
-        raw_payload = coalesce($5::jsonb, raw_payload),
+        payment_payload = coalesce($5::jsonb, payment_payload),
         updated_at = now()
       where external_reference = $1 or order_code = $1
     `,

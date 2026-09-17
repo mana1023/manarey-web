@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createOrder } from "@/lib/orders";
+import { createOrder, respuestaDeErrorDeCheckout } from "@/lib/orders";
 import { createMercadoPagoPreference } from "@/lib/payments";
-import { sendEmail, buildOrderConfirmationEmail, notificarAlLocal } from "@/lib/email-sender";
+import { sendEmail, buildOrderConfirmationEmail } from "@/lib/email-sender";
 
 export async function POST(request) {
   try {
@@ -15,9 +15,9 @@ export async function POST(request) {
       sendEmail({ to: order.customer.email, subject, html }).catch(() => {});
     }
 
-    // Aviso al local. Va fuera del if de arriba a proposito: el negocio
-    // tiene que enterarse aunque el cliente no haya dejado mail.
-    notificarAlLocal(order, "card", false);
+    // Al local no se le avisa acá: el cliente todavía no pagó y un checkout
+    // de tarjeta abandonado no es una venta. El aviso sale del webhook cuando
+    // Mercado Pago aprueba el pago.
 
     return NextResponse.json({
       orderCode: order.orderCode,
@@ -26,9 +26,7 @@ export async function POST(request) {
       sandboxInitPoint: preference.sandbox_init_point,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "No se pudo iniciar el checkout con tarjeta." },
-      { status: 400 },
-    );
+    const { status, body } = respuestaDeErrorDeCheckout(error, "No se pudo iniciar el checkout con tarjeta.");
+    return NextResponse.json(body, { status });
   }
 }
