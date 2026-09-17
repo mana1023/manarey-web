@@ -3,6 +3,7 @@ import { handleUpload } from "@vercel/blob/client";
 import { put } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { getSessionFromCookies } from "@/lib/session";
+import { cloudinaryConfigurado, subirImagenACloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -73,6 +74,14 @@ export async function POST(request) {
 
     if (file.size > 20 * 1024 * 1024) {
       return NextResponse.json({ error: "La imagen no puede superar 20MB." }, { status: 400 });
+    }
+
+    // Las fotos nuevas van a Cloudinary cuando está configurado: el plan
+    // gratis de Vercel Blob es de 1 GB y al pasarlo bloqueó toda la web.
+    // Sin configurar, sigue yendo a Vercel Blob como siempre.
+    if (cloudinaryConfigurado()) {
+      const url = await subirImagenACloudinary(file);
+      return NextResponse.json({ url });
     }
 
     const ext = file.name.split(".").pop() || "jpg";

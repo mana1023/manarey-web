@@ -12,6 +12,7 @@
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { esUrlDeCloudinary, srcSetDeCloudinary, urlDeCloudinary } from "@/lib/cloudinary-url";
 
 const BLOB_HOST_RE = /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//i;
 
@@ -84,6 +85,27 @@ export function ProductImage({
   if (!src) return null;
   if (fallo) return <FotoNoDisponible fill={fill} width={width} height={height} />;
   const alFallar = () => setFallo(true);
+
+  // Cloudinary redimensiona y elige el formato por su cuenta, así que no pasa
+  // por el optimizador de Vercel: una foto menos que transformar y un límite
+  // menos que cuidar.
+  if (esUrlDeCloudinary(src)) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={urlDeCloudinary(src, 640)}
+        srcSet={srcSetDeCloudinary(src)}
+        sizes={sizes || "(max-width: 600px) 50vw, 25vw"}
+        alt={alt || ""}
+        className={className}
+        loading={priority ? "eager" : loading}
+        style={fill ? { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit } : undefined}
+        {...rest}
+        ref={imagenRef}
+        onError={alFallar}
+      />
+    );
+  }
 
   if (isBlobUrl(src)) {
     if (fill) {
