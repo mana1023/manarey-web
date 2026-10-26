@@ -1,0 +1,1947 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   INICIO y páginas de contenido — bienvenida, hero, muebles de pino,
+   destacados, sucursales, "sobre nosotros", contacto y la franja de ayuda.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.warning-banner {
+  text-align: center;
+  color: var(--danger);
+}
+
+.hero-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 30px;
+  align-items: stretch;
+}
+
+.hero-home-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-home-text {
+  max-width: 55ch;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.hero-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.metric-card,
+.trust-card,
+.category-highlight-card,
+.empty-state {
+  padding: 18px 20px;
+  border: 1px solid rgba(88, 61, 28, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 251, 243, 0.64);
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 1.65rem;
+}
+
+.hero-home-brand,
+.showcase-main-card {
+  min-height: 100%;
+}
+
+.brand-panel.editorial {
+  min-height: 100%;
+  border-radius: 28px;
+  /* Crema — igual al fondo de estudio de las fotos de producto, así el
+     recorte "contain" se funde con la foto en vez de dejar un recuadro. */
+  background: linear-gradient(160deg, #f6efe0 0%, #fbf6ea 55%, #f6efe0 100%);
+}
+
+.brand-panel.editorial > :first-child {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-panel-overlay {
+  position: absolute;
+  inset: auto 18px 18px 18px;
+  padding: 20px;
+  border-radius: 22px;
+}
+
+.showcase-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 20px;
+  border-radius: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.brand-panel-overlay {
+  background: linear-gradient(180deg, rgba(15, 10, 6, 0.2), rgba(15, 10, 6, 0.9));
+  color: #f8efdf;
+}
+
+.brand-panel-overlay .eyebrow,
+.brand-panel-overlay p {
+  color: rgba(248, 239, 223, 0.82);
+}
+
+.brand-panel-overlay h2 {
+  margin: 8px 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1;
+}
+
+.trust-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.trust-card strong,
+.category-highlight-card strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.home-invite {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+}
+
+.invite-copy {
+  max-width: 58ch;
+}
+
+.category-highlight-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.category-highlight-card {
+  text-align: left;
+}
+
+.category-highlight-card span {
+  display: block;
+  margin-bottom: 28px;
+}
+
+.showcase-heading {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.showcase-heading h2 {
+  max-width: 12ch;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+}
+
+.showcase-top {
+  align-items: center;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.showcase-main-card,
+.showcase-mini-card {
+  border: 1px solid rgba(210, 162, 62, 0.22);
+  padding: 0;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%);
+  text-align: left;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
+.showcase-main-visual {
+  min-height: 100%;
+  height: 100%;
+  border-radius: 26px;
+}
+
+.showcase-side-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.showcase-mini-visual {
+  aspect-ratio: 1 / 1;
+}
+
+.showcase-overlay {
+  background: linear-gradient(180deg,
+    rgba(24, 10, 2, 0) 0%,
+    rgba(24, 10, 2, 0.18) 40%,
+    rgba(24, 10, 2, 0.88) 65%,
+    rgba(30, 14, 5, 0.98) 100%
+  );
+}
+
+.showcase-overlay h3,
+.showcase-mini-copy h4 {
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  color: rgba(255, 248, 228, 0.95);
+}
+.showcase-overlay .product-category,
+.showcase-overlay .eyebrow {
+  color: rgba(210, 162, 62, 0.75) !important;
+}
+.showcase-overlay p,
+.showcase-mini-copy p {
+  color: rgba(245, 222, 185, 0.72);
+}
+
+.showcase-overlay-actions {
+  margin-top: 18px;
+}
+
+.showcase-mini-copy {
+  padding: 16px 18px 20px;
+}
+
+.visual-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.visual-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(31, 21, 14, 0.94);
+  color: #f7de9d;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.visual-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(31, 21, 14, 0.74);
+}
+
+.visual-body {
+  align-self: end;
+}
+
+.visual-title {
+  margin-top: 18px;
+  font-size: clamp(1.6rem, 2.5vw, 2.7rem);
+  line-height: 1.02;
+  font-weight: 700;
+}
+
+.visual-caption {
+  margin: 10px 0 0;
+  max-width: 28ch;
+  line-height: 1.6;
+}
+
+.visual-footer {
+  width: fit-content;
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.76);
+  font-size: 0.88rem;
+}
+
+.content-hero,
+.help-strip {
+  text-align: center;
+}
+
+.inline-link,
+.contact-link {
+  color: var(--gold-strong);
+}
+
+.about-grid,
+.contact-grid,
+.help-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.info-card,
+.contact-box,
+.help-card {
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.info-card.dark {
+  background: linear-gradient(180deg, #0f0905 0%, #1c130d 100%);
+  color: #f6dfaa;
+}
+
+.info-card.dark p {
+  color: rgba(246, 223, 170, 0.84);
+}
+
+.feature-list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+}
+
+.help-strip {
+  margin-top: 28px;
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
+  border-color: rgba(210, 162, 62, 0.18) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28) !important;
+  text-align: left !important;
+}
+
+.help-strip-header {
+  margin-bottom: 28px;
+}
+
+.help-strip-header .eyebrow {
+  color: rgba(210, 162, 62, 0.72) !important;
+}
+
+.help-strip h2 {
+  color: rgba(255, 248, 228, 0.96) !important;
+  margin: 6px 0 8px !important;
+}
+
+.help-strip-sub {
+  color: rgba(210, 162, 62, 0.6);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Cards dentro del help-strip */
+.help-card {
+  background: rgba(255, 248, 228, 0.04) !important;
+  border: 1px solid rgba(210, 162, 62, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 24px 22px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.help-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(210, 162, 62, 0.38) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22) !important;
+}
+
+/* Card destacada (consulta personalizada) */
+.help-card--featured {
+  background: rgba(210, 162, 62, 0.1) !important;
+  border-color: rgba(210, 162, 62, 0.35) !important;
+}
+
+/* Ícono */
+.help-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.help-card-icon--whatsapp {
+  background: rgba(37, 211, 102, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+}
+
+.help-card-icon--consult {
+  background: rgba(210, 162, 62, 0.18);
+  color: #f0c96a;
+  border: 1px solid rgba(210, 162, 62, 0.35);
+}
+
+.help-card-icon--email {
+  background: rgba(147, 197, 253, 0.12);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+}
+
+/* Título de cada card */
+.help-card h3 {
+  color: rgba(255, 248, 228, 0.95) !important;
+  font-size: 1rem !important;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Descripción */
+.help-card p {
+  color: rgba(210, 162, 62, 0.62) !important;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* Botón de acción de cada card */
+.help-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(210, 162, 62, 0.35);
+  background: rgba(210, 162, 62, 0.1);
+  color: #f0c96a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.help-card-btn:hover {
+  background: rgba(210, 162, 62, 0.2);
+  border-color: rgba(210, 162, 62, 0.55);
+  transform: translateX(2px);
+}
+
+/* Botón primario (card central) */
+.help-card-btn--primary {
+  background: linear-gradient(135deg, rgba(210,162,62,0.25), rgba(169,115,30,0.35)) !important;
+  border-color: rgba(210, 162, 62, 0.5) !important;
+  color: #f6e0a6 !important;
+}
+.help-card-btn--primary:hover {
+  background: linear-gradient(135deg, rgba(210,162,62,0.38), rgba(169,115,30,0.48)) !important;
+}
+
+/* ── Sobre nosotros ─────────────────────────────── */
+.about-story {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  margin-top: 8px;
+}
+.about-story-text {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-story-text p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+.about-social-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.about-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.about-social-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.about-social-ig {
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #fff;
+}
+.about-social-fb {
+  background: #1877f2;
+  color: #fff;
+}
+.about-story-branches {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-story-branches .eyebrow {
+  margin-bottom: 2px;
+}
+.about-branch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.about-branch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.about-branch-row strong {
+  font-size: 0.88rem;
+  display: block;
+  margin-bottom: 2px;
+}
+.about-branch-row p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+@media (max-width: 1100px) {
+
+  .hero-home,
+  .showcase-grid,
+  .about-grid,
+  .contact-grid,
+  .help-grid,
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* En mobile: ocultar la card grande del showcase, solo mostrar las 4 mini-cards */
+  .showcase-main-card {
+    display: none;
+  }
+  .showcase-side-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
+  .showcase-side-grid,
+  .category-highlight-grid,
+  .hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .showcase-main-visual {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 760px) {
+
+  /* Sucursales mobile: 2 columnas compactas */
+  .home-branches-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .home-branch-card {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px;
+    border-radius: 16px;
+  }
+  .home-branch-pin {
+    width: 32px;
+    height: 32px;
+  }
+  .home-branch-name { font-size: 0.82rem; }
+  .home-branch-address { font-size: 0.72rem; }
+  .home-branches-header h2 { font-size: 1.5rem; }
+  .home-branches-all-btn { font-size: 0.82rem; padding: 8px 14px; }
+
+  .hero-home,
+  .trust-strip,
+  .home-invite,
+  .showcase-section,
+  .content-hero,
+  .help-strip,
+  .warning-banner {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .hero-home h1,
+  .content-hero h2,
+  .home-invite h2,
+  .showcase-heading h2,
+  .help-strip h2 {
+    font-size: clamp(1.9rem, 9vw, 3rem);
+  }
+
+  .showcase-side-grid,
+  .category-highlight-grid,
+  .hero-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .showcase-mini-copy,
+  .info-card,
+  .contact-box,
+  .help-card {
+    padding: 18px;
+  }
+
+  .showcase-overlay,
+  .brand-panel-overlay {
+    inset: auto 12px 12px 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+
+  /* Hero home: imagen ARRIBA, texto abajo — efecto portada */
+  .hero-home {
+    grid-template-columns: 1fr;
+    padding: 0 0 26px;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  .hero-home-brand {
+    order: -1;
+    min-height: 320px;
+  }
+
+  .hero-home-copy {
+    padding: 22px 26px 0;
+  }
+
+  /* Botones de hero: apilados y full-width en mobile */
+  .hero-home-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-home-actions .hero-buy-button,
+  .hero-home-actions .ghost-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Categorías: 2x2 en mobile */
+  .category-highlight-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Trust strip: 2 cols */
+  .trust-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Showcase mini grid: 1 col */
+  .showcase-side-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ─── MEJORAS VISUALES DE BOTONES ────────────────────────────────────────── */
+.primary-button:hover:not(:disabled),
+.hero-buy-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(169, 115, 30, 0.32);
+  transition: all 0.22s ease;
+}
+
+/* ─── HERO MEJORAS ───────────────────────────────────────────────────────── */
+.hero-home {
+  background: linear-gradient(160deg, rgba(255, 252, 243, 0.98), rgba(248, 238, 218, 0.92));
+}
+
+/* ── Destacados / relacionados / hero: producto completo visible, sin recorte ──
+   Las fotos vienen con orientación mixta (horizontal, vertical, cuadrada) y
+   fondo de estudio blanco/crema, así que se usa contain + el mismo tono crema
+   para que el espacio vacío alrededor de la foto se funda con la foto misma. */
+.showcase-main-visual .product-image {
+  object-fit: contain;
+}
+@media (max-width: 768px) {
+  .about-story {
+    grid-template-columns: 1fr;
+  }
+  .about-story-branches {
+    /* order natural: historia primero, sucursales después */
+  }
+}
+
+@media (max-width: 480px) {
+  .about-social-links {
+    flex-direction: column;
+  }
+}
+
+/* ─── CONTACTO MEJORADO ──────────────────────────────────────────────────── */
+.contact-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 40px;
+  background: linear-gradient(135deg, var(--surface) 0%, #fffbf0 100%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.contact-hero-text h2 {
+  font-size: 2.4rem;
+  margin: 6px 0 8px;
+}
+.contact-hero-text p {
+  color: var(--text-secondary);
+  max-width: 420px;
+  margin: 0;
+}
+.contact-hero-wsp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: #25d366;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 50px;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.contact-hero-wsp:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(37,211,102,0.45); }
+
+/* Canales */
+.contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.contact-channel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.contact-channel:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+.contact-channel-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+.contact-channel-wsp { border-color: #25d366; }
+.contact-channel-wsp .contact-channel-icon { background: #25d366; }
+.contact-channel-wsp:hover { background: #f0fff6; }
+
+.contact-channel-ig { border-color: #e1306c; }
+.contact-channel-ig .contact-channel-icon { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.contact-channel-ig:hover { background: #fff5f8; }
+
+.contact-channel-fb { border-color: #1877f2; }
+.contact-channel-fb .contact-channel-icon { background: #1877f2; }
+.contact-channel-fb:hover { background: #f0f5ff; }
+
+.contact-channel-mail { border-color: var(--gold); }
+.contact-channel-mail .contact-channel-icon { background: var(--gold); }
+.contact-channel-mail:hover { background: #fffbf0; }
+
+.contact-channel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.contact-channel-body strong { font-size: 1rem; }
+.contact-channel-body span { font-size: 0.9rem; color: var(--text-secondary); }
+.contact-channel-body em { font-size: 0.8rem; color: var(--text-muted); font-style: normal; }
+.contact-channel-arrow { font-size: 1.6rem; color: var(--text-muted); line-height: 1; }
+
+/* Sucursales en contacto */
+.contact-branches {
+  margin-top: 8px;
+}
+.contact-branches h3 { margin: 4px 0 18px; }
+.contact-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.contact-branch-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.contact-branch-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+.contact-branch-card strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
+.contact-branch-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+@media (max-width: 600px) {
+  .contact-hero { padding: 22px 20px; }
+  .contact-hero-text h2 { font-size: 1.8rem; }
+  .contact-hero-wsp { width: 100%; justify-content: center; }
+  .contact-channel { padding: 14px 16px; gap: 12px; }
+  .contact-channel-icon { width: 44px; height: 44px; }
+}
+
+/* ─── INICIO: MEJORAS ────────────────────────────────────────────────────── */
+.hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 10px 0 22px;
+  max-width: 420px;
+}
+
+/* Franja de confianza */
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 18px;
+  background: var(--surface);
+}
+.trust-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+.trust-item strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
+.trust-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+/* Categorías mejoradas */
+.cat-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  margin-bottom: 6px;
+}
+.cat-card-cta {
+  font-size: 0.82rem;
+  color: var(--gold-strong);
+}
+
+/* ─── SUCURSALES EN INICIO ────────────────────────────────────────────────── */
+.home-branches {
+  margin-top: 8px;
+}
+
+.home-branches-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.home-branches-header h2 {
+  margin: 6px 0 4px;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.home-branches-sub {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.home-branches-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(169, 115, 30, 0.35);
+  background: rgba(210, 162, 62, 0.08);
+  color: var(--gold-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.home-branches-all-btn:hover {
+  background: rgba(210, 162, 62, 0.16);
+  border-color: var(--gold);
+  transform: translateX(2px);
+}
+
+.home-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.home-branch-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 18px;
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%);
+  border: 1px solid rgba(210, 162, 62, 0.22);
+  border-radius: 18px;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+}
+
+.home-branch-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+  border-color: rgba(210, 162, 62, 0.45);
+}
+
+.home-branch-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(210, 162, 62, 0.15);
+  border: 1.5px solid rgba(210, 162, 62, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #f0c96a;
+  margin-top: 1px;
+}
+
+.home-branch-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.home-branch-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(255, 248, 228, 0.95);
+  display: block;
+  line-height: 1.3;
+}
+
+.home-branch-address {
+  font-size: 0.78rem;
+  color: rgba(210, 162, 62, 0.65);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.home-branch-directions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(210, 162, 62, 0.12);
+  border: 1px solid rgba(210, 162, 62, 0.28);
+  color: #f0c96a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+  width: fit-content;
+}
+.home-branch-directions:hover {
+  background: rgba(210, 162, 62, 0.22);
+  border-color: rgba(210, 162, 62, 0.5);
+}
+@media (max-width: 900px) {
+  .trust-strip { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .trust-strip { grid-template-columns: 1fr; border-radius: 14px; }
+  .trust-item { padding: 14px 16px; }
+}
+
+@media (max-width: 540px) {
+
+  /* Hero en pantallas muy pequeñas: imagen más compacta */
+  .hero-home-brand {
+    min-height: 260px;
+  }
+  .hero-home-copy {
+    padding: 18px 20px 0;
+  }
+
+  /* Showcase de productos: más compacto */
+  .showcase-main-visual {
+    min-height: 200px !important;
+    max-height: 260px !important;
+  }
+  .showcase-mini-card {
+    border-radius: 14px;
+  }
+  .showcase-mini-copy {
+    padding: 10px 12px !important;
+  }
+  .showcase-mini-copy h4 {
+    font-size: 0.8rem !important;
+  }
+
+  /* Cards en la home (showcase tabs) más pequeñas */
+  .showcase-tab {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+  }
+}
+
+/* ─── BOTÓN CÓMO LLEGAR POR SUCURSAL ─────────────────────────────────────── */
+.branch-directions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1.5px solid rgba(210, 162, 62, 0.35);
+  border-radius: 999px;
+  background: rgba(210, 162, 62, 0.07);
+  color: var(--gold-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 6px;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.branch-directions-btn:hover {
+  background: rgba(210, 162, 62, 0.15);
+  border-color: var(--gold);
+}
+
+/* ── Animación de entrada del hero ──────────────────────────────────────── */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-home-copy .eyebrow {
+  animation: heroFadeUp 0.5s ease both;
+  animation-delay: 0.05s;
+}
+
+.hero-home h1 {
+  animation: heroFadeUp 0.55s ease both;
+  animation-delay: 0.15s;
+}
+
+.hero-home-text {
+  animation: heroFadeUp 0.55s ease both;
+  animation-delay: 0.25s;
+}
+
+.hero-home-actions {
+  animation: heroFadeUp 0.55s ease both;
+  animation-delay: 0.35s;
+}
+
+.hero-metrics {
+  animation: heroFadeUp 0.55s ease both;
+  animation-delay: 0.45s;
+}
+@media (max-width: 760px) {
+  .hero-home h1 {
+    font-size: clamp(2.2rem, 10vw, 3.5rem) !important;
+  }
+  /* Imagen va de borde a borde en el hero card */
+  .hero-home-brand .brand-panel.editorial {
+    border-radius: 0;
+    min-height: 320px;
+  }
+
+  /* Fade inferior sobre la imagen para conectar visualmente con el texto */
+  .hero-home-brand .brand-panel.editorial::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, rgba(240, 224, 192, 0.55));
+    pointer-events: none;
+  }
+
+  /* Entrada animada de la imagen */
+  .hero-home-brand {
+    animation: heroFadeIn 0.6s ease both;
+  }
+
+  /* Métricas: 3 columnas en mobile, más compactas */
+  .hero-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .metric-card {
+    padding: 12px 8px;
+    text-align: center;
+    border-radius: 16px;
+  }
+
+  .metric-card strong {
+    font-size: 1.3rem;
+  }
+
+  .metric-card span {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero-home-brand .brand-panel.editorial {
+    min-height: 260px;
+  }
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PÁGINA DE BIENVENIDA — welcome section con botones sociales
+   ══════════════════════════════════════════════════════════════════ */
+
+.welcome-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  border: 1px solid rgba(210, 162, 62, 0.22);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.34);
+  /* El fondo lo manejan los .welcome-bg-slide (slideshow JS) */
+  background: #180e06;
+  min-height: 420px;
+}
+
+/* Slides de fondo con crossfade */
+.welcome-bg-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: right center;
+  opacity: 0;
+  transition: opacity 1.4s ease-in-out;
+  z-index: 0;
+}
+.welcome-bg-slide.active {
+  opacity: 1;
+}
+
+/* Overlay: oscuro a la izquierda para que el texto sea legible, translúcido a la derecha */
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    rgba(18, 9, 2, 0.96) 0%,
+    rgba(28, 13, 4, 0.90) 38%,
+    rgba(20, 10, 3, 0.60) 65%,
+    rgba(14, 7, 2, 0.18) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Contenedor del contenido (encima del overlay) */
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 52px 52px 48px;
+  max-width: 560px;
+}
+
+/* Logo circular en sección de bienvenida */
+.welcome-logo-wrap {
+  margin-bottom: 28px;
+  align-self: center;
+}
+
+.welcome-logo-img {
+  width: 210px;
+  height: 210px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  filter: drop-shadow(0 8px 32px rgba(210, 162, 62, 0.45));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.welcome-logo-img:hover {
+  transform: scale(1.04);
+  filter: drop-shadow(0 10px 40px rgba(210, 162, 62, 0.6));
+}
+
+/* Textos de bienvenida */
+.welcome-tagline {
+  font-size: 1rem;
+  color: rgba(248, 228, 195, 0.65);
+  margin: 0 0 4px;
+  letter-spacing: 0.04em;
+}
+
+.welcome-years {
+  font-size: 0.82rem;
+  color: rgba(210, 162, 62, 0.7);
+  margin: 0 0 36px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* Botones de acción */
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.welcome-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.welcome-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.08);
+}
+
+.welcome-btn:active {
+  transform: scale(0.97);
+}
+
+/* Comprar por la web — dorado Manarey */
+.welcome-btn-catalog {
+  background: linear-gradient(135deg, #d2a23e 0%, #a9731e 100%);
+  color: #fff9f0;
+  box-shadow: 0 8px 28px rgba(169, 115, 30, 0.4);
+}
+
+/* WhatsApp — verde */
+.welcome-btn-wsp {
+  background: #25D366;
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(37, 211, 102, 0.35);
+}
+
+/* Instagram — degradado */
+.welcome-btn-ig {
+  background: linear-gradient(135deg, #833AB4 0%, #E1306C 50%, #F77737 100%);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(225, 48, 108, 0.35);
+}
+
+/* Facebook — azul */
+.welcome-btn-fb {
+  background: #1877F2;
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(24, 119, 242, 0.35);
+}
+
+/* Sucursales como pills */
+.welcome-branches {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Botón "Ver ubicaciones de nuestras sucursales" — abre Google Maps */
+.welcome-btn-locations {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 162, 62, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(248, 228, 195, 0.85);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+.welcome-btn-locations:hover {
+  background: rgba(210, 162, 62, 0.1);
+  border-color: rgba(210, 162, 62, 0.55);
+  color: #f0c96a;
+}
+.welcome-btn-locations svg:first-child {
+  flex-shrink: 0;
+  color: #d2a23e;
+}
+.welcome-btn-locations svg:last-child {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Lista de direcciones desplegable */
+.welcome-locations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin-top: 8px;
+  animation: locFadeIn 0.22s ease;
+}
+
+@keyframes locFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-location-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(210, 162, 62, 0.12);
+  text-decoration: none;
+  transition: background 0.18s, border-color 0.18s;
+}
+.welcome-location-item:hover {
+  background: rgba(210, 162, 62, 0.1);
+  border-color: rgba(210, 162, 62, 0.3);
+}
+.welcome-location-address {
+  font-size: 0.85rem;
+  color: rgba(248, 228, 195, 0.82);
+  line-height: 1.4;
+}
+.welcome-location-cta {
+  font-size: 0.78rem;
+  color: #d2a23e;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  .welcome-section {
+    border-radius: 24px;
+    min-height: 0;
+    /* En móvil la foto cubre todo con un overlay más cerrado */
+    background-position: center center;
+  }
+  .welcome-section::before {
+    background: linear-gradient(
+      160deg,
+      rgba(16, 8, 2, 0.97) 0%,
+      rgba(22, 11, 3, 0.93) 50%,
+      rgba(18, 9, 2, 0.80) 100%
+    );
+    z-index: 1;
+  }
+  .welcome-content {
+    padding: 36px 24px 32px;
+    max-width: 100%;
+  }
+  .welcome-logo-img {
+    width: 160px;
+    height: 160px;
+  }
+  .welcome-btn {
+    min-height: 54px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ── Hero: oscuro, lujoso, inmersivo ────────────────────────── */
+.hero-home {
+  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
+  border-color: rgba(210, 162, 62, 0.22) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(210,162,62,0.12) !important;
+}
+
+/* Título con degradado dorado — efecto premium */
+.hero-home h1 {
+  background: linear-gradient(135deg, #f8ead4 25%, #e8aa3e 75%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-home-copy .eyebrow {
+  color: #d4943a;
+  letter-spacing: 0.22em;
+}
+
+.hero-subtitle {
+  color: rgba(248, 228, 195, 0.68) !important;
+}
+
+/* Métricas sobre fondo oscuro */
+.hero-home .metric-card {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(210, 162, 62, 0.18);
+}
+
+.hero-home .metric-card strong {
+  color: #e8a93a;
+}
+
+.hero-home .metric-card span {
+  color: rgba(245, 222, 185, 0.55);
+}
+
+/* Botón fantasma visible sobre fondo oscuro */
+.hero-home-actions .ghost-button {
+  border-color: rgba(245, 222, 185, 0.26);
+  color: rgba(245, 222, 185, 0.82);
+  background: rgba(255, 255, 255, 0.04);
+}
+.hero-home-actions .ghost-button:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 222, 185, 0.5);
+  color: #f8ead4;
+}
+
+/* ── Showcase (productos destacados): más cálido ─────────────── */
+.showcase-section {
+  background: linear-gradient(160deg, rgba(255, 252, 245, 0.97) 0%, rgba(252, 242, 222, 0.94) 100%) !important;
+}
+
+/* ── Sección "¿Qué estás buscando?": oscura para contraste ─── */
+.home-invite {
+  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
+  border-color: rgba(210, 162, 62, 0.2) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+}
+
+.home-invite .eyebrow {
+  color: #d4943a;
+}
+
+.home-invite h2 {
+  color: #f8ead4;
+  background: linear-gradient(135deg, #f8ead4 20%, #e8aa3e 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tarjetas de categoría sobre fondo oscuro */
+.category-highlight-card {
+  background: rgba(255, 250, 238, 0.92) !important;
+  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
+  padding: 22px !important;
+  border-radius: 20px !important;
+}
+
+.category-highlight-card:hover {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(210, 162, 62, 0.5) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* ── Showcase mini cards ─────────────────────────────────────── */
+.showcase-mini-card {
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
+  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
+}
+
+.showcase-mini-card:hover {
+  background: linear-gradient(160deg, #2e1a09 0%, #3a2214 55%, #241508 100%) !important;
+  border-color: rgba(210, 162, 62, 0.45) !important;
+}
+
+/* Textos en showcase-mini-copy sobre fondo oscuro */
+.showcase-mini-copy .price-tag {
+  color: #f0c96a !important;
+}
+.showcase-mini-copy h4 {
+  color: rgba(255, 248, 228, 0.95) !important;
+}
+.showcase-mini-copy p,
+.showcase-mini-copy .product-category {
+  color: rgba(210, 162, 62, 0.72) !important;
+}
+
+/* ── Sección showcase: mismo marrón oscuro que el hero ───────────── */
+.showcase-section {
+  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
+  border-color: rgba(210, 162, 62, 0.18) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.32) !important;
+}
+
+/* Textos del encabezado de la sección sobre fondo oscuro */
+.showcase-section .eyebrow {
+  color: rgba(210, 162, 62, 0.72) !important;
+}
+.showcase-section .showcase-heading h2,
+.showcase-section h2 {
+  color: rgba(255, 248, 228, 0.95) !important;
+}
+
+/* Tabs de categoría sobre fondo oscuro */
+.showcase-section .showcase-tab {
+  background: rgba(255, 248, 228, 0.08) !important;
+  border-color: rgba(210, 162, 62, 0.22) !important;
+  color: rgba(245, 222, 185, 0.75) !important;
+}
+.showcase-section .showcase-tab:hover:not(.active) {
+  background: rgba(255, 248, 228, 0.15) !important;
+  color: rgba(255, 248, 228, 0.95) !important;
+}
+.showcase-section .showcase-tab.active {
+  background: linear-gradient(135deg, rgba(210,162,62,0.25), rgba(169,115,30,0.35)) !important;
+  border-color: rgba(210, 162, 62, 0.5) !important;
+  color: #f6e0a6 !important;
+}
+@media (max-width: 760px) {
+  /* El fade del hero apunta al color oscuro del hero */
+  .hero-home-brand .brand-panel.editorial::after {
+    background: linear-gradient(to bottom, transparent, rgba(24, 14, 6, 0.65)) !important;
+  }
+
+  /* Sección de categorías oscura: tarjetas con buen contraste */
+  .home-invite {
+    padding: 24px 20px !important;
+  }
+}
+
+/* ── El escenario de la foto ───────────────────────────────────────────── */
+/* Las fotos vienen con fondo de estudio claro. El degradado radial imita una
+   luz cenital y el viñeteado del ::after disimula la costura entre el fondo
+   de la foto y el de la tarjeta. */
+.showcase-mini-visual,
+.brand-panel.editorial,
+.showcase-main-visual {
+  background: radial-gradient(118% 86% at 50% 2%, #fffefa 0%, #fdf8ec 46%, #f4e9d4 100%);
+}
+.showcase-mini-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--vitrina-borde-hover) !important;
+  box-shadow: var(--vitrina-sombra-hover) !important;
+}
+
+.showcase-mini-copy h4 {
+  font-size: 0.98rem !important;
+  line-height: 1.32;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.showcase-main-card {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.showcase-main-card:hover {
+  border-color: var(--vitrina-borde-hover) !important;
+  box-shadow: var(--vitrina-sombra-hover) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .showcase-mini-card:hover {
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ESCENARIO DE FOTO EN BLANCO
+   Las fotos vienen con fondo de estudio blanco, así que un escenario crema
+   dibujaba un recuadro visible alrededor de cada producto. En blanco casi
+   puro la foto se funde y lo que separa la imagen del cuerpo de la tarjeta
+   pasa a ser la línea de abajo, no un salto de color.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.showcase-mini-visual,
+.brand-panel.editorial,
+.showcase-main-visual {
+  background: radial-gradient(120% 88% at 50% 0%, #ffffff 0%, #fffefb 58%, #fbf7ef 100%);
+}
+
+/* "Ver productos →" de las tarjetas de categoría — 3.31 → 5.48 */
+.cat-card-cta {
+  color: #7d5310;
+}
+
+/* Dirección de sucursal: era dorado al 65% sobre marrón (3.92) → crudo, 10.17 */
+.home-branch-address {
+  color: #d6c2a2;
+}
+
+/* Texto de las tarjetas de ayuda: dorado al 62% sobre marrón (3.51) → 9.02.
+   Lleva !important porque la regla original (línea ~1408) también lo usa. */
+.help-card p {
+  color: #d2c0a4 !important;
+}
+
+/* ── Redes en la bienvenida: iconos, no barras de color ────────────────── */
+/* Antes Instagram y Facebook eran dos botones del ancho completo con sus
+   colores de marca (degradado violeta-naranja y azul). Apilados debajo de
+   los otros dos, la portada entera era una columna de botones de colores:
+   parecía un árbol de links, no una mueblería. Además los colores peleaban
+   con la paleta dorada de la marca. */
+.welcome-social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.welcome-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 18px 9px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(245, 222, 185, 0.24);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(248, 234, 212, 0.9);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.15s;
+}
+
+.welcome-social-btn svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.welcome-social-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(245, 222, 185, 0.5);
+  color: #fff8ec;
+  transform: translateY(-1px);
+}
+
+/* El color de marca aparece sólo en el ícono, al pasar el mouse */
+.welcome-social-btn.welcome-btn-ig:hover svg { color: #e1306c; }
+.welcome-social-btn.welcome-btn-fb:hover svg { color: #1877f2; }
+
+.welcome-social-label {
+  white-space: nowrap;
+}
+@media (max-width: 540px) {
+  .welcome-social {
+    gap: 8px;
+  }
+  .welcome-social-btn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* El degradado y el resplandor de color de los botones viejos de Instagram y
+   Facebook seguían aplicando por la clase, y dejaban un halo rosa y otro azul
+   debajo de los iconos nuevos. */
+.welcome-social-btn.welcome-btn-ig,
+.welcome-social-btn.welcome-btn-fb {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+  color: rgba(248, 234, 212, 0.9);
+}
+
+.welcome-social-btn.welcome-btn-ig:hover,
+.welcome-social-btn.welcome-btn-fb:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff8ec;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INICIO ESTILO TIENDA GRANDE
+   ───────────────────────────────────────────────────────────────────────
+   Lo que veía alguien al entrar era un logo circular gigante y cuatro
+   botones apilados: una pantalla entera sin un solo producto. MercadoLibre,
+   Frávega y Coto hacen lo contrario — muestran mercadería en el primer
+   scroll. Acá se comprime la bienvenida y se sube el pino, que es donde
+   Manarey gana por precio.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Bienvenida comprimida ─────────────────────────────────────────────── */
+.welcome-section {
+  min-height: 0 !important;
+}
+
+.welcome-content {
+  padding: 30px 30px 32px !important;
+}
+
+.welcome-logo-wrap {
+  width: 118px !important;
+  height: 118px !important;
+  margin-bottom: 14px !important;
+}
+
+.welcome-logo-img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.welcome-tagline {
+  font-size: 1.02rem !important;
+  margin-bottom: 2px !important;
+}
+
+.welcome-years {
+  margin-bottom: 16px !important;
+}
+
+/* Los dos botones principales pasan a estar uno al lado del otro: apilados
+   a lo ancho ocupaban media pantalla ellos solos. */
+.welcome-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.welcome-actions .welcome-btn {
+  flex: 1 1 240px;
+  min-height: 50px;
+  margin: 0 !important;
+}
+
+.welcome-branches {
+  margin-top: 12px;
+}
+
+/* ── Sección de muebles de pino ────────────────────────────────────────── */
+.pino-section {
+  padding: 30px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 250, 235, 0.95), transparent 60%),
+    linear-gradient(160deg, #fffdf6 0%, #faf2e0 100%);
+  box-shadow: 0 16px 44px rgba(120, 80, 40, 0.14);
+}
+
+.pino-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.pino-heading h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.pino-sub {
+  margin: 8px 0 0;
+  max-width: 46ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pino-ver-todos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(181, 133, 68, 0.4);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--gold-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s, transform 0.14s;
+}
+
+.pino-ver-todos:hover {
+  background: #fff;
+  border-color: var(--gold);
+  transform: translateX(2px);
+}
+
+.pino-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pino-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1.5px solid rgba(181, 133, 68, 0.3);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(120, 80, 40, 0.1);
+  transition: transform 0.24s cubic-bezier(0.22, 0.9, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+}
+
+.pino-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--vitrina-borde-hover);
+  box-shadow: var(--vitrina-sombra-hover);
+}
+
+.pino-card-visual {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: radial-gradient(120% 88% at 50% 0%, #ffffff 0%, #fffefb 58%, #fbf7ef 100%);
+  border-bottom: 1px solid rgba(181, 133, 68, 0.2);
+}
+
+.pino-card-visual .product-image {
+  transition: transform 0.5s cubic-bezier(0.22, 0.9, 0.3, 1);
+  padding: 7%;
+}
+
+.pino-card:hover .product-image {
+  transform: scale(1.07);
+}
+
+.pino-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+  flex: 1;
+}
+
+.pino-card-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.pino-card-medida {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pino-card-precio {
+  margin: 4px 0 0;
+  font-size: 1.42rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-strong);
+}
+
+.pino-card-envio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--verde-stock);
+}
+
+.pino-card-envio svg { flex-shrink: 0; }
+@media (max-width: 900px) {
+  .pino-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .pino-section {
+    padding: 22px 16px;
+    border-radius: 20px;
+  }
+  .pino-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .pino-card { border-radius: 16px; }
+  .pino-card-copy { padding: 10px 12px 12px; gap: 3px; }
+  .pino-card-copy h3 { font-size: 0.83rem; }
+  .pino-card-precio { font-size: 1.05rem; }
+  .pino-card-medida { font-size: 0.68rem; }
+  .pino-card-envio { font-size: 0.67rem; }
+  .pino-ver-todos { min-height: 42px; font-size: 0.85rem; }
+
+  .welcome-content { padding: 22px 18px 24px !important; }
+  .welcome-logo-wrap { width: 92px !important; height: 92px !important; }
+  .welcome-actions .welcome-btn { flex: 1 1 100%; }
+}
