@@ -1600,11 +1600,6 @@
   border-color: var(--vitrina-borde-hover) !important;
   box-shadow: var(--vitrina-sombra-hover) !important;
 }
-@media (prefers-reduced-motion: reduce) {
-  .showcase-mini-card:hover {
-    transform: none !important;
-  }
-}
 
 /* ═══════════════════════════════════════════════════════════════════════
    ESCENARIO DE FOTO EN BLANCO

@@ -1,0 +1,82 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PÁGINAS LEGALES — formulario de arrepentimiento (Resolución 424/2020).
+   La política de privacidad y el 404 no tienen estilos acá: están escritos
+   directo en el JSX.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── Botón de arrepentimiento (Resolución 424/2020) ──────────────────── */
+.arrepentimiento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+.arrepentimiento-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.arrepentimiento-form label > span {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #3b2a1c;
+}
+.arrepentimiento-form label em {
+  font-style: normal;
+  font-weight: 400;
+  opacity: 0.6;
+}
+.arrepentimiento-form input,
+.arrepentimiento-form textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(120, 85, 60, 0.28);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  color: #2c1e12;
+}
+.arrepentimiento-form input:focus,
+.arrepentimiento-form textarea:focus {
+  outline: 2px solid var(--gold-soft, #e8c547);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.arrepentimiento-form textarea {
+  resize: vertical;
+}
+.arrepentimiento-form button {
+  margin-top: 0.25rem;
+}
+.arrepentimiento-nota {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b5744;
+  text-align: center;
+}
+.arrepentimiento-error {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(171, 84, 67, 0.12);
+  color: #8c3a2c;
+  font-size: 0.86rem;
+}
+.arrepentimiento-ok {
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(90, 140, 90, 0.35);
+  background: rgba(120, 170, 110, 0.12);
+}
+.arrepentimiento-ok strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #2f5e2f;
+}
+.arrepentimiento-ok p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}

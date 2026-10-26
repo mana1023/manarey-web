@@ -1913,13 +1913,6 @@
   border-color: var(--vitrina-borde-hover) !important;
   box-shadow: var(--vitrina-sombra-hover) !important;
 }
-@media (prefers-reduced-motion: reduce) {
-  .product-card:hover,
-  .related-card:hover {
-    transform: none !important;
-  }
-}
-
 @media (max-width: 540px) {
   /* El :not() es necesario: la grilla de admin es de 1 columna y se define
      más arriba en la hoja, así que sin esto este bloque se la pisaría. */

@@ -1,0 +1,97 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PLACEHOLDERS DE CARGA — lo que se ve mientras la página trae los datos
+   (src/app/loading.js).
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(90deg, #e8dbc8 25%, #f3e7cf 50%, #e8dbc8 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+
+.skeleton-text   { height: 14px; border-radius: 6px; }
+.skeleton-title  { height: 22px; border-radius: 6px; }
+.skeleton-thumb  { border-radius: 12px; aspect-ratio: 1; }
+.skeleton-card   { border-radius: 16px; }
+
+/* Product card skeleton */
+.product-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface-strong);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+.product-skeleton .sk-img  { height: 180px; border-radius: 12px; }
+.product-skeleton .sk-tag  { height: 12px; width: 60px; }
+.product-skeleton .sk-name { height: 16px; width: 80%; }
+.product-skeleton .sk-price{ height: 20px; width: 50%; }
+.product-skeleton .sk-btn  { height: 40px; border-radius: 10px; }
+
+/* Product skeleton inner body spacing */
+.loading-sk-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LOADING PAGE (loading.js — Suspense fallback)
+   ══════════════════════════════════════════════════════════════════════ */
+.loading-page-shell {
+  min-height: 100dvh;
+  background: var(--background);
+  overflow: hidden;
+}
+
+/* Navbar skeleton */
+.loading-navbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--line);
+}
+.loading-nav-logo  { width: 120px; height: 32px; border-radius: 8px; }
+.loading-nav-links { display: flex; gap: 16px; margin-left: auto; }
+.loading-nav-link  { width: 72px;  height: 16px; border-radius: 6px; }
+.loading-nav-icon  { width: 36px;  height: 36px; border-radius: 50%; }
+
+/* Hero skeleton */
+.loading-hero {
+  width: 100%;
+  height: clamp(220px, 40vh, 420px);
+  border-radius: 0;
+}
+
+/* Catalog section skeleton */
+.loading-catalog {
+  max-width: 1360px;
+  margin: 40px auto 0;
+  padding: 0 24px 64px;
+}
+.loading-catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+}
+.loading-eyebrow { width: 80px;  height: 12px; margin-bottom: 8px; }
+.loading-title   { width: 220px; height: 26px; }
+
+/* Product grid skeleton */
+.loading-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+@media (max-width: 600px) {
+  .loading-navbar   { padding: 12px 16px; }
+  .loading-nav-links{ display: none; }
+  .loading-catalog  { padding: 0 16px 48px; margin-top: 28px; }
+  .loading-product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
