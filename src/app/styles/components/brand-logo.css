@@ -1,0 +1,51 @@
+/* Estilos de src/components/brand-logo.jsx */
+
+.brand-logo-img {
+  display: block;
+  width: 200px;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+}
+
+.brand-logo-img.compact {
+  width: 160px;
+}
+
+/* SVG logo (sección de bienvenida oscura) */
+.brand-logo {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 140px;
+  color: #d3a23d;
+}
+
+.brand-mark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.brand-wording span {
+  font-size: clamp(2.2rem, 3.4vw, 4rem);
+  letter-spacing: 0.1em;
+  line-height: 0.95;
+  color: #d3a23d;
+}
+@media (max-width: 480px) {
+  .brand-logo-img.compact {
+    width: 120px;
+  }
+
+  .brand-mark {
+    width: 96px;
+  }
+
+  .brand-wording span {
+    font-size: 1.8rem;
+  }
+}

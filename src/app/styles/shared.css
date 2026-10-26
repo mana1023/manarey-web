@@ -1,0 +1,355 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPARTIDO — piezas que aparecen en más de una pantalla: botones, pastillas,
+   campos de formulario, el fondo de tarjeta y los modales.
+
+   Si una regla de acá se toca, se toca en toda la web. Para cambiar sólo una
+   pantalla, pisarla en el archivo de esa pantalla.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.site-header,
+.service-ribbon,
+.hero-home,
+.trust-strip,
+.home-invite,
+.showcase-section,
+.catalog-hero,
+.catalog-tools,
+.content-hero,
+.info-card,
+.contact-box,
+.help-strip,
+.help-card,
+.product-card,
+.warning-banner,
+.detail-modal,
+.modal-card {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.header-brand-copy span,
+.header-link,
+.product-description-preview,
+.product-meta-row,
+.catalog-summary,
+.description,
+.meta-line,
+.availability,
+.contact-box p,
+.help-card p,
+.info-card p,
+.hero-home-text,
+.showcase-overlay p,
+.showcase-mini-copy p,
+.visual-caption {
+  color: var(--muted);
+}
+
+.main-nav,
+.header-actions,
+.hero-home-actions,
+.showcase-top,
+.category-rail,
+.product-badges,
+.product-meta-row,
+.detail-topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-pill,
+.secondary-button,
+.ghost-button,
+.showcase-tab,
+.category-pill,
+.sort-select,
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 15px;
+  border: 1px solid rgba(88, 61, 28, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 251, 243, 0.72);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.nav-pill,
+.secondary-button,
+.ghost-button,
+.showcase-tab,
+.category-pill {
+  border-width: 1px;
+}
+
+.nav-pill.active,
+.showcase-tab.active,
+.category-pill.active {
+  background: linear-gradient(135deg, #23170f, #3a2617);
+  color: #f6e0a6;
+  border-color: #23170f;
+  font-weight: 700;
+}
+
+.primary-button,
+.hero-buy-button,
+.upload-button,
+.big-action,
+.cart-checkout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
+  color: #fff9f0;
+  box-shadow: 0 12px 28px rgba(169, 115, 30, 0.24);
+}
+
+.hero-home,
+.trust-strip,
+.home-invite,
+.showcase-section,
+.catalog-hero,
+.catalog-tools,
+.content-hero,
+.help-strip,
+.warning-banner {
+  padding: 30px;
+  border-radius: 30px;
+}
+
+.hero-home h1,
+.catalog-hero h2,
+.content-hero h2,
+.home-invite h2,
+.showcase-heading h2,
+.help-strip h2 {
+  margin: 10px 0 0;
+  font-size: clamp(2.1rem, 4vw, 4.2rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+}
+
+.hero-metrics,
+.trust-grid,
+.category-highlight-grid,
+.catalog-grid,
+.about-grid,
+.contact-grid,
+.help-grid,
+.related-grid,
+.dimension-row,
+.editor-actions {
+  display: grid;
+  gap: 18px;
+}
+
+.trust-card,
+.product-card,
+.showcase-mini-card,
+.showcase-main-card,
+.category-highlight-card,
+.service-pill,
+.info-card,
+.contact-box,
+.help-card,
+.related-card {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.trust-card:hover,
+.product-card:hover,
+.showcase-mini-card:hover,
+.showcase-main-card:hover,
+.category-highlight-card:hover,
+.service-pill:hover,
+.info-card:hover,
+.contact-box:hover,
+.help-card:hover,
+.related-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px rgba(80, 52, 21, 0.16);
+  border-color: rgba(169, 115, 30, 0.22);
+}
+
+.brand-panel.editorial,
+.showcase-main-visual,
+.showcase-mini-visual,
+.image-frame,
+.detail-media,
+.related-visual {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f0dfba 0%, #f9f2e2 100%);
+}
+
+.showcase-overlay h3,
+.showcase-mini-copy h4,
+.info-card h3,
+.contact-box h3,
+.help-card h3,
+.product-header h2 {
+  margin: 0;
+}
+
+.editor-input,
+.editor-textarea {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid rgba(88, 61, 28, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+}
+
+.editor-textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.product-card:hover .product-image,
+.showcase-mini-card:hover .product-image,
+.related-card:hover .product-image {
+  transform: scale(1.04);
+}
+
+.editor-grid,
+.login-form {
+  display: grid;
+  gap: 12px;
+}
+
+.dimension-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.editor-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.modal-backdrop {
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(24, 16, 9, 0.42);
+  overscroll-behavior: contain;
+  overflow: hidden;
+}
+
+.modal-card {
+  width: min(420px, 100%);
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.reveal-block {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal-block.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.error-text {
+  margin: 0;
+  color: var(--danger);
+}
+@media (max-width: 760px) {
+
+  .dimension-row,
+  .editor-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.secondary-button:hover:not(:disabled),
+.ghost-button:hover:not(:disabled) {
+  border-color: rgba(169, 115, 30, 0.28);
+  background: rgba(255, 251, 243, 0.96);
+  transform: translateY(-1px);
+  transition: all 0.18s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SKELETON LOADERS — loading state genérico reutilizable
+   ══════════════════════════════════════════════════════════════════════ */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.showcase-main-visual,
+.showcase-mini-visual,
+.related-visual {
+  background: linear-gradient(160deg, #f6efe0 0%, #fbf6ea 55%, #f6efe0 100%);
+}
+
+.catalog-grid .image-frame::after,
+.showcase-mini-visual::after,
+.related-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(112% 88% at 50% 36%, transparent 56%, rgba(122, 84, 38, 0.09) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.product-card:hover .product-image,
+.showcase-mini-card:hover .product-image,
+.related-card:hover .product-image {
+  transform: scale(1.065);
+}
+
+/* ── Destacados y relacionados: mismo lenguaje ─────────────────────────── */
+.showcase-mini-card,
+.related-card {
+  border-radius: 20px !important;
+  transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.3, 1), box-shadow 0.26s ease, border-color 0.26s ease;
+}
+
+/* El viñeteado también se suaviza: sobre blanco, el anterior se notaba */
+.catalog-grid .image-frame::after,
+.showcase-mini-visual::after,
+.related-visual::after {
+  background: radial-gradient(114% 90% at 50% 34%, transparent 62%, rgba(122, 84, 38, 0.055) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CONTRASTE (WCAG AA)
+   ───────────────────────────────────────────────────────────────────────
+   Medido sobre el fondo real de cada elemento (componiendo transparencias
+   y promediando los stops de los degradados). Cada valor de acá abajo está
+   elegido para superar 4.5:1, con el ratio anotado al lado.
+
+   El patrón que se repite es dorado sobre marrón oscuro: son dos colores
+   de luminancia parecida, así que por más que se vea "elegante" nunca da
+   contraste. En esos casos el texto secundario pasa a un crudo cálido.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Botón principal — era el peor caso y es el CTA más importante del sitio:
+   blanco sobre dorado daba 2.74. Se mantiene el dorado brillante (es el
+   acento de la marca) y el texto pasa a espresso → 5.69. */
+.primary-button,
+.hero-buy-button,
+.upload-button,
+.big-action,
+.cart-checkout {
+  color: #2b1d13;
+  font-weight: 700;
+}
