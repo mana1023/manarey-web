@@ -1,0 +1,47 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOKENS — el único lugar donde se tocan los colores, la sombra y el acento.
+   Cambiar un valor acá lo cambia en toda la web.
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  --background: #efe2c9;
+  --surface: rgba(250, 244, 233, 0.9);
+  --surface-strong: #fff9ef;
+  --surface-dark: #1f150e;
+  --text: #2b1d13;
+  --muted: #6f5a46;
+  --line: rgba(88, 61, 28, 0.12);
+  --gold: #d2a23e;
+  --gold-strong: #a9731e;
+  --gold-soft: rgba(210, 162, 62, 0.16);
+  --success: #45674f;
+  --danger: #ab5443;
+  --shadow: 0 22px 60px rgba(89, 58, 24, 0.14);
+  /* Alias para componentes */
+  --accent: #d2a23e;
+  --border: rgba(88, 61, 28, 0.18);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VITRINA — capa final de producto
+   ───────────────────────────────────────────────────────────────────────
+   Esta hoja está construida por capas: reglas viejas más arriba y ajustes
+   más abajo. Este bloque es la capa final del producto en sí (tarjetas del
+   catálogo, destacados, relacionados) y cierra con los ajustes de mobile,
+   que si no quedarían pisados por lo de acá arriba.
+
+   Muchos `!important` de acá no son capricho: las reglas de las líneas
+   ~2909 y ~8108 ya usan `!important` sobre las mismas propiedades, así que
+   es la única forma de ganarles sin ir a reescribir media hoja.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Tokens de la vitrina — un solo lugar donde tocar el acento */
+  --vitrina-borde: rgba(181, 133, 68, 0.34);
+  --vitrina-borde-hover: rgba(200, 150, 62, 0.85);
+  --vitrina-sombra: 0 10px 26px rgba(120, 80, 40, 0.13);
+  --vitrina-sombra-hover: 0 26px 54px rgba(104, 66, 24, 0.26);
+  --vitrina-oro: linear-gradient(135deg, #e0ab3c 0%, #a9731e 100%);
+  --vitrina-oro-hover: linear-gradient(135deg, #efbe52 0%, #b8801f 100%);
+  --verde-stock: #2f7d4f;
+  --ambar-stock: #a86a12;
+}

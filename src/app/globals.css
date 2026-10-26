@@ -1,73 +1,7 @@
-:root {
-  --background: #efe2c9;
-  --surface: rgba(250, 244, 233, 0.9);
-  --surface-strong: #fff9ef;
-  --surface-dark: #1f150e;
-  --text: #2b1d13;
-  --muted: #6f5a46;
-  --line: rgba(88, 61, 28, 0.12);
-  --gold: #d2a23e;
-  --gold-strong: #a9731e;
-  --gold-soft: rgba(210, 162, 62, 0.16);
-  --success: #45674f;
-  --danger: #ab5443;
-  --shadow: 0 22px 60px rgba(89, 58, 24, 0.14);
-  /* Alias para componentes */
-  --accent: #d2a23e;
-  --border: rgba(88, 61, 28, 0.18);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-  max-width: 100vw;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  max-width: 100vw;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  color: var(--text);
-  background:
-    radial-gradient(circle at top center, rgba(255, 232, 170, 0.5), transparent 24%),
-    radial-gradient(circle at left 30%, rgba(214, 176, 102, 0.18), transparent 24%),
-    linear-gradient(180deg, #ead8ae 0%, #f3e7cf 36%, #f6efe4 100%);
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img {
-  max-width: 100%;
-}
-
-.page-shell {
-  width: min(1240px, calc(100vw - 20px));
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 16px 0 40px;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
+/* Reorganización en curso: lo que ya se separó entra por @import; el resto
+   sigue más abajo, tal cual estaba. */
+@import "./styles/tokens.css";
+@import "./styles/base.css";
 
 .site-header,
 .service-ribbon,
@@ -173,7 +107,6 @@ img {
   background: linear-gradient(180deg, transparent, rgba(210,162,62,0.25) 30%, rgba(210,162,62,0.25) 70%, transparent);
   flex-shrink: 0;
 }
-
 @media (max-width: 900px) {
   .info-banner-content {
     flex-wrap: wrap;
@@ -2246,7 +2179,6 @@ img {
   width: min(320px, 100%);
   height: auto;
 }
-
 @media (max-width: 1100px) {
   .site-header {
     flex-wrap: wrap;
@@ -2303,10 +2235,6 @@ img {
 }
 
 @media (max-width: 760px) {
-  .page-shell {
-    width: calc(100vw - 24px);
-    padding-top: 10px;
-  }
 
   /* Sucursales mobile: 2 columnas compactas */
   .home-branches-grid {
@@ -2470,7 +2398,6 @@ img {
   }
 }
 
-/* ── Mejoras generales mobile ─────────────────────────────────────────────── */
 @media (max-width: 760px) {
   /* Precio más pequeño en card mobile para que quepa */
   .price-tag {
@@ -3102,8 +3029,6 @@ img {
 .checkout-result-card {
   animation: fadeInUp 0.5s ease both;
 }
-
-/* ─── MOBILE CHECKOUT RESULT ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .checkout-result-card {
     padding: 28px 22px;
@@ -3880,6 +3805,7 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 .cf-app-btn {
   display: flex;
   flex-direction: column;
@@ -4571,8 +4497,6 @@ details[open] .cf-transfer-manual-toggle::before {
   display: grid;
   gap: 14px;
 }
-
-/* ─── CHECKOUT FLOW RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .cf-layout {
     grid-template-columns: 1fr;
@@ -4600,7 +4524,6 @@ details[open] .cf-transfer-manual-toggle::before {
   }
 }
 
-/* ─── QR SOLO EN ESCRITORIO ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .qr-desktop-only {
     display: none !important;
@@ -4817,7 +4740,6 @@ details[open] .cf-transfer-manual-toggle::before {
   color: var(--text);
 }
 
-
 /* ══════════════════════════════════════════════════════════════════════
    SKELETON LOADERS — loading state genérico reutilizable
    ══════════════════════════════════════════════════════════════════════ */
@@ -4912,7 +4834,6 @@ details[open] .cf-transfer-manual-toggle::before {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
-
 @media (max-width: 600px) {
   .loading-navbar   { padding: 12px 16px; }
   .loading-nav-links{ display: none; }
@@ -5161,7 +5082,6 @@ details[open] .cf-transfer-manual-toggle::before {
 }
 .aop-pagination button:disabled { opacity: 0.4; cursor: default; }
 .aop-pagination button:not(:disabled):hover { background: var(--background); }
-
 @media (max-width: 640px) {
   .aop-header { padding: 20px 16px 14px; }
   .aop-toolbar { padding: 12px 16px; }
@@ -5450,6 +5370,7 @@ details[open] .cf-transfer-manual-toggle::before {
 @media (max-width: 380px) {
   .admin-editor-fields { grid-template-columns: 1fr; }
 }
+
 .admin-field-label {
   display: flex;
   flex-direction: column;
@@ -5594,8 +5515,6 @@ details[open] .cf-transfer-manual-toggle::before {
   width: 14px;
   border-radius: 3px;
 }
-
-/* Tap feedback táctil en mobile */
 @media (hover: none) and (pointer: coarse) {
   .image-frame-btn:active {
     opacity: 0.85;
@@ -5739,8 +5658,6 @@ details[open] .cf-transfer-manual-toggle::before {
   font-size: 1rem;
   line-height: 2.4rem;
 }
-
-/* ─── RESPONSIVE: sobre nosotros y footer social ────────────────────────── */
 @media (max-width: 768px) {
   .about-story {
     grid-template-columns: 1fr;
@@ -5752,6 +5669,7 @@ details[open] .cf-transfer-manual-toggle::before {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
 @media (max-width: 480px) {
   .footer-grid {
     grid-template-columns: 1fr;
@@ -5947,7 +5865,6 @@ details[open] .cf-transfer-manual-toggle::before {
 .contact-branch-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
 .contact-branch-card strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
 .contact-branch-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
-
 @media (max-width: 600px) {
   .contact-hero { padding: 22px 20px; }
   .contact-hero-text h2 { font-size: 1.8rem; }
@@ -6246,10 +6163,10 @@ details[open] .cf-transfer-manual-toggle::before {
   background: rgba(210, 162, 62, 0.22);
   border-color: rgba(210, 162, 62, 0.5);
 }
-
 @media (max-width: 900px) {
   .trust-strip { grid-template-columns: repeat(2, 1fr); }
 }
+
 @media (max-width: 480px) {
   .trust-strip { grid-template-columns: 1fr; border-radius: 14px; }
   .trust-item { padding: 14px 16px; }
@@ -6528,14 +6445,12 @@ details[open] .cf-transfer-manual-toggle::before {
   transition: background 0.12s;
 }
 .featured-remove-btn:hover { background: rgba(171,84,67,0.1); }
-
 @media (max-width: 600px) {
   .card-initial { font-size: 2.4rem; }
   .card-badge { font-size: 0.65rem; padding: 2px 7px; }
   .product-desc-preview { font-size: 0.75rem; }
 }
 
-/* ─── DESKTOP ONLY ───────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }
   .main-nav { display: none !important; }
@@ -6784,10 +6699,6 @@ details[open] .cf-transfer-manual-toggle::before {
   transform: translateX(-2px);
 }
 .back-btn svg { flex-shrink: 0; }
-
-/* ─── CATÁLOGO MOBILE — diseño moderno ───────────────────────────────────── */
-
-/* Categoria pills: scroll horizontal en mobile (sin wrapping) */
 @media (max-width: 768px) {
   .category-rail {
     flex-wrap: nowrap !important;
@@ -6840,7 +6751,6 @@ details[open] .cf-transfer-manual-toggle::before {
   }
 }
 
-/* 2 columnas con diseño moderno */
 @media (max-width: 540px) {
   .catalog-grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -7341,8 +7251,6 @@ details[open] .cf-transfer-manual-toggle::before {
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(89, 58, 24, 0.12);
 }
-
-/* ── Mejoras extra mobile ────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .cf-btn-primary,
   .cf-google-btn,
@@ -7434,7 +7342,6 @@ details[open] .cf-transfer-manual-toggle::before {
   text-decoration: none;
   white-space: nowrap;
 }
-
 @media (min-width: 761px) {
   .sticky-cart-bar { display: none; }
 }
@@ -7571,13 +7478,6 @@ details[open] .cf-transfer-manual-toggle::before {
   filter: grayscale(30%);
 }
 
-/* ── Mejor padding del page shell para no ocultar el sticky bar ─────────── */
-@media (max-width: 760px) {
-  .page-shell {
-    padding-bottom: 88px;
-  }
-}
-
 /* ── Total bar en paso de pago ───────────────────────────────────────────── */
 .cf-total-bar {
   display: flex;
@@ -7609,13 +7509,10 @@ details[open] .cf-transfer-manual-toggle::before {
   font-size: 0.75rem;
   font-weight: 800;
 }
-
-/* ── Hero título mobile más grande ─────────────────────────────────────── */
 @media (max-width: 760px) {
   .hero-home h1 {
     font-size: clamp(2.2rem, 10vw, 3.5rem) !important;
   }
-
 }
 
 /* Payment methods marquee strip */
@@ -7683,8 +7580,6 @@ details[open] .cf-transfer-manual-toggle::before {
   border-radius: 6px;
   display: block;
 }
-
-/* ── Hero mobile: imagen full-bleed arriba + bienvenida ────────────────── */
 @media (max-width: 760px) {
   /* Imagen va de borde a borde en el hero card */
   .hero-home-brand .brand-panel.editorial {
@@ -7987,8 +7882,6 @@ details[open] .cf-transfer-manual-toggle::before {
   white-space: nowrap;
   flex-shrink: 0;
 }
-
-/* Mobile: ajustes */
 @media (max-width: 760px) {
   .welcome-section {
     border-radius: 24px;
@@ -8017,18 +7910,6 @@ details[open] .cf-transfer-manual-toggle::before {
     min-height: 54px;
     font-size: 0.95rem;
   }
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   OVERHAUL VISUAL — diseño premium, wow factor, menos blanco
-   ══════════════════════════════════════════════════════════════════ */
-
-/* ── Fondo general: más rico, más cálido, menos blanco ──────── */
-body {
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 218, 110, 0.28), transparent),
-    radial-gradient(ellipse 50% 60% at 90% 40%, rgba(195, 130, 45, 0.13), transparent),
-    linear-gradient(170deg, #dfc799 0%, #ebd9b0 22%, #f3e6cc 55%, #f8f0df 100%);
 }
 
 /* ── Hero: oscuro, lujoso, inmersivo ────────────────────────── */
@@ -8140,7 +8021,6 @@ body {
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22) !important;
 }
 
-
 /* ── Header: sutil toque oscuro cuando scrollea ──────────────── */
 .site-header {
   background: linear-gradient(135deg, rgba(250,244,232,0.95) 0%, rgba(248,238,218,0.92) 100%) !important;
@@ -8212,8 +8092,6 @@ body {
   border-color: rgba(210, 162, 62, 0.5) !important;
   color: #f6e0a6 !important;
 }
-
-/* ── Mobile: adaptar secciones oscuras ───────────────────────── */
 @media (max-width: 760px) {
   /* El fade del hero apunta al color oscuro del hero */
   .hero-home-brand .brand-panel.editorial::after {
@@ -8226,9 +8104,6 @@ body {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   ADMIN MOBILE — catálogo fácil de gestionar desde el celular
-   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
   /* ── Barra de herramientas admin ──────────────────────────── */
@@ -8476,16 +8351,11 @@ body {
 .mobile-nav-toggle span {
   background: #4a2c14 !important;
 }
-
 @media (max-width: 1100px) {
   .site-header { padding: 8px 10px 8px 18px; }
   .main-nav { width: auto; }
 }
 
-/* Centrar los links respecto a TODA la barra (no solo el espacio libre entre
-   logo y acciones) — como logo y acciones no miden lo mismo, flex:1 +
-   justify-content:center corría la píldora hacia un lado. Con position:
-   absolute + left:50% queda centrada de verdad sobre el bar completo. */
 @media (min-width: 1101px) {
   /* .site-header ya es position:sticky, que también sirve de contenedor
      para el position:absolute de abajo — no hace falta position:relative. */
@@ -8496,31 +8366,6 @@ body {
     transform: translate(-50%, -50%);
     flex: 0 0 auto;
   }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   VITRINA — capa final de producto
-   ───────────────────────────────────────────────────────────────────────
-   Esta hoja está construida por capas: reglas viejas más arriba y ajustes
-   más abajo. Este bloque es la capa final del producto en sí (tarjetas del
-   catálogo, destacados, relacionados) y cierra con los ajustes de mobile,
-   que si no quedarían pisados por lo de acá arriba.
-
-   Muchos `!important` de acá no son capricho: las reglas de las líneas
-   ~2909 y ~8108 ya usan `!important` sobre las mismas propiedades, así que
-   es la única forma de ganarles sin ir a reescribir media hoja.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-:root {
-  /* Tokens de la vitrina — un solo lugar donde tocar el acento */
-  --vitrina-borde: rgba(181, 133, 68, 0.34);
-  --vitrina-borde-hover: rgba(200, 150, 62, 0.85);
-  --vitrina-sombra: 0 10px 26px rgba(120, 80, 40, 0.13);
-  --vitrina-sombra-hover: 0 26px 54px rgba(104, 66, 24, 0.26);
-  --vitrina-oro: linear-gradient(135deg, #e0ab3c 0%, #a9731e 100%);
-  --vitrina-oro-hover: linear-gradient(135deg, #efbe52 0%, #b8801f 100%);
-  --verde-stock: #2f7d4f;
-  --ambar-stock: #a86a12;
 }
 
 /* ── Grilla: un poco más de aire, entrada escalonada ───────────────────── */
@@ -8876,7 +8721,6 @@ body {
   background: rgba(210, 162, 62, 0.32);
   color: var(--text);
 }
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -8893,7 +8737,6 @@ body {
   }
 }
 
-/* ── Mobile: va último para no quedar pisado por el bloque de arriba ───── */
 @media (max-width: 540px) {
   /* El :not() es necesario: la grilla de admin es de 1 columna y se define
      más arriba en la hoja, así que sin esto este bloque se la pisaría. */
@@ -8973,10 +8816,6 @@ body {
 .branch-stock-count {
   color: var(--text);
 }
-
-/* ── Admin en mobile: los colores asumían tarjetas oscuras ─────────────── */
-/* Las tarjetas ahora son crema, así que el botón "Destacar" y el separador
-   del panel quedaban en blanco sobre blanco. */
 @media (max-width: 768px) {
   .catalog-grid--admin .admin-panel {
     border-top: 1px solid rgba(181, 133, 68, 0.22);
@@ -9285,8 +9124,6 @@ body {
   flex-shrink: 0;
   padding-left: 2px;
 }
-
-/* ── Mobile: filtros pensados para el pulgar ───────────────────────────── */
 @media (max-width: 760px) {
   .catalog-filter-row {
     flex-wrap: wrap;
@@ -9345,40 +9182,6 @@ body {
     width: 15px;
     height: 15px;
   }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   FONDO DE LA PÁGINA
-   ───────────────────────────────────────────────────────────────────────
-   El degradado estaba puesto sobre <body>, así que se estiraba a lo largo
-   de TODO el documento: en el catálogo, que mide varias pantallas, lo que
-   se ve en cada momento es una franja mínima del degradado — o sea, un
-   amarillo plano y lavado.
-
-   La solución es un pseudo-elemento fijo al viewport: el degradado siempre
-   se dibuja del alto de la pantalla y se percibe como tal. Va en ::before
-   fijo en vez de `background-attachment: fixed` porque este último tiene
-   problemas conocidos de scroll en iOS.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-body {
-  background: #f4ecdc;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    /* luz cálida cayendo desde arriba */
-    radial-gradient(ellipse 92% 52% at 50% -8%, rgba(255, 228, 156, 0.55), transparent 68%),
-    /* reflejo lateral, rompe la simetría */
-    radial-gradient(ellipse 55% 58% at 104% 26%, rgba(196, 146, 66, 0.16), transparent 66%),
-    /* apoyo en la base, da profundidad */
-    radial-gradient(ellipse 78% 44% at -6% 92%, rgba(163, 118, 52, 0.13), transparent 68%),
-    linear-gradient(168deg, #f0e4cd 0%, #f6eedd 34%, #f9f3e7 66%, #fcf8f0 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -9549,7 +9352,6 @@ body::before {
   font-size: 0.92rem;
   border-radius: 12px;
 }
-
 @media (max-width: 540px) {
   .measure-chips {
     padding: 7px 10px 0;
@@ -9644,7 +9446,6 @@ body::before {
 .detail-delivery-free strong {
   font-weight: 800;
 }
-
 @media (max-width: 540px) {
   .card-free-shipping {
     font-size: 0.7rem;
@@ -9794,7 +9595,6 @@ body::before {
     drop-shadow(0 1px 3px rgba(90, 55, 15, 0.5))
     contrast(1.15) saturate(1.1);
 }
-
 @media (max-width: 540px) {
   .welcome-social {
     gap: 8px;
@@ -10036,7 +9836,6 @@ body::before {
 .info-banner-destacado {
   color: #7ee2a8 !important;
 }
-
 @media (max-width: 900px) {
   .pino-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -10145,7 +9944,6 @@ body::before {
   margin-top: 2px;
   color: var(--gold-strong);
 }
-
 @media (max-width: 540px) {
   .cf-dia-entrega-opts { grid-template-columns: 1fr; }
   .cf-cuotas-nota { font-size: 0.8rem; padding: 11px 12px; }
@@ -10325,7 +10123,6 @@ button.aop-back-btn:disabled {
 
 .aop-avisos-resultado.is-ok { color: #2f6b45; }
 .aop-avisos-resultado.is-error { color: #a4412f; }
-
 @media (max-width: 640px) {
   .aop-avisos { margin: 10px 12px 0; padding: 14px; }
   .aop-avisos-botones { flex-direction: column; }
