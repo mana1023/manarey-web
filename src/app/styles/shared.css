@@ -7,43 +7,28 @@
    ──────────────────────────────────────────────────────────────────────────── */
 
 .site-header,
-.service-ribbon,
 .hero-home,
-.trust-strip,
 .home-invite,
 .showcase-section,
-.catalog-hero,
 .catalog-tools,
 .content-hero,
-.info-card,
-.contact-box,
 .help-strip,
 .help-card,
 .product-card,
 .warning-banner,
-.detail-modal,
-.modal-card {
+.detail-modal {
   border: 1px solid var(--line);
   background: var(--surface);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
 }
 
-.header-brand-copy span,
-.header-link,
-.product-description-preview,
-.product-meta-row,
-.catalog-summary,
 .description,
 .meta-line,
 .availability,
-.contact-box p,
 .help-card p,
-.info-card p,
-.hero-home-text,
 .showcase-overlay p,
-.showcase-mini-copy p,
-.visual-caption {
+.showcase-mini-copy p {
   color: var(--muted);
 }
 
@@ -52,8 +37,6 @@
 .hero-home-actions,
 .showcase-top,
 .category-rail,
-.product-badges,
-.product-meta-row,
 .detail-topline {
   display: flex;
   flex-wrap: wrap;
@@ -65,8 +48,7 @@
 .ghost-button,
 .showcase-tab,
 .category-pill,
-.sort-select,
-.header-link {
+.sort-select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -97,10 +79,7 @@
 }
 
 .primary-button,
-.hero-buy-button,
-.upload-button,
-.big-action,
-.cart-checkout {
+.hero-buy-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,10 +93,8 @@
 }
 
 .hero-home,
-.trust-strip,
 .home-invite,
 .showcase-section,
-.catalog-hero,
 .catalog-tools,
 .content-hero,
 .help-strip,
@@ -127,7 +104,6 @@
 }
 
 .hero-home h1,
-.catalog-hero h2,
 .content-hero h2,
 .home-invite h2,
 .showcase-heading h2,
@@ -139,27 +115,18 @@
 }
 
 .hero-metrics,
-.trust-grid,
 .category-highlight-grid,
 .catalog-grid,
-.about-grid,
-.contact-grid,
 .help-grid,
-.related-grid,
-.dimension-row,
-.editor-actions {
+.related-grid {
   display: grid;
   gap: 18px;
 }
 
-.trust-card,
 .product-card,
 .showcase-mini-card,
 .showcase-main-card,
 .category-highlight-card,
-.service-pill,
-.info-card,
-.contact-box,
 .help-card,
 .related-card {
   transition:
@@ -168,14 +135,10 @@
     border-color 0.22s ease;
 }
 
-.trust-card:hover,
 .product-card:hover,
 .showcase-mini-card:hover,
 .showcase-main-card:hover,
 .category-highlight-card:hover,
-.service-pill:hover,
-.info-card:hover,
-.contact-box:hover,
 .help-card:hover,
 .related-card:hover {
   transform: translateY(-4px);
@@ -196,10 +159,7 @@
 
 .showcase-overlay h3,
 .showcase-mini-copy h4,
-.info-card h3,
-.contact-box h3,
-.help-card h3,
-.product-header h2 {
+.help-card h3 {
   margin: 0;
 }
 
@@ -224,20 +184,6 @@
   transform: scale(1.04);
 }
 
-.editor-grid,
-.login-form {
-  display: grid;
-  gap: 12px;
-}
-
-.dimension-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.editor-actions {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .modal-backdrop {
   z-index: 45;
   display: grid;
@@ -246,12 +192,6 @@
   background: rgba(24, 16, 9, 0.42);
   overscroll-behavior: contain;
   overflow: hidden;
-}
-
-.modal-card {
-  width: min(420px, 100%);
-  padding: 24px;
-  border-radius: 24px;
 }
 
 .reveal-block {
@@ -268,13 +208,6 @@
 .error-text {
   margin: 0;
   color: var(--danger);
-}
-@media (max-width: 760px) {
-
-  .dimension-row,
-  .editor-actions {
-    grid-template-columns: 1fr;
-  }
 }
 
 .secondary-button:hover:not(:disabled),
@@ -346,10 +279,7 @@
    blanco sobre dorado daba 2.74. Se mantiene el dorado brillante (es el
    acento de la marca) y el texto pasa a espresso → 5.69. */
 .primary-button,
-.hero-buy-button,
-.upload-button,
-.big-action,
-.cart-checkout {
+.hero-buy-button {
   color: var(--text);
   font-weight: 700;
 }

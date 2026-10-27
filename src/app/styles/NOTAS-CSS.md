@@ -20,12 +20,29 @@ Se fueron 87 reglas enteras, 2 bloques `@media` que quedaron sin nada adentro,
 selectores se sacó la pieza muerta (`.cf-guest-btn` salió de
 `.cf-btn-primary, .cf-google-btn, .cf-guest-btn`, que siguen ahí).
 
+**2026-10-26 — las 27 clases muertas de `shared.css`** (punto 1, segunda
+tanda). La "cinta de servicios" vieja de la home (`.service-ribbon`,
+`.service-pill`), las tarjetas que ya no se dibujan (`.info-card`,
+`.contact-box`, `.trust-strip`, `.trust-card`, `.catalog-hero`,
+`.product-header`) y restos del editor (`.editor-grid`, `.editor-actions`,
+`.dimension-row`, `.login-form`, `.modal-card`). `shared.css` pasó de 355
+líneas a 285.
+
+Acá casi todo el trabajo fue recortar listas: estas clases viajaban dentro de
+12 listas largas de selectores compartidas con cosas que sí se usan, así que
+de cada lista se sacaron sólo las piezas muertas. Además se fueron 5 reglas
+enteras y un `@media (max-width: 760px)` que quedó sin nada adentro.
+
+Ojo: varias de esas clases también tienen reglas en `layout.css`, `home.css`
+y `catalog.css`. Esas siguen ahí (ver más abajo), así que `.service-ribbon` y
+compañía todavía aparecen en la hoja, aunque ya no puedan pintar nada.
+
 Todo lo demás de esta lista sigue en su lugar y la web se ve exactamente igual
 que antes. Cómo se comprobó, al final del archivo.
 
 ---
 
-## 1. Clases que no existen en ninguna pantalla (122, quedan 64)
+## 1. Clases que no existen en ninguna pantalla (122, quedan 37)
 
 Estas clases están escritas en el CSS pero no aparecen en ningún archivo
 `.jsx`/`.js` del proyecto. O sea: el navegador lee esas reglas y nunca
@@ -99,7 +116,12 @@ antes de borrarlas.
 - `.qr-image` — 1 regla(s), línea(s) 19
 - `.qr-modal` — 1 regla(s), línea(s) 6
 
-### `src/app/styles/shared.css` — 27
+### ~~`src/app/styles/shared.css` — 27~~ — BORRADAS el 2026-10-26
+
+Igual que arriba: quedan como registro, con las líneas que tenían antes.
+Varias de estas clases **siguen teniendo reglas en otros archivos**, que no se
+tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
+`catalog.css`, `admin.css`, `cart.css` y `skeletons.css`.
 
 - `.info-card` — 9 regla(s), línea(s) 9, 32, 155, 171, 197, 280, 287, 292, 591
 - `.service-ribbon` — 8 regla(s), línea(s) 9, 554, 559, 566, 576, 581, 720, 1053
@@ -1156,6 +1178,35 @@ algo si su selector le apunta a algún elemento:
 7. **Contra el build de producción**, comparando el CSS minificado de antes
    con el de ahora: de las 370 declaraciones que dejó de emitir, 369 son las
    borradas. La que sobra se explica abajo.
+
+### La segunda tanda: `shared.css`
+
+Mismo método, con dos cosas distintas por ser una hoja compartida:
+
+- Casi todo fue **recortar listas, no borrar reglas**: 12 listas largas de
+  selectores donde convivían clases vivas y muertas. De cada una se sacaron
+  sólo las piezas muertas, dejando las demás con la misma sangría y en el
+  mismo renglón que tenían. Las 329 declaraciones que quedan son, una por una
+  y en el mismo orden, las mismas 329 de antes.
+- En pantalla hubo que mirar más cosas, porque `shared.css` pinta todo el
+  sitio: inicio, catálogo, ficha, carrito, el modal de "Iniciar sesión",
+  checkout, páginas de resultado, arrepentimiento y privacidad, a 1280px,
+  700px (el corte de 760) y 390px. Cero diferencias. Para lo del editor del
+  admin, que no se puede abrir, se usó de nuevo un elemento por cada uno de
+  los 77 selectores que quedaron. Cero diferencias.
+- Contra el build de producción: las 138 declaraciones que dejó de emitir son
+  todas de clases muertas, ninguna sin explicar.
+
+Dos cosas que conviene saber:
+
+- `.service-ribbon`, `.info-card`, `.contact-box` y varias más **también
+  tienen reglas en `layout.css`, `home.css` y `catalog.css`**, que no se
+  tocaron. Siguen sin poder pintar nada, pero siguen ocupando lugar.
+- El encabezado grande de **CONTRASTE (WCAG AA)** casi se va de paseo: sus
+  primeras reglas estaban muertas, pero el bloque explica decisiones de toda
+  la hoja y abajo siguen las reglas vivas, cada una con su propio comentario.
+  Un encabezado se borra sólo si se borraron todas las reglas que encabezaba,
+  y nunca el comentario de arriba de todo del archivo.
 
 ### La única diferencia en el archivo compilado
 
