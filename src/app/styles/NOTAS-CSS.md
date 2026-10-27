@@ -1093,3 +1093,15 @@ costa de varios archivos extra.
 4. Para el panel de pedidos y los placeholders de carga, que no se pueden
    abrir sin entrar como administrador, se dibujó el markup aparte y se
    comparó igual.
+5. Lo mismo contra el sitio compilado para producción (`npm run build` +
+   `npm run start`), que no es igual al de desarrollo: ahí el CSS sale
+   minificado y partido en dos archivos. También da cero diferencias, y los
+   dos archivos se cargan en el orden correcto.
+
+### Lo que no se pudo probar en pantalla
+
+- Los pasos del checkout posteriores a "Ingresá para continuar" (envío, forma
+  de pago, transferencia): hay que entrar con una cuenta y no se quiso crear
+  una contra la base de datos real. Esa parte quedó cubierta por el análisis
+  del CSS, que no encontró ningún cambio de orden en `checkout.css`.
+- El panel `/admin` de verdad, por lo mismo. Se probó con el markup copiado.
