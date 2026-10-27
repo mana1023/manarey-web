@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d2a23e;
+  color: var(--gold);
   box-shadow: 0 0 18px rgba(210, 162, 62, 0.12);
 }
 
@@ -260,7 +260,7 @@
   height: 20px;
   padding: 0 5px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #d2a23e, #b8841e);
+  background: linear-gradient(135deg, var(--gold), #b8841e);
   color: #fff9f0;
   font-size: 0.7rem;
   font-weight: 700;
@@ -1166,7 +1166,7 @@
 .site-header .cart-button {
   background: linear-gradient(135deg, #e8ac3e 0%, #a3651c 100%) !important;
   border: 2px solid rgba(255, 250, 235, 0.85) !important;
-  color: #fff9ef !important;
+  color: var(--surface-strong) !important;
   border-radius: 50% !important;
   width: 44px;
   height: 44px;

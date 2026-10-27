@@ -901,7 +901,7 @@
   flex-shrink: 0;
 }
 .home-branches-all-btn:hover {
-  background: rgba(210, 162, 62, 0.16);
+  background: var(--gold-soft);
   border-color: var(--gold);
   transform: translateX(2px);
 }
@@ -1270,7 +1270,7 @@
 
 /* Comprar por la web — dorado Manarey */
 .welcome-btn-catalog {
-  background: linear-gradient(135deg, #d2a23e 0%, #a9731e 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
   color: #fff9f0;
   box-shadow: 0 8px 28px rgba(169, 115, 30, 0.4);
 }
@@ -1333,7 +1333,7 @@
 }
 .welcome-btn-locations svg:first-child {
   flex-shrink: 0;
-  color: #d2a23e;
+  color: var(--gold);
 }
 .welcome-btn-locations svg:last-child {
   margin-left: auto;
@@ -1379,7 +1379,7 @@
 }
 .welcome-location-cta {
   font-size: 0.78rem;
-  color: #d2a23e;
+  color: var(--gold);
   font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;

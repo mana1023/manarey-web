@@ -109,14 +109,14 @@
   font-size: clamp(1.7rem, 5vw, 2.4rem);
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .checkout-result-body {
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.7;
-  color: #6f5a46;
+  color: var(--muted);
   max-width: 48ch;
 }
 
@@ -126,7 +126,7 @@
   padding: 20px;
   border-radius: 20px;
   background: rgba(210, 162, 62, 0.07);
-  border: 1px solid rgba(210, 162, 62, 0.16);
+  border: 1px solid var(--gold-soft);
 }
 
 .checkout-result-step {
@@ -134,7 +134,7 @@
   align-items: center;
   gap: 14px;
   font-size: 0.97rem;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .step-num {
@@ -143,7 +143,7 @@
   min-width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d2a23e, #a9731e);
+  background: linear-gradient(135deg, var(--gold), var(--gold-strong));
   color: #fff9f0;
   font-size: 0.82rem;
   font-weight: 700;
@@ -191,7 +191,7 @@
 .checkout-pickup-branch {
   font-size: 1.2rem;
   font-weight: 800;
-  color: #2b1d13;
+  color: var(--text);
   margin: 0;
 }
 
@@ -253,7 +253,7 @@
 }
 
 .checkout-result-cta--primary {
-  background: linear-gradient(135deg, #d2a23e, #a9731e);
+  background: linear-gradient(135deg, var(--gold), var(--gold-strong));
   color: #fff9f0;
   box-shadow: 0 10px 24px rgba(169, 115, 30, 0.28);
 }
@@ -271,7 +271,7 @@
 
 .checkout-result-cta--secondary:hover {
   border-color: rgba(210, 162, 62, 0.5);
-  color: #2b1d13;
+  color: var(--text);
   background: rgba(210, 162, 62, 0.06);
 }
 
@@ -415,7 +415,7 @@
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-error {
@@ -444,7 +444,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-card-header {
@@ -495,7 +495,7 @@
   padding: 14px 28px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #d2a23e, #a9731e);
+  background: linear-gradient(135deg, var(--gold), var(--gold-strong));
   color: #fff9f0;
   font: inherit;
   font-weight: 700;
@@ -524,10 +524,10 @@
   gap: 12px;
   min-height: 52px;
   padding: 14px 24px;
-  border: 1.5px solid rgba(88, 61, 28, 0.18);
+  border: 1.5px solid var(--border);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
-  color: #2b1d13;
+  color: var(--text);
   font: inherit;
   font-size: 1rem;
   font-weight: 600;
@@ -556,7 +556,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: rgba(88, 61, 28, 0.12);
+  background: var(--line);
 }
 
 /* Auth tabs */
@@ -564,7 +564,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  border: 1px solid rgba(88, 61, 28, 0.12);
+  border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -627,7 +627,7 @@
   display: block;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-mode-btn > div > span {
@@ -664,7 +664,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 14px 18px;
-  border: 1.5px solid rgba(88, 61, 28, 0.12);
+  border: 1.5px solid var(--line);
   border-radius: 14px;
   background: #fff;
   cursor: pointer;
@@ -693,7 +693,7 @@
 
 .cf-branch-name {
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
   font-size: 0.95rem;
 }
 
@@ -725,7 +725,7 @@
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(69, 103, 79, 0.12);
-  color: #45674f;
+  color: var(--success);
   white-space: nowrap;
   flex-shrink: 0;
   margin-top: 2px;
@@ -770,7 +770,7 @@
 
 .cf-payment-btn strong {
   font-size: 1rem;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-payment-btn span {
@@ -900,6 +900,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* El marrón oscuro de este panel coincide con --text por casualidad: es un
+     fondo, no un texto, así que no se engancha al token. */
   background: linear-gradient(135deg, #2b1d13 0%, #1a0e00 100%);
   border: 1px solid rgba(201,160,64,0.3);
   border-radius: 14px;
@@ -944,7 +946,7 @@
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2b1d13;
+  color: var(--text);
 }
 .cf-transfer-apps-hint {
   margin: -8px 0 0;
@@ -983,7 +985,7 @@
 .cf-copy-field-value {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2b1d13;
+  color: var(--text);
   word-break: break-all;
   font-family: ui-monospace, SFMono-Regular, monospace;
 }
@@ -1005,7 +1007,7 @@
 }
 .cf-copy-btn:hover {
   border-color: #C9A040;
-  color: #2b1d13;
+  color: var(--text);
 }
 .cf-copy-btn--ok {
   background: #f0fdf4;
@@ -1041,7 +1043,7 @@
   margin: 0;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
 }
 .cf-app-grid {
   display: grid;
@@ -1080,7 +1082,7 @@
 .cf-app-name {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
   text-align: center;
   line-height: 1.2;
 }
@@ -1125,7 +1127,7 @@ details[open] .cf-transfer-manual-toggle::before {
 .cf-transfer-title {
   margin: 0;
   font-weight: 600;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-transfer-grid {
@@ -1154,7 +1156,7 @@ details[open] .cf-transfer-manual-toggle::before {
 
 .cf-transfer-method strong {
   font-size: 0.95rem;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-transfer-method p {
@@ -1172,7 +1174,7 @@ details[open] .cf-transfer-manual-toggle::before {
   border: 1px solid rgba(210, 162, 62, 0.2);
   font-family: monospace;
   font-size: 0.95rem;
-  color: #2b1d13;
+  color: var(--text);
   letter-spacing: 0.04em;
   word-break: break-all;
 }
@@ -1695,7 +1697,7 @@ details[open] .cf-transfer-manual-toggle::before {
 .cf-summary-item-info {
   display: grid;
   gap: 2px;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .cf-summary-item-info small {
@@ -1725,7 +1727,7 @@ details[open] .cf-transfer-manual-toggle::before {
   padding: 14px 16px;
   border-radius: 14px;
   background: rgba(210, 162, 62, 0.1);
-  border: 1px solid rgba(210, 162, 62, 0.16);
+  border: 1px solid var(--gold-soft);
 }
 
 .cf-summary-total strong {
@@ -1790,7 +1792,7 @@ details[open] .cf-transfer-manual-toggle::before {
   border: 2px solid rgba(88, 61, 28, 0.14);
   border-radius: 999px;
   background: rgba(255, 252, 244, 0.9);
-  color: #2b1d13;
+  color: var(--text);
   font: inherit;
   font-size: 1rem;
   font-weight: 600;

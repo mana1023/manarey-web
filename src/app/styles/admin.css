@@ -558,7 +558,7 @@
 .admin-editor-tag--green {
   background: rgba(69,103,79,0.08);
   border: 1px solid rgba(69,103,79,0.2);
-  color: #45674f;
+  color: var(--success);
 }
 .admin-editor-tag--warn {
   background: #fff9e6;
@@ -971,7 +971,7 @@
   margin-top: 0.15rem;
   flex-shrink: 0;
   cursor: pointer;
-  accent-color: #ab5443;
+  accent-color: var(--danger);
 }
 .admin-ocultar-toggle span {
   display: flex;
@@ -1174,7 +1174,7 @@ button.aop-back-btn:disabled {
 }
 
 .aop-avisos--apagado {
-  border-color: #d2a23e;
+  border-color: var(--gold);
   background: #fff7e6;
 }
 
@@ -1187,7 +1187,7 @@ button.aop-back-btn:disabled {
   margin: 0 0 6px;
   font-size: 1.02rem;
   font-weight: 700;
-  color: #2b1d13;
+  color: var(--text);
 }
 
 .aop-avisos-texto {

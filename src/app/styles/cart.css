@@ -107,7 +107,7 @@
     width: 36px;
     height: 4px;
     border-radius: 2px;
-    background: rgba(88,61,28,0.18);
+    background: var(--border);
     position: absolute;
     top: 8px;
     left: 50%;

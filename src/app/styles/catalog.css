@@ -921,7 +921,7 @@
   gap: 5px;
   padding: 4px 10px 4px 6px;
   border-radius: 999px;
-  border: 1.5px solid rgba(88, 61, 28, 0.12);
+  border: 1.5px solid var(--line);
   background: rgba(255, 251, 243, 0.8);
   cursor: pointer;
   font-size: 0.78rem;
@@ -2678,7 +2678,7 @@
 
 .product-card .color-swatches--texto .color-swatch.active {
   border-color: #a97b2c;
-  background: rgba(210, 162, 62, 0.16);
+  background: var(--gold-soft);
 }
 
 .color-swatches--texto .color-swatch.active .color-swatch-label {
