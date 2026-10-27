@@ -2,16 +2,30 @@
 
 Lista armada el 2026-10-26, al separar `globals.css` en varios archivos.
 
-**No se borró nada.** Todo lo que está acá abajo sigue en su lugar y la web
-se ve exactamente igual que antes. Es una lista para que decidas qué sacar:
-cada cosa que se saque hace la hoja más corta y más fácil de entender, pero
-conviene sacarlas de a poco y mirando la pantalla que toca.
+Es una lista para que decidas qué sacar: cada cosa que se saque hace la hoja
+más corta y más fácil de entender, pero conviene sacarlas de a poco y mirando
+la pantalla que toca.
 
 Los números de línea son los de este commit. Si editás los archivos, se corren.
 
+## Lo que ya se borró
+
+**2026-10-26 — las 58 clases muertas de `checkout.css`** (punto 1, primera
+tanda). Eran los restos del checkout viejo: el QR de Mercado Pago, el selector
+de cuotas, elegir la app del banco, la transferencia manual. `checkout.css`
+pasó de 1.954 líneas a 1.337.
+
+Se fueron 87 reglas enteras, 2 bloques `@media` que quedaron sin nada adentro,
+8 encabezados de sección que quedaron sin reglas debajo, y de una sola lista de
+selectores se sacó la pieza muerta (`.cf-guest-btn` salió de
+`.cf-btn-primary, .cf-google-btn, .cf-guest-btn`, que siguen ahí).
+
+Todo lo demás de esta lista sigue en su lugar y la web se ve exactamente igual
+que antes. Cómo se comprobó, al final del archivo.
+
 ---
 
-## 1. Clases que no existen en ninguna pantalla (122)
+## 1. Clases que no existen en ninguna pantalla (122, quedan 64)
 
 Estas clases están escritas en el CSS pero no aparecen en ningún archivo
 `.jsx`/`.js` del proyecto. O sea: el navegador lee esas reglas y nunca
@@ -21,7 +35,10 @@ La búsqueda es deliberadamente generosa (alcanza con que el nombre aparezca
 en cualquier parte de cualquier archivo del front), así que si una clase está
 en esta lista es porque realmente no se usa.
 
-### `src/app/styles/checkout.css` — 58
+### ~~`src/app/styles/checkout.css` — 58~~ — BORRADAS el 2026-10-26
+
+Quedan listadas como registro de lo que se sacó. Las líneas son las que tenían
+antes de borrarlas.
 
 - `.cf-transfer-submethod-btn` — 5 regla(s), línea(s) 1358, 1372, 1382, 1389, 1394
 - `.cf-transfer-manual-toggle` — 4 regla(s), línea(s) 1102, 1114, 1115, 1120
@@ -169,12 +186,12 @@ en esta lista es porque realmente no se usa.
 
 ### Lo más gordo de todo esto
 
-La mitad de `checkout.css` que no se usa (`.cf-transfer-method`,
+La mitad de `checkout.css` que no se usaba (`.cf-transfer-method`,
 `.cf-installment-*`, `.cf-app-*`, `.cf-mp-*`, `.cf-qr-*`,
-`.cf-surcharge-*`, `.cf-boleta-link`, `.cf-guest-btn`…) son restos de
+`.cf-surcharge-*`, `.cf-boleta-link`, `.cf-guest-btn`…) eran restos de
 versiones anteriores del checkout: el pago con QR de Mercado Pago, el
 selector de cuotas, el elegir la app del banco, la transferencia manual.
-Nada de eso está hoy en `checkout-flow.jsx`.
+Nada de eso está hoy en `checkout-flow.jsx`. **Ya se borraron.**
 
 `.service-ribbon` y `.service-pill*` son la "cinta de servicios" vieja de
 la home, reemplazada por el banner informativo. Son ~15 reglas repartidas
@@ -1105,3 +1122,46 @@ costa de varios archivos extra.
   una contra la base de datos real. Esa parte quedó cubierta por el análisis
   del CSS, que no encontró ningún cambio de orden en `checkout.css`.
 - El panel `/admin` de verdad, por lo mismo. Se probó con el markup copiado.
+
+---
+
+## Cómo se comprobó el borrado del 2026-10-26
+
+Borrar es más fácil de comprobar que mover, porque una regla sólo puede pintar
+algo si su selector le apunta a algún elemento:
+
+1. **Ninguno de los 88 selectores que se fueron podía apuntar a nada.** Cada
+   uno nombra al menos una clase que no aparece en ningún archivo del
+   proyecto, buscando el nombre suelto en todo `src/` (no sólo en los
+   `className`). Se comprobó dos veces, con dos programas distintos.
+2. **Las clases que se arman en pedazos no esconden ninguna.** En el JSX hay
+   clases escritas como `` `cf-dia-btn${activo ? " active" : ""}` ``, pero
+   ninguna se arma pegando una variable: siempre son textos enteros, así que
+   la búsqueda del punto 1 las ve.
+3. **Una clase muerta dentro de un `:not()` no cuenta.** `.algo:not(.muerta)`
+   sí le apunta a algo. Sólo se borró un selector cuando la clase muerta es
+   obligatoria para que apunte.
+4. **Lo que quedó está igual y en el mismo orden.** Las 773 declaraciones que
+   siguen en `checkout.css` son, una por una y en el mismo orden, las mismas
+   773 de antes: ni una cambió de valor ni de lugar. Eso es lo que decide
+   quién gana cuando dos reglas pelean con la misma fuerza.
+5. **En pantalla, contra la hoja de antes**, con el mismo método del punto 3
+   de más arriba: inicio, catálogo, ficha de producto, carrito, checkout, las
+   tres páginas de resultado, arrepentimiento y privacidad, en escritorio
+   (1280px) y en celular (390px). Cero diferencias.
+6. **Los pasos del checkout a los que no se llega sin cuenta** se cubrieron
+   dibujando un elemento por cada uno de los 153 selectores que quedaron en
+   `checkout.css` y comparando igual, en escritorio y en celular. Cero
+   diferencias.
+7. **Contra el build de producción**, comparando el CSS minificado de antes
+   con el de ahora: de las 370 declaraciones que dejó de emitir, 369 son las
+   borradas. La que sobra se explica abajo.
+
+### La única diferencia en el archivo compilado
+
+Hay dos bloques `@media (max-width: 600px)` distintos que le ponen tamaño al
+mismo `.cf-heading`: uno 1.7rem y el otro, más abajo, 1.5rem. Gana siempre el
+segundo, así que el primero nunca se vio. Al borrar las reglas que había en el
+medio, los dos quedaron cerca y el minificador se dio cuenta: ahora emite uno
+solo. En pantalla `.cf-heading` mide 1.5rem igual que antes. Las dos reglas
+siguen las dos en el archivo fuente (está anotado en el punto 2a).
