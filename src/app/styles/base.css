@@ -13,10 +13,14 @@ html {
   max-width: 100vw;
 }
 
+/* body sin overflow propio. El de html ya recorta a lo ancho (en el
+   elemento raíz el overflow se propaga al viewport), así que el de body no
+   agregaba nada y en cambio lo volvía marco de scroll: con eso el
+   `position: sticky` del header se ataba a body en vez de al viewport y la
+   barra se iba con la página. */
 body {
   margin: 0;
   min-height: 100vh;
-  overflow-x: hidden;
   max-width: 100vw;
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   color: var(--text);
@@ -46,13 +50,17 @@ img {
   max-width: 100%;
 }
 
+/* Sin `overflow-x: hidden`. Un contenedor con overflow en un eje pasa a
+   ser marco de scroll en los dos (el otro eje computa `auto`), y el
+   `position: sticky` del header se ata a ESE marco, que nunca scrollea:
+   el header se iba con la página y en el celular te quedabas sin carrito
+   ni menú a los 800px de scroll. html y body ya recortan a lo ancho. */
 .page-shell {
   width: min(1240px, calc(100vw - 20px));
   max-width: 100%;
   margin: 0 auto;
   padding: 16px 0 40px;
   box-sizing: border-box;
-  overflow-x: hidden;
 }
 @media (max-width: 760px) {
   .page-shell {

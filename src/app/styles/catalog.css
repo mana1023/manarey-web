@@ -2201,25 +2201,42 @@
   padding-left: 2px;
 }
 @media (max-width: 760px) {
+  /* Fila 1: el riel a todo el ancho. Fila 2: los dos botones al 50%.
+
+     `flex-direction: row` no es decoración: la regla de ~1219 deja la
+     fila en `column`, y una columna que envuelve arma COLUMNAS, no
+     renglones. Con eso el riel se estiraba a 2.039px (su contenido
+     entero, porque en columna el ancho lo decide el contenido) y los
+     dos botones se iban a 2.100px a la derecha, fuera de la pantalla,
+     recortados por el `overflow: hidden` de .catalog-tools. En el
+     celular no había ni filtro de categorías ni orden. */
   .catalog-filter-row {
+    flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
   }
 
-  /* Fila 1: el riel a todo el ancho. Fila 2: los dos botones al 50%. */
   .category-rail-wrap {
     flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
     order: 1;
   }
+  /* min-width: 0 para que los dos entren en el mismo renglón: con el
+     `auto` que traen por ser items de flex no bajan de su contenido
+     ("Destacados primero" mide 213px) y se apilaban uno por fila. */
   .category-all-btn {
     order: 2;
     flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
     min-height: 46px;
   }
   .sort-wrapper {
     order: 3;
     flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
     min-height: 46px;
   }
@@ -2493,11 +2510,18 @@
    mucho más altas que otras y, como la grilla iguala alturas, las vecinas
    quedaban con un hueco enorme entre el precio y los botones.
    Ahora van en una sola fila que se desliza, igual que en el celular. */
+/* Mismo difuminado que el riel de categorías: el chip cortado al medio
+   en el borde derecho es lo único que avisa que hay más medidas, y
+   cortado en seco parecía el final de la lista. Un mueble que viene en
+   nueve medidas se veía como si viniera en tres. */
 .measure-chips {
   flex-wrap: nowrap;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   scroll-snap-type: x proximity;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
 }
 .measure-chips::-webkit-scrollbar { display: none; }
 .measure-chip { scroll-snap-align: start; }
