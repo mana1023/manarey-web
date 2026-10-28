@@ -1703,11 +1703,17 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                 />
               </div>
 
-              {/* Tagline */}
+              {/* Titular, promesa y datos. Antes vivían en una segunda
+                  sección (.hero-home) pegada abajo que repetía el mismo
+                  mensaje, el mismo botón al catálogo y los mismos "+8
+                  años". Acá van una sola vez. */}
+              <h1 className="welcome-titulo">Tu hogar merece lo mejor.</h1>
               <p className="welcome-tagline">
-                Muebles y artículos del hogar · Zona sur del GBA
+                Muebles y artículos del hogar · Entrega a domicilio o retiro en nuestros {storeBranches.length} locales del sur del GBA
               </p>
-              <p className="welcome-years">Empresa familiar · +8 años de trayectoria</p>
+              <p className="welcome-years">
+                Empresa familiar · +8 años{inStockCount > 0 ? ` · +${inStockCount} productos` : ""}
+              </p>
 
               {/* Botones de acción */}
               <div className="welcome-actions">
@@ -1789,36 +1795,11 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               </div>{/* end welcome-content */}
             </section>
 
-            {/* ── Hero ────────────────────────────────────────────────────── */}
-            <section className="hero-home">
-              <div className="hero-home-copy">
-                <p className="eyebrow">Empresa familiar desde 2017</p>
-                <h1>Tu hogar merece lo mejor.</h1>
-                <p className="hero-subtitle">Muebles y artículos del hogar con entrega a domicilio o retiro en nuestros {storeBranches.length} locales del sur del GBA.</p>
-                <div className="hero-home-actions">
-                  <button className="hero-buy-button" onClick={() => navigateTo("catalogo")} type="button">
-                    Ver catálogo
-                  </button>
-                  <button className="ghost-button" onClick={() => navigateTo("contacto")} type="button">
-                    Contactanos
-                  </button>
-                </div>
-                <div className="hero-metrics">
-                  <div className="metric-card">
-                    <strong>{inStockCount > 0 ? `+${inStockCount}` : visibleProducts.length}</strong>
-                    <span>productos disponibles</span>
-                  </div>
-                  <div className="metric-card">
-                    <strong>{storeBranches.length}</strong>
-                    <span>sucursales</span>
-                  </div>
-                  <div className="metric-card">
-                    <strong>+8 años</strong>
-                    <span>de trayectoria</span>
-                  </div>
-                </div>
-              </div>
-
+            {/* ── Producto destacado ───────────────────────────────────────
+                Era la mitad derecha del hero. Ahora que el titular está en
+                la bienvenida, el destacado sube y es lo primero que se ve
+                después de la portada: un mueble, no otro cartel. */}
+            <section className="hero-home hero-home--solo-destacado">
               <div className="hero-home-brand">
                 <div className="brand-panel editorial">
                   {featuredMainProduct?.imageData && !isVideoSrc(featuredMainProduct.imageData) ? (

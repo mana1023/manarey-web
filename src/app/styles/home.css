@@ -15,6 +15,28 @@
   align-items: stretch;
 }
 
+/* Cuando el hero sólo lleva el producto destacado (la copia se mudó a la
+   bienvenida) deja de tener dos columnas y ocupa el ancho entero. */
+.hero-home--solo-destacado {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Al quedar ancho y bajo, el cartel de abajo le tapaba el mueble. En
+   pantalla ancha pasa a ser un panel a la izquierda y la foto se ve entera
+   a la derecha; en celular vuelve a ser una banda al pie, que es lo único
+   que entra. */
+@media (min-width: 761px) {
+  .hero-home--solo-destacado .brand-panel.editorial {
+    min-height: 400px;
+  }
+  .hero-home--solo-destacado .brand-panel-overlay {
+    inset: auto auto 22px 22px;
+    max-width: 380px;
+    background: linear-gradient(150deg, rgba(15, 10, 6, 0.88), rgba(15, 10, 6, 0.72));
+    backdrop-filter: blur(3px);
+  }
+}
+
 .hero-home-copy {
   display: flex;
   flex-direction: column;
@@ -1099,9 +1121,11 @@
 }
 
 /* Logo circular en sección de bienvenida */
+/* El logo iba centrado cuando era lo único de la portada. Ahora que arriba
+   del titular hay texto alineado a la izquierda, centrarlo rompía el borde. */
 .welcome-logo-wrap {
   margin-bottom: 28px;
-  align-self: center;
+  align-self: flex-start;
 }
 
 .welcome-logo-img {
@@ -1120,6 +1144,18 @@
 }
 
 /* Textos de bienvenida */
+/* El titular de la portada. Vive sobre la foto del local, así que va en
+   crudo claro con una sombra suave: el degradado dorado que usa el resto
+   de los títulos no se lee sobre una foto. */
+.welcome-titulo {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #fff8e4;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
 .welcome-tagline {
   font-size: 1rem;
   color: rgba(248, 228, 195, 0.65);
