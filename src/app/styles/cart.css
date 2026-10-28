@@ -10,8 +10,7 @@
 }
 
 .cart-extra,
-.cart-name,
-.cart-price {
+.cart-name {
   margin: 0 0 6px;
 }
 
@@ -119,19 +118,6 @@
 /* ─── CART DRAWER MEJORADO ───────────────────────────────────────────────── */
 .cart-drawer {
   background: linear-gradient(180deg, #fffdf5, #fff8e8);
-}
-
-/* ─── CART CHECKOUT ACTIONS ──────────────────────────────────────────────── */
-.cart-checkout-actions {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.cart-checkout {
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
 }
 
 /* ─── CART MEJORADO ──────────────────────────────────────────────────────── */
@@ -364,12 +350,7 @@
   color: var(--text);
   white-space: nowrap;
 }
-.cart-footer-note {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--muted);
-  text-align: center;
-}
+
 .cart-checkout-btn {
   width: 100%;
   justify-content: center;
