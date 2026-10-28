@@ -1981,7 +1981,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           <h4>{getDisplayName(product.productKey, product.nombre)}</h4>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                             <p style={{ fontWeight: 700, color: "var(--gold-strong)" }}>{currencyFormatter.format(product.precioVenta)}</p>
-                            {!product.isSoldOut && <span style={{ fontSize: "0.72rem", color: "var(--verde-stock)", fontWeight: 600 }}>En stock</span>}
+                            {!product.isSoldOut && <span style={{ fontSize: "0.78rem", color: "var(--verde-stock)", fontWeight: 600 }}>En stock</span>}
                           </div>
                         </div>
                       </button>

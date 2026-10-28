@@ -1293,11 +1293,14 @@
   .catalog-grid .card-actions .ghost-button {
     display: none; /* tocar la imagen ya abre el detalle */
   }
+  /* 8px de padding con letra de 12px daban un botón de 36px de alto.
+     Es el botón que cobra: va a 44, el mínimo cómodo para el pulgar. */
   .catalog-grid .card-actions .primary-button {
     width: 100%;
-    font-size: 0.75rem;
-    padding: 8px 6px;
-    border-radius: 10px;
+    min-height: 44px;
+    font-size: 0.78rem;
+    padding: 10px 6px;
+    border-radius: 12px;
     font-weight: 700;
     justify-content: center;
   }
@@ -1321,8 +1324,8 @@
 
   /* Badges más pequeños en mobile */
   .catalog-grid .card-badge {
-    font-size: 0.62rem;
-    padding: 2px 6px;
+    font-size: 0.69rem;
+    padding: 3px 7px;
   }
 
   /* Search input: más tacto-friendly */
@@ -1871,8 +1874,11 @@
     letter-spacing: -0.02em;
   }
 
+  /* 0.66rem daba 10,5px. Es el renglón que dice si queda stock: si hay
+     algo que tiene que leerse de un vistazo en una tarjeta de 171px, es
+     este y el precio. */
   .card-stock {
-    font-size: 0.66rem;
+    font-size: 0.73rem;
     gap: 4px;
   }
   .card-stock-dot {
@@ -2241,10 +2247,12 @@
     min-height: 46px;
   }
 
-  /* Chips más altos: 40px es lo mínimo cómodo para tocar */
+  /* 44px: es lo que piden Apple (44pt) y Material (48dp). 40 entraba
+     justo pero el riel scrollea en horizontal, y ahí un chip bajo se
+     toca mal porque el dedo arrastra antes de soltar. */
   .category-pill {
-    min-height: 40px;
-    padding: 8px 15px;
+    min-height: 44px;
+    padding: 10px 16px;
     font-size: 0.86rem;
   }
 
@@ -2417,9 +2425,9 @@
 
   .measure-chip {
     flex-shrink: 0;
-    min-height: 28px;
-    padding: 4px 9px;
-    font-size: 0.72rem;
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
   }
 
   .measure-chips--modal {
@@ -2432,8 +2440,13 @@
     font-size: 0.88rem;
   }
 
-  .card-measure { font-size: 0.7rem; }
-  .card-measure-label { font-size: 0.6rem; }
+  /* El rótulo ("ANCHO X PROF.") en 0.6rem son 9,6px en mayúsculas con
+     letter-spacing: ilegible, y encima envolvía a dos renglones, que
+     corría el precio para abajo y lo desalineaba con la tarjeta de al
+     lado. En el celular queda sólo el valor: "80x80cm" se entiende solo,
+     y la ficha del producto sigue teniendo la medida con su nombre. */
+  .card-measure { font-size: 0.74rem; }
+  .card-measure-label { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

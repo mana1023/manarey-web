@@ -283,3 +283,17 @@
   color: var(--text);
   font-weight: 700;
 }
+
+/* ─── Alto de toque en el celular ──────────────────────────────────────
+   .showcase-tab (las categorías de la portada) y .sort-select se
+   quedaron en los 38px de la regla de arriba, que es la medida de
+   escritorio donde apuntás con el mouse. Con el pulgar el mínimo
+   cómodo son 44px: 44pt pide Apple, 48dp pide Material.
+   .category-pill ya sube a 44 en catalog.css. */
+@media (max-width: 760px) {
+  .showcase-tab,
+  .sort-select {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}

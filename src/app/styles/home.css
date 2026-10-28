@@ -97,14 +97,18 @@
   justify-content: flex-end;
 }
 
+/* El velo arrancaba en 20% de negro arriba, que sobre una foto clara de
+   un mueble de pino deja el rotulo ("Producto destacado") en 3,19:1. El
+   degradado sigue dejando ver la foto, pero desde un piso que garantiza
+   que el texto se lea sea cual sea la foto. */
 .brand-panel-overlay {
-  background: linear-gradient(180deg, rgba(15, 10, 6, 0.2), rgba(15, 10, 6, 0.9));
+  background: linear-gradient(180deg, rgba(15, 10, 6, 0.55), rgba(15, 10, 6, 0.92));
   color: #f8efdf;
 }
 
 .brand-panel-overlay .eyebrow,
 .brand-panel-overlay p {
-  color: rgba(248, 239, 223, 0.82);
+  color: rgba(248, 239, 223, 0.93);
 }
 
 .brand-panel-overlay h2 {
@@ -373,7 +377,8 @@
   align-items: center;
   gap: 7px;
   margin-top: 6px;
-  padding: 9px 18px;
+  min-height: 44px;
+  padding: 11px 18px;
   border-radius: 999px;
   border: 1.5px solid rgba(169, 115, 30, 0.3);
   background: rgba(210, 162, 62, 0.12);
@@ -526,7 +531,7 @@
   .home-branch-name { font-size: 0.82rem; }
   .home-branch-address { font-size: 0.72rem; }
   .home-branches-header h2 { font-size: 1.5rem; }
-  .home-branches-all-btn { font-size: 0.82rem; padding: 8px 14px; }
+  .home-branches-all-btn { font-size: 0.82rem; padding: 11px 16px; }
 
   .hero-home,
   .home-invite,
@@ -826,7 +831,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  min-height: 44px;
+  padding: 11px 20px;
   border-radius: 999px;
   border: 1.5px solid rgba(169, 115, 30, 0.35);
   background: rgba(210, 162, 62, 0.08);
@@ -909,7 +915,8 @@
   align-items: center;
   gap: 5px;
   margin-top: 8px;
-  padding: 5px 12px;
+  min-height: 44px;
+  padding: 10px 15px;
   border-radius: 999px;
   background: rgba(210, 162, 62, 0.14);
   border: 1px solid rgba(169, 115, 30, 0.26);
@@ -1551,7 +1558,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 42px;
+  min-height: 44px;
   padding: 9px 18px 9px 14px;
   border-radius: 999px;
   border: 1.5px solid rgba(245, 222, 185, 0.24);
@@ -1837,11 +1844,33 @@
   .pino-card-copy { padding: 10px 12px 12px; gap: 3px; }
   .pino-card-copy h3 { font-size: 0.83rem; }
   .pino-card-precio { font-size: 1.05rem; }
-  .pino-card-medida { font-size: 0.68rem; }
-  .pino-card-envio { font-size: 0.67rem; }
-  .pino-ver-todos { min-height: 42px; font-size: 0.85rem; }
+  /* "Envío gratis" en 10,7px era la letra más chica de la tarjeta, y es
+     el gancho. Va al mismo cuerpo que la medida. */
+  .pino-card-medida { font-size: 0.74rem; }
+  .pino-card-envio { font-size: 0.75rem; }
+  .pino-ver-todos { min-height: 44px; font-size: 0.85rem; }
 
   .welcome-content { padding: 22px 18px 24px !important; }
   .welcome-logo-wrap { width: 92px !important; height: 92px !important; }
   .welcome-actions .welcome-btn { flex: 1 1 100%; }
+}
+
+/* ─── Cuerpo mínimo en la franja de destacados ────────────────────────
+   El "En stock" de las tarjetas chicas quedaba en 11,5px. Es el mismo
+   dato que en el catálogo se lee a 11,7: no hay razón para que acá sea
+   más chico. */
+@media (max-width: 760px) {
+  .showcase-mini-copy span {
+    font-size: 0.78rem;
+  }
+}
+
+/* Los dos botones sobre la foto del producto destacado medían 38px de
+   alto, y están sobre una imagen: si errás el toque abrís el detalle en
+   vez de agregar al carrito. */
+@media (max-width: 760px) {
+  .showcase-overlay-actions .ghost-button,
+  .showcase-overlay-actions .primary-button {
+    min-height: 44px;
+  }
 }
