@@ -187,15 +187,6 @@
   background: transparent;
 }
 
-.header-brand-copy {
-  display: grid;
-  gap: 2px;
-}
-
-.header-brand-copy strong {
-  font-size: 1rem;
-}
-
 .main-nav {
   display: flex;
   flex-direction: row;
@@ -306,13 +297,6 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
-
-.footer-contact-link {
-  color: rgba(248, 235, 203, 0.9);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-.footer-contact-link:hover { text-decoration: underline; }
 
 .footer-social {
   display: flex;
@@ -551,37 +535,17 @@
     margin-left: auto;
   }
 
-  .service-ribbon,
   .footer-grid {
     grid-template-columns: 1fr;
   }
 
-  .service-ribbon {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 760px) {
 
-  .site-header,
-  .service-ribbon {
+  .site-header {
     padding: 20px;
     border-radius: 24px;
-  }
-
-  .header-brand-copy {
-    display: none;
-  }
-
-  .service-ribbon {
-    grid-template-columns: 1fr;
-  }
-
-  /* Ribbon: solo mostrar 2 pills en mobile (branches + wsp) */
-  .service-ribbon {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 12px;
   }
 
   /* Footer grid 2 cols */
@@ -611,18 +575,6 @@
   box-shadow:
     0 8px 32px rgba(89, 58, 24, 0.1),
     0 1px 0 rgba(255, 255, 255, 0.6) inset;
-}
-
-/* ─── RIBBON DE SERVICIOS MEJORADO ───────────────────────────────────────── */
-.service-pill {
-  background: linear-gradient(135deg, rgba(255, 253, 246, 0.9), rgba(255, 248, 230, 0.8));
-  border: 1px solid rgba(210, 162, 62, 0.14);
-  transition: all 0.22s ease;
-}
-
-.service-pill:hover {
-  background: linear-gradient(135deg, rgba(255, 253, 246, 1), rgba(255, 248, 230, 0.96));
-  border-color: rgba(210, 162, 62, 0.3);
 }
 
 /* ─── FOOTER MEJORADO ────────────────────────────────────────────────────── */
@@ -715,16 +667,7 @@
     flex-wrap: nowrap !important;
     align-items: center;
   }
-  /* Ocultar pills adicionales de la ribbon, solo mostrar sucursales */
-  .service-pill-desktop { display: none !important; }
-  .service-ribbon { grid-template-columns: 1fr !important; }
-  .service-pill-branches {
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    background: inherit;
-  }
+
 }
 
 /* ─── MOBILE NAV TOGGLE (hamburger) ─────────────────────────────────────── */
@@ -1047,26 +990,6 @@
   flex-shrink: 0;
   border-radius: 6px;
   display: block;
-}
-
-/* ── Service ribbon: oscuro, consistente con el hero ─────────── */
-.service-ribbon {
-  background: linear-gradient(135deg, #1e1108 0%, #2e1a0a 100%) !important;
-  border-color: rgba(210, 162, 62, 0.2) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14) !important;
-}
-
-.service-pill {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(210, 162, 62, 0.12) !important;
-}
-
-.service-pill strong {
-  color: #e8aa3e;
-}
-
-.service-pill span {
-  color: rgba(245, 220, 178, 0.58);
 }
 
 /* ── Header: sutil toque oscuro cuando scrollea ──────────────── */
