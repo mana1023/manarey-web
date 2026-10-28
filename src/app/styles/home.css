@@ -21,19 +21,12 @@
   justify-content: center;
 }
 
-.hero-home-text {
-  max-width: 55ch;
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
 .hero-metrics {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 22px;
 }
 
 .metric-card,
-.trust-card,
 .category-highlight-card,
 .empty-state {
   padding: 18px 20px;
@@ -98,12 +91,6 @@
   line-height: 1;
 }
 
-.trust-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 18px;
-}
-
-.trust-card strong,
 .category-highlight-card strong {
   display: block;
   font-size: 1.1rem;
@@ -246,56 +233,18 @@
   font-weight: 700;
 }
 
-.visual-caption {
-  margin: 10px 0 0;
-  max-width: 28ch;
-  line-height: 1.6;
-}
-
-.visual-footer {
-  width: fit-content;
-  margin-top: 18px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255, 250, 241, 0.76);
-  font-size: 0.88rem;
-}
-
 .content-hero,
 .help-strip {
   text-align: center;
 }
 
-.inline-link,
-.contact-link {
-  color: var(--gold-strong);
-}
-
-.about-grid,
-.contact-grid,
 .help-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.info-card,
-.contact-box,
 .help-card {
   padding: 24px;
   border-radius: 24px;
-}
-
-.info-card.dark {
-  background: linear-gradient(180deg, #0f0905 0%, #1c130d 100%);
-  color: #f6dfaa;
-}
-
-.info-card.dark p {
-  color: rgba(246, 223, 170, 0.84);
-}
-
-.feature-list {
-  margin: 14px 0 0;
-  padding-left: 18px;
 }
 
 .help-strip {
@@ -511,10 +460,7 @@
 
   .hero-home,
   .showcase-grid,
-  .about-grid,
-  .contact-grid,
-  .help-grid,
-  .trust-grid {
+  .help-grid {
     grid-template-columns: 1fr;
   }
 
@@ -561,7 +507,6 @@
   .home-branches-all-btn { font-size: 0.82rem; padding: 8px 14px; }
 
   .hero-home,
-  .trust-strip,
   .home-invite,
   .showcase-section,
   .content-hero,
@@ -589,8 +534,6 @@
 @media (max-width: 480px) {
 
   .showcase-mini-copy,
-  .info-card,
-  .contact-box,
   .help-card {
     padding: 18px;
   }
@@ -635,11 +578,6 @@
 
   /* Categorías: 2x2 en mobile */
   .category-highlight-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
-  /* Trust strip: 2 cols */
-  .trust-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
@@ -822,28 +760,6 @@
   max-width: 420px;
 }
 
-/* Franja de confianza */
-.trust-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-.trust-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 20px 18px;
-  background: var(--surface);
-}
-.trust-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
-.trust-item strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
-.trust-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
-
 /* Categorías mejoradas */
 .cat-card-name {
   font-size: 1rem;
@@ -986,14 +902,6 @@
   background: rgba(210, 162, 62, 0.22);
   border-color: rgba(210, 162, 62, 0.5);
 }
-@media (max-width: 900px) {
-  .trust-strip { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 480px) {
-  .trust-strip { grid-template-columns: 1fr; border-radius: 14px; }
-  .trust-item { padding: 14px 16px; }
-}
 
 @media (max-width: 540px) {
 
@@ -1063,11 +971,6 @@
 .hero-home h1 {
   animation: heroFadeUp 0.55s ease both;
   animation-delay: 0.15s;
-}
-
-.hero-home-text {
-  animation: heroFadeUp 0.55s ease both;
-  animation-delay: 0.25s;
 }
 
 .hero-home-actions {
@@ -1342,48 +1245,12 @@
 }
 
 /* Lista de direcciones desplegable */
-.welcome-locations-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-  margin-top: 8px;
-  animation: locFadeIn 0.22s ease;
-}
 
 @keyframes locFadeIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.welcome-location-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 16px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(210, 162, 62, 0.12);
-  text-decoration: none;
-  transition: background 0.18s, border-color 0.18s;
-}
-.welcome-location-item:hover {
-  background: rgba(210, 162, 62, 0.1);
-  border-color: rgba(210, 162, 62, 0.3);
-}
-.welcome-location-address {
-  font-size: 0.85rem;
-  color: rgba(248, 228, 195, 0.82);
-  line-height: 1.4;
-}
-.welcome-location-cta {
-  font-size: 0.78rem;
-  color: var(--gold);
-  font-weight: 700;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
 @media (max-width: 760px) {
   .welcome-section {
     border-radius: 24px;
