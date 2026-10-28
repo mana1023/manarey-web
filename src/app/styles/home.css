@@ -97,13 +97,15 @@
   justify-content: flex-end;
 }
 
-/* El velo arrancaba en 20% de negro arriba, que sobre una foto clara de
-   un mueble de pino deja el rotulo ("Producto destacado") en 3,19:1. El
-   degradado sigue dejando ver la foto, pero desde un piso que garantiza
-   que el texto se lea sea cual sea la foto. */
+/* El velo arrancaba en 20% de negro, que sobre una foto clara de pino
+   deja el rotulo ("Producto destacado") en 3,19:1. Subirlo a secas tapa
+   el mueble, que es justamente lo que se quiere mostrar, asi que la
+   mitad del trabajo la hace la sombra del texto: el velo sube apenas y
+   cada letra se recorta sola contra lo que tenga atras. */
 .brand-panel-overlay {
-  background: linear-gradient(180deg, rgba(15, 10, 6, 0.55), rgba(15, 10, 6, 0.92));
+  background: linear-gradient(180deg, rgba(15, 10, 6, 0.42), rgba(15, 10, 6, 0.93));
   color: #f8efdf;
+  text-shadow: 0 1px 8px rgba(8, 5, 2, 0.75);
 }
 
 .brand-panel-overlay .eyebrow,

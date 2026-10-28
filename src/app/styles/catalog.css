@@ -393,8 +393,8 @@
 .detail-modal-handle { display: none; }
 
 .detail-modal-close {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--surface, #f5f0e8);
