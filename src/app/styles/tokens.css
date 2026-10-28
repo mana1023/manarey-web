@@ -12,6 +12,9 @@
   --line: rgba(88, 61, 28, 0.12);
   --gold: #d2a23e;
   --gold-strong: #a9731e;
+  /* El dorado cuando hace de TEXTO sobre fondo claro: --gold-strong da
+     3.47:1 sobre el crudo de las secciones y se lee a medias. */
+  --gold-text: #7d5310;
   --gold-soft: rgba(210, 162, 62, 0.16);
   --success: #45674f;
   --danger: #ab5443;

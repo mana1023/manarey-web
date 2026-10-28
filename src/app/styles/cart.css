@@ -465,7 +465,8 @@
   border: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
-  color: #fff9f0;
+  /* marron sobre oro: el crudo daba 2.23 y este da 7 */
+  color: #2b1d13;
   font: inherit;
   font-weight: 700;
   font-size: 1rem;

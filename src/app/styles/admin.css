@@ -372,7 +372,7 @@
 
 .aop-wa-btn {
   display: block; text-align: center; padding: 12px;
-  background: linear-gradient(135deg, #25d366, #128c7e);
+  background: linear-gradient(135deg, #0e7a3b, #0d6b38);
   color: #fff; font-weight: 700; font-size: 0.93rem;
   border-radius: 10px; text-decoration: none; transition: opacity 0.15s;
 }
@@ -807,7 +807,7 @@
   border-radius: 20px;
   border: 1.5px solid var(--line);
   background: var(--surface);
-  color: var(--text-muted);
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -874,7 +874,7 @@
 }
 .featured-list-info span {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--muted);
 }
 .featured-list-actions {
   display: flex;

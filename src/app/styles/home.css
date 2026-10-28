@@ -249,9 +249,9 @@
 
 .help-strip {
   margin-top: 28px;
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
-  border-color: rgba(210, 162, 62, 0.18) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28) !important;
+  background: linear-gradient(160deg, #fdf6e9 0%, #f8eeda 55%, #f2e4cb 100%) !important;
+  border-color: rgba(169, 115, 30, 0.16) !important;
+  box-shadow: 0 18px 46px rgba(120, 80, 30, 0.1) !important;
   text-align: left !important;
 }
 
@@ -260,24 +260,24 @@
 }
 
 .help-strip-header .eyebrow {
-  color: rgba(210, 162, 62, 0.72) !important;
+  color: var(--gold-text) !important;
 }
 
 .help-strip h2 {
-  color: rgba(255, 248, 228, 0.96) !important;
+  color: var(--text) !important;
   margin: 6px 0 8px !important;
 }
 
 .help-strip-sub {
-  color: rgba(210, 162, 62, 0.6);
+  color: var(--muted);
   font-size: 0.95rem;
   margin: 0;
 }
 
 /* Cards dentro del help-strip */
 .help-card {
-  background: rgba(255, 248, 228, 0.04) !important;
-  border: 1px solid rgba(210, 162, 62, 0.18) !important;
+  background: #fffdf8 !important;
+  border: 1px solid rgba(169, 115, 30, 0.16) !important;
   border-radius: 20px !important;
   padding: 24px 22px !important;
   display: flex;
@@ -289,14 +289,14 @@
 
 .help-card:hover {
   transform: translateY(-3px) !important;
-  border-color: rgba(210, 162, 62, 0.38) !important;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.22) !important;
+  border-color: rgba(169, 115, 30, 0.34) !important;
+  box-shadow: 0 14px 30px rgba(120, 80, 30, 0.14) !important;
 }
 
 /* Card destacada (consulta personalizada) */
 .help-card--featured {
-  background: rgba(210, 162, 62, 0.1) !important;
-  border-color: rgba(210, 162, 62, 0.35) !important;
+  background: rgba(210, 162, 62, 0.12) !important;
+  border-color: rgba(169, 115, 30, 0.3) !important;
 }
 
 /* Ícono */
@@ -311,26 +311,26 @@
 }
 
 .help-card-icon--whatsapp {
-  background: rgba(37, 211, 102, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(37, 211, 102, 0.25);
+  background: rgba(37, 211, 102, 0.12);
+  color: #1a7f43;
+  border: 1px solid rgba(37, 211, 102, 0.28);
 }
 
 .help-card-icon--consult {
-  background: rgba(210, 162, 62, 0.18);
-  color: #f0c96a;
-  border: 1px solid rgba(210, 162, 62, 0.35);
+  background: rgba(210, 162, 62, 0.16);
+  color: var(--gold-strong);
+  border: 1px solid rgba(169, 115, 30, 0.3);
 }
 
 .help-card-icon--email {
-  background: rgba(147, 197, 253, 0.12);
-  color: #93c5fd;
-  border: 1px solid rgba(147, 197, 253, 0.22);
+  background: rgba(78, 125, 184, 0.12);
+  color: #3a6396;
+  border: 1px solid rgba(78, 125, 184, 0.24);
 }
 
 /* Título de cada card */
 .help-card h3 {
-  color: rgba(255, 248, 228, 0.95) !important;
+  color: var(--text) !important;
   font-size: 1rem !important;
   font-weight: 700;
   margin: 0;
@@ -338,7 +338,7 @@
 
 /* Descripción */
 .help-card p {
-  color: rgba(210, 162, 62, 0.62) !important;
+  color: var(--muted) !important;
   font-size: 0.88rem;
   line-height: 1.5;
   margin: 0;
@@ -353,9 +353,9 @@
   margin-top: 6px;
   padding: 9px 18px;
   border-radius: 999px;
-  border: 1.5px solid rgba(210, 162, 62, 0.35);
-  background: rgba(210, 162, 62, 0.1);
-  color: #f0c96a;
+  border: 1.5px solid rgba(169, 115, 30, 0.3);
+  background: rgba(210, 162, 62, 0.12);
+  color: #7d5310;
   font-size: 0.84rem;
   font-weight: 700;
   text-decoration: none;
@@ -363,19 +363,19 @@
   transition: background 0.18s, border-color 0.18s, transform 0.18s;
 }
 .help-card-btn:hover {
-  background: rgba(210, 162, 62, 0.2);
-  border-color: rgba(210, 162, 62, 0.55);
+  background: rgba(210, 162, 62, 0.22);
+  border-color: rgba(169, 115, 30, 0.5);
   transform: translateX(2px);
 }
 
-/* Botón primario (card central) */
+/* Botón primario (card central): oro lleno, que es el acento de la marca */
 .help-card-btn--primary {
-  background: linear-gradient(135deg, rgba(210,162,62,0.25), rgba(169,115,30,0.35)) !important;
-  border-color: rgba(210, 162, 62, 0.5) !important;
-  color: #f6e0a6 !important;
+  background: var(--vitrina-oro) !important;
+  border-color: transparent !important;
+  color: #2b1d13 !important;
 }
 .help-card-btn--primary:hover {
-  background: linear-gradient(135deg, rgba(210,162,62,0.38), rgba(169,115,30,0.48)) !important;
+  background: var(--vitrina-oro-hover) !important;
 }
 
 /* ── Sobre nosotros ─────────────────────────────── */
@@ -391,7 +391,7 @@
   gap: 14px;
 }
 .about-story-text p {
-  color: var(--text-secondary);
+  color: var(--muted);
   line-height: 1.7;
   margin: 0;
 }
@@ -453,7 +453,7 @@
 }
 .about-branch-row p {
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: var(--muted);
   margin: 0;
 }
 @media (max-width: 1100px) {
@@ -640,7 +640,7 @@
   margin: 6px 0 8px;
 }
 .contact-hero-text p {
-  color: var(--text-secondary);
+  color: var(--muted);
   max-width: 420px;
   margin: 0;
 }
@@ -649,7 +649,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 28px;
-  background: #25d366;
+  background: #0e7a3b;
   color: #fff;
   font-weight: 700;
   font-size: 1rem;
@@ -694,8 +694,8 @@
   flex-shrink: 0;
   color: #fff;
 }
-.contact-channel-wsp { border-color: #25d366; }
-.contact-channel-wsp .contact-channel-icon { background: #25d366; }
+.contact-channel-wsp { border-color: #0e7a3b; }
+.contact-channel-wsp .contact-channel-icon { background: #0e7a3b; }
 .contact-channel-wsp:hover { background: #f0fff6; }
 
 .contact-channel-ig { border-color: #e1306c; }
@@ -717,9 +717,9 @@
   flex: 1;
 }
 .contact-channel-body strong { font-size: 1rem; }
-.contact-channel-body span { font-size: 0.9rem; color: var(--text-secondary); }
-.contact-channel-body em { font-size: 0.8rem; color: var(--text-muted); font-style: normal; }
-.contact-channel-arrow { font-size: 1.6rem; color: var(--text-muted); line-height: 1; }
+.contact-channel-body span { font-size: 0.9rem; color: var(--muted); }
+.contact-channel-body em { font-size: 0.8rem; color: var(--muted); font-style: normal; }
+.contact-channel-arrow { font-size: 1.6rem; color: var(--muted); line-height: 1; }
 
 /* Sucursales en contacto */
 .contact-branches {
@@ -742,7 +742,7 @@
 }
 .contact-branch-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
 .contact-branch-card strong { font-size: 0.9rem; display: block; margin-bottom: 3px; }
-.contact-branch-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+.contact-branch-card p { font-size: 0.82rem; color: var(--muted); margin: 0; }
 @media (max-width: 600px) {
   .contact-hero { padding: 22px 20px; }
   .contact-hero-text h2 { font-size: 1.8rem; }
@@ -753,7 +753,7 @@
 
 /* ─── INICIO: MEJORAS ────────────────────────────────────────────────────── */
 .hero-subtitle {
-  color: var(--text-secondary);
+  color: var(--muted);
   font-size: 1.05rem;
   line-height: 1.6;
   margin: 10px 0 22px;
@@ -808,7 +808,7 @@
   border-radius: 999px;
   border: 1.5px solid rgba(169, 115, 30, 0.35);
   background: rgba(210, 162, 62, 0.08);
-  color: var(--gold-strong);
+  color: var(--gold-text);
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
@@ -833,30 +833,30 @@
   align-items: flex-start;
   gap: 14px;
   padding: 20px 18px;
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%);
-  border: 1px solid rgba(210, 162, 62, 0.22);
+  background: #fffdf8;
+  border: 1px solid rgba(169, 115, 30, 0.16);
   border-radius: 18px;
   transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 16px rgba(120, 80, 30, 0.08);
 }
 
 .home-branch-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.28);
-  border-color: rgba(210, 162, 62, 0.45);
+  box-shadow: 0 14px 30px rgba(120, 80, 30, 0.14);
+  border-color: rgba(169, 115, 30, 0.36);
 }
 
 .home-branch-pin {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(210, 162, 62, 0.15);
-  border: 1.5px solid rgba(210, 162, 62, 0.35);
+  background: rgba(210, 162, 62, 0.16);
+  border: 1.5px solid rgba(169, 115, 30, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #f0c96a;
+  color: var(--gold-strong);
   margin-top: 1px;
 }
 
@@ -870,7 +870,7 @@
 .home-branch-name {
   font-size: 0.9rem;
   font-weight: 700;
-  color: rgba(255, 248, 228, 0.95);
+  color: var(--text);
   display: block;
   line-height: 1.3;
 }
@@ -889,9 +889,9 @@
   margin-top: 8px;
   padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(210, 162, 62, 0.12);
-  border: 1px solid rgba(210, 162, 62, 0.28);
-  color: #f0c96a;
+  background: rgba(210, 162, 62, 0.14);
+  border: 1px solid rgba(169, 115, 30, 0.26);
+  color: var(--gold-text);
   font-size: 0.75rem;
   font-weight: 600;
   transition: background 0.15s, border-color 0.15s;
@@ -1171,16 +1171,19 @@
   transform: scale(0.97);
 }
 
-/* Comprar por la web — dorado Manarey */
+/* Comprar por la web — dorado Manarey.
+   El texto va en marrón, no en blanco: sobre este dorado el blanco daba
+   2.2:1 y el marrón da 7:1. De paso se ve más caro — oro con tinta oscura
+   es el gesto de siempre de las marcas de lujo. */
 .welcome-btn-catalog {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
-  color: #fff9f0;
+  color: #2b1d13;
   box-shadow: 0 8px 28px rgba(169, 115, 30, 0.4);
 }
 
 /* WhatsApp — verde */
 .welcome-btn-wsp {
-  background: #25D366;
+  background: #0E7A3B;
   color: #fff;
   box-shadow: 0 8px 28px rgba(37, 211, 102, 0.35);
 }
@@ -1281,54 +1284,49 @@
   }
 }
 
-/* ── Hero: oscuro, lujoso, inmersivo ────────────────────────── */
+/* ── Hero: claro y aireado ──────────────────────────────────────────────
+   Antes era marrón oscuro, igual que casi todas las secciones. Con ocho
+   bloques oscuros seguidos la página pesaba y no respiraba: lo oscuro deja
+   de ser un golpe de efecto cuando es lo normal. Ahora lo oscuro queda para
+   la bienvenida y el pie, y el resto va en crudo cálido.
+   ───────────────────────────────────────────────────────────────────── */
 .hero-home {
-  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
-  border-color: rgba(210, 162, 62, 0.22) !important;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(210,162,62,0.12) !important;
+  background: linear-gradient(148deg, #fffdf7 0%, #fdf5e6 55%, #f7ecd8 100%) !important;
+  border-color: rgba(169, 115, 30, 0.16) !important;
+  box-shadow: 0 28px 64px rgba(120, 80, 30, 0.1) !important;
 }
 
-/* Título con degradado dorado — efecto premium */
+/* El titular: del marrón profundo al dorado. Sobre claro se lee de verdad,
+   y el degradado sigue dando el aire caro que buscaba el dorado sobre
+   oscuro, pero sin pelearle al ojo. */
 .hero-home h1 {
-  background: linear-gradient(135deg, #f8ead4 25%, #e8aa3e 75%);
+  background: linear-gradient(118deg, #35200f 18%, #9a6a1c 88%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .hero-home-copy .eyebrow {
-  color: #d4943a;
+  color: var(--gold-text);
   letter-spacing: 0.22em;
 }
 
 .hero-subtitle {
-  color: rgba(248, 228, 195, 0.68) !important;
+  color: var(--muted) !important;
 }
 
-/* Métricas sobre fondo oscuro */
+/* Métricas: fichas blancas sobre el crudo, con el número en dorado oscuro */
 .hero-home .metric-card {
-  background: rgba(255, 255, 255, 0.045);
-  border-color: rgba(210, 162, 62, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(169, 115, 30, 0.18);
 }
 
 .hero-home .metric-card strong {
-  color: #e8a93a;
+  color: var(--gold-strong);
 }
 
 .hero-home .metric-card span {
-  color: rgba(245, 222, 185, 0.55);
-}
-
-/* Botón fantasma visible sobre fondo oscuro */
-.hero-home-actions .ghost-button {
-  border-color: rgba(245, 222, 185, 0.26);
-  color: rgba(245, 222, 185, 0.82);
-  background: rgba(255, 255, 255, 0.04);
-}
-.hero-home-actions .ghost-button:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(245, 222, 185, 0.5);
-  color: #f8ead4;
+  color: var(--muted);
 }
 
 /* ── Showcase (productos destacados): más cálido ─────────────── */
@@ -1338,27 +1336,27 @@
 
 /* ── Sección "¿Qué estás buscando?": oscura para contraste ─── */
 .home-invite {
-  background: linear-gradient(148deg, #180e06 0%, #2b1809 52%, #1c1007 100%) !important;
-  border-color: rgba(210, 162, 62, 0.2) !important;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+  background: linear-gradient(148deg, #fffdf7 0%, #fdf5e6 55%, #f7ecd8 100%) !important;
+  border-color: rgba(169, 115, 30, 0.16) !important;
+  box-shadow: 0 24px 56px rgba(120, 80, 30, 0.1) !important;
 }
 
 .home-invite .eyebrow {
-  color: #d4943a;
+  color: var(--gold-text);
 }
 
 .home-invite h2 {
-  color: #f8ead4;
-  background: linear-gradient(135deg, #f8ead4 20%, #e8aa3e 80%);
+  color: var(--text);
+  background: linear-gradient(118deg, #35200f 18%, #9a6a1c 88%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Tarjetas de categoría sobre fondo oscuro */
+/* Tarjetas de categoría: blancas sobre el crudo, para que se despeguen */
 .category-highlight-card {
-  background: rgba(255, 250, 238, 0.92) !important;
-  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
+  background: #fffdf8 !important;
+  border: 1px solid rgba(169, 115, 30, 0.16) !important;
   padding: 22px !important;
   border-radius: 20px !important;
 }
@@ -1371,58 +1369,60 @@
 }
 
 /* ── Showcase mini cards ─────────────────────────────────────── */
+/* La tarjeta va en blanco, como la del catálogo: la foto del mueble es
+   clara y sobre marrón quedaba flotando en un recuadro oscuro. */
 .showcase-mini-card {
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
-  border: 1.5px solid rgba(210, 162, 62, 0.22) !important;
+  background: #fffdf8 !important;
+  border: 1px solid rgba(169, 115, 30, 0.16) !important;
 }
 
 .showcase-mini-card:hover {
-  background: linear-gradient(160deg, #2e1a09 0%, #3a2214 55%, #241508 100%) !important;
-  border-color: rgba(210, 162, 62, 0.45) !important;
+  background: #fff !important;
+  border-color: rgba(169, 115, 30, 0.36) !important;
 }
 
-/* Textos en showcase-mini-copy sobre fondo oscuro */
 .showcase-mini-copy .price-tag {
-  color: #f0c96a !important;
+  color: var(--gold-strong) !important;
 }
 .showcase-mini-copy h4 {
-  color: rgba(255, 248, 228, 0.95) !important;
+  color: var(--text) !important;
 }
 .showcase-mini-copy p,
 .showcase-mini-copy .product-category {
-  color: rgba(210, 162, 62, 0.72) !important;
+  color: var(--muted) !important;
 }
 
-/* ── Sección showcase: mismo marrón oscuro que el hero ───────────── */
+/* ── Sección showcase ─────────────────────────────────────────────── */
+/* Un punto más tostado que el hero, para que las secciones no sean todas
+   el mismo crudo: esa alternancia suave es la que da ritmo al scroll. */
 .showcase-section {
-  background: linear-gradient(160deg, #241508 0%, #2e1a09 55%, #1e1107 100%) !important;
-  border-color: rgba(210, 162, 62, 0.18) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.32) !important;
+  background: linear-gradient(160deg, #fdf6e9 0%, #f8eeda 55%, #f2e4cb 100%) !important;
+  border-color: rgba(169, 115, 30, 0.16) !important;
+  box-shadow: 0 18px 46px rgba(120, 80, 30, 0.1) !important;
 }
 
-/* Textos del encabezado de la sección sobre fondo oscuro */
 .showcase-section .eyebrow {
-  color: rgba(210, 162, 62, 0.72) !important;
+  color: var(--gold-text) !important;
 }
 .showcase-section .showcase-heading h2,
 .showcase-section h2 {
-  color: rgba(255, 248, 228, 0.95) !important;
+  color: var(--text) !important;
 }
 
-/* Tabs de categoría sobre fondo oscuro */
+/* Tabs de categoría sobre el crudo */
 .showcase-section .showcase-tab {
-  background: rgba(255, 248, 228, 0.08) !important;
-  border-color: rgba(210, 162, 62, 0.22) !important;
-  color: rgba(245, 222, 185, 0.75) !important;
+  background: rgba(255, 255, 255, 0.66) !important;
+  border-color: rgba(169, 115, 30, 0.2) !important;
+  color: var(--muted) !important;
 }
 .showcase-section .showcase-tab:hover:not(.active) {
-  background: rgba(255, 248, 228, 0.15) !important;
-  color: rgba(255, 248, 228, 0.95) !important;
+  background: #fff !important;
+  color: var(--text) !important;
 }
 .showcase-section .showcase-tab.active {
-  background: linear-gradient(135deg, rgba(210,162,62,0.25), rgba(169,115,30,0.35)) !important;
-  border-color: rgba(210, 162, 62, 0.5) !important;
-  color: #f6e0a6 !important;
+  background: var(--vitrina-oro) !important;
+  border-color: transparent !important;
+  color: #fffaf0 !important;
 }
 @media (max-width: 760px) {
   /* El fade del hero apunta al color oscuro del hero */
@@ -1487,15 +1487,15 @@
   color: #7d5310;
 }
 
-/* Dirección de sucursal: era dorado al 65% sobre marrón (3.92) → crudo, 10.17 */
+/* Estos dos textos estaban calibrados contra el marrón: un crudo claro que
+   sobre oscuro daba 10:1. Con las secciones en claro había que darlos
+   vuelta, y el marrón apagado de la paleta da de sobra. */
 .home-branch-address {
-  color: #d6c2a2;
+  color: var(--muted);
 }
 
-/* Texto de las tarjetas de ayuda: dorado al 62% sobre marrón (3.51) → 9.02.
-   Lleva !important porque la regla original (línea ~1408) también lo usa. */
 .help-card p {
-  color: #d2c0a4 !important;
+  color: var(--muted) !important;
 }
 
 /* ── Redes en la bienvenida: iconos, no barras de color ────────────────── */
@@ -1679,7 +1679,7 @@
   border-radius: 999px;
   border: 1.5px solid rgba(181, 133, 68, 0.4);
   background: rgba(255, 255, 255, 0.7);
-  color: var(--gold-strong);
+  color: var(--gold-text);
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
@@ -1768,7 +1768,9 @@
   font-weight: 800;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
-  color: var(--gold-strong);
+  /* En celular este precio baja a 1.05rem y deja de contar como texto
+     grande: con --gold-strong quedaba en 4.07 y no llegaba al minimo. */
+  color: var(--gold-text);
 }
 
 .pino-card-envio {

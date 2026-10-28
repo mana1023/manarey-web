@@ -18,13 +18,16 @@
   justify-content: center;
 }
 
+/* El dorado va un punto más oscuro que --gold-strong: sobre el crudo de
+   las secciones aquel daba 3.47 y este 5.5. Donde el fondo es oscuro hay
+   reglas propias que lo pisan (pie de página, bienvenida). */
 .eyebrow,
 .product-category {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 0.76rem;
-  color: var(--gold-strong);
+  color: var(--gold-text);
 }
 
 .product-visual {
@@ -552,7 +555,7 @@
 .pack-badge {
   display: inline-block;
   background: var(--gold-soft);
-  color: var(--gold-strong);
+  color: var(--gold-text);
   border: 1px solid rgba(169, 115, 30, 0.3);
   border-radius: 20px;
   padding: 3px 10px;
@@ -766,7 +769,7 @@
 }
 .product-card .pack-badge {
   background: var(--gold-soft);
-  color: var(--gold-strong);
+  color: var(--gold-text);
 }
 .product-card .pack-total {
   color: var(--gold-strong);
@@ -1024,7 +1027,7 @@
 }
 .catalog-page-ellipsis {
   padding: 0 0.3rem;
-  color: var(--text-muted, #999);
+  color: var(--muted);
   font-size: 1rem;
   line-height: 2.4rem;
 }
