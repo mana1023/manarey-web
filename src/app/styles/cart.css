@@ -131,8 +131,8 @@
   background: rgba(255,252,244,0.98);
 }
 .cart-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: rgba(88, 61, 28, 0.07);
   border-radius: 50%;
@@ -272,13 +272,16 @@
 .cart-quantity {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-top: 2px;
 }
+/* 28px con el botón de quitar a 4px al lado: querés sumar uno y borrás
+   el mueble. 40 es lo mínimo razonable y la fila sigue entrando de
+   sobra (40×3 + el número + los huecos ≈ 180px de 343). */
 .cart-quantity button {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   border: 1.5px solid var(--border);
   background: var(--surface);
   font-size: 1rem;
@@ -303,10 +306,12 @@
   opacity: 0.55;
   letter-spacing: 0;
 }
+/* Separado del "+" de verdad: borrar un producto no se deshace, así que
+   no puede estar a 4px del botón que más se toca. */
 .cart-remove-btn {
-  margin-left: 4px;
-  width: 26px !important;
-  height: 26px !important;
+  margin-left: 14px;
+  width: 40px !important;
+  height: 40px !important;
   border-color: transparent !important;
   background: transparent !important;
   color: var(--muted) !important;
@@ -372,7 +377,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 0;
+  min-height: 40px;
+  padding: 4px 2px;
   font: inherit;
   transition: color 0.15s;
 }
@@ -383,7 +389,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  min-height: 40px;
+  padding: 4px 10px;
   font: inherit;
   border-radius: 6px;
   transition: color 0.15s, background 0.15s;

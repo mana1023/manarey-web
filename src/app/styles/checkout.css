@@ -127,7 +127,7 @@
   height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), var(--gold-strong));
-  color: #fff9f0;
+  color: #2b1d13;
   font-size: 0.82rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -237,7 +237,7 @@
 
 .checkout-result-cta--primary {
   background: linear-gradient(135deg, var(--gold), var(--gold-strong));
-  color: #fff9f0;
+  color: #2b1d13;
   box-shadow: 0 10px 24px rgba(169, 115, 30, 0.28);
 }
 
@@ -332,6 +332,9 @@
 }
 
 .cf-logo-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   text-decoration: none;
 }
 
@@ -346,12 +349,16 @@
   color: var(--muted);
 }
 
+/* Es la unica salida del checkout: en el celular medía 19px de alto. */
 .cf-link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   background: none;
   border: none;
   font: inherit;
   font-size: 0.9rem;
-  color: var(--gold-strong);
+  color: var(--gold-text);
   cursor: pointer;
   text-decoration: none;
 }
@@ -385,7 +392,7 @@
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 0.74rem;
-  color: var(--gold-strong);
+  color: var(--gold-text);
 }
 
 .cf-heading {
@@ -474,7 +481,10 @@
   border: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--gold), var(--gold-strong));
-  color: #fff9f0;
+  /* Tinta oscura sobre el oro, igual que los botones de la portada: el
+     crudo sobre este degradado da 2,92 y el marron da 4,9 en la punta
+     oscura y 7,3 en la clara. Es el boton que entra al checkout. */
+  color: #2b1d13;
   font: inherit;
   font-weight: 700;
   font-size: 1.05rem;
