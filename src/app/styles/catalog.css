@@ -330,10 +330,13 @@
   background: rgba(171, 84, 67, 0.14);
 }
 
+/* --gold-strong sobre el blanco de la tarjeta da 3,75 y el precio es el
+   numero que mas se mira. --gold-text es el mismo dorado un punto mas
+   oscuro, hecho para esto: da 5,3. */
 .price-tag,
 .detail-price {
   margin: 0;
-  color: var(--gold-strong);
+  color: var(--gold-text);
 }
 
 .price-tag {
@@ -760,7 +763,7 @@
   color: var(--gold-strong);
 }
 .product-card .price-tag {
-  color: var(--gold-strong) !important;
+  color: var(--gold-text) !important;
 }
 .product-card .meta-line,
 .product-card .pack-notice p,
@@ -829,11 +832,11 @@
   color: var(--text);
 }
 .related-card .price-tag {
-  color: var(--gold-strong) !important;
+  color: var(--gold-text) !important;
 }
 .related-card .product-category,
 .related-card .related-copy p {
-  color: var(--gold-strong);
+  color: var(--gold-text);
   opacity: 0.85;
 }
 
@@ -1701,7 +1704,9 @@
   letter-spacing: 0.16em;
   font-weight: 700;
   color: var(--gold-strong);
-  opacity: 0.9;
+  /* Sin opacity: mas abajo (~2295) el color ya se corrigio apuntando a
+     5,43 de contraste, pero ese calculo no contaba este 0.9, que lo
+     dejaba en 4,36 y seguia sin pasar AA. */
 }
 
 .product-card .product-name {
@@ -1721,7 +1726,7 @@
   font-weight: 800;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
-  color: var(--gold-strong) !important;
+  color: var(--gold-text) !important;
 }
 
 .product-card .product-desc-preview {
@@ -1898,10 +1903,13 @@
   .product-card .card-actions .ghost-button {
     display: none; /* tocar la foto ya abre el detalle */
   }
+  /* Esta regla viene despues que la de .catalog-grid con la misma
+     especificidad, asi que es la que manda: subirla alla sin tocarla aca
+     no hacia nada y el boton seguia en 36px. */
   .product-card .card-actions .primary-button {
-    min-height: 36px;
-    font-size: 0.76rem;
-    border-radius: 10px;
+    min-height: 44px;
+    font-size: 0.78rem;
+    border-radius: 12px;
   }
 
   /* El destello del botón se saltea en mobile: no hay hover y gasta pintura */
@@ -2348,8 +2356,11 @@
 
 /* Sin stock en esa medida: se muestra igual (sirve para saber que existe)
    pero apagada y tachada. */
+/* 0.45 daba 2,79 de contraste: no se leia que medida era. Lo que dice
+   "sin stock" es el tachado, no lo flojo del gris, asi que se puede
+   subir sin que parezca disponible. */
 .measure-chip.agotada:not(.active) {
-  opacity: 0.45;
+  opacity: 0.62;
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
