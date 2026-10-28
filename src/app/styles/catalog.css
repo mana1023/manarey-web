@@ -252,12 +252,6 @@
   background: rgba(210, 162, 62, 0.3);
 }
 
-.catalog-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
 .catalog-grid {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   align-items: stretch;
@@ -302,14 +296,6 @@
   flex: 1;
 }
 
-.product-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 14px;
-}
-
-.product-header h2,
 .detail-copy h2 {
   font-size: clamp(1.55rem, 2.3vw, 2.4rem);
   line-height: 1;
@@ -319,11 +305,6 @@
   font-size: 0.7rem;
 }
 
-.product-badges {
-  margin-top: 10px;
-}
-
-.product-badge,
 .stock-pill {
   display: inline-flex;
   align-items: center;
@@ -346,11 +327,6 @@
   background: rgba(171, 84, 67, 0.14);
 }
 
-.neutral {
-  color: var(--text);
-  background: var(--gold-soft);
-}
-
 .price-tag,
 .detail-price {
   margin: 0;
@@ -366,10 +342,6 @@
 
 .detail-price {
   font-size: 2rem;
-}
-
-.product-meta-row {
-  font-size: 0.95rem;
 }
 
 .card-actions {
@@ -397,12 +369,6 @@
   font-size: 0.84rem;
   min-height: 38px;
   opacity: 0.75;
-}
-
-.card-actions-split {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
 }
 
 .detail-modal {
@@ -667,25 +633,12 @@
 
 @media (max-width: 760px) {
 
-  .catalog-hero,
   .catalog-tools,
   .detail-modal {
     padding: 20px;
     border-radius: 24px;
   }
 
-  .catalog-hero h2 {
-    font-size: clamp(1.9rem, 9vw, 3rem);
-  }
-
-  .catalog-toolbar,
-  .card-actions-split {
-    grid-template-columns: 1fr;
-  }
-
-  .product-header {
-    flex-direction: column;
-  }
   /* cart-header, cart-item y cart-footer mantienen su flex-direction normal en mobile */
 
   .detail-media,
@@ -872,8 +825,7 @@
 .related-card .related-copy strong {
   color: var(--text);
 }
-.related-card .price-tag,
-.related-card .related-price {
+.related-card .price-tag {
   color: var(--gold-strong) !important;
 }
 .related-card .product-category,
@@ -952,26 +904,6 @@
 
 .color-swatch-label {
   white-space: nowrap;
-}
-
-.modal-color-swatches {
-  margin-top: 10px;
-}
-
-/* ── Image frame como botón (clickeable) ────────────────────────────── */
-.image-frame-btn {
-  display: block;
-  width: 100%;
-  border: none;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-}
-.image-frame-btn:hover .product-image {
-  opacity: 0.9;
-  transform: scale(1.02);
-  transition: transform 0.2s, opacity 0.2s;
 }
 
 /* ── Card image inner — producto completo visible, sin recorte ── */
@@ -1138,14 +1070,6 @@
 .search-clear:hover {
   color: var(--text);
   background: var(--gold-soft);
-}
-
-/* Resumen de búsqueda / filtros activos */
-.catalog-summary-filter {
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin: 0 0 4px 0;
-  font-style: italic;
 }
 
 /* Tarjeta producto — nombre */
@@ -1412,11 +1336,6 @@
     border-radius: 14px;
   }
 
-  /* Resumen de catálogo: más pequeño */
-  .catalog-summary {
-    font-size: 0.8rem;
-    gap: 10px;
-  }
 }
 
 /* ── Search wrapper mejorado ────────────────────────────────────────────── */
@@ -2504,23 +2423,10 @@
    MercadoLibre, y es lo primero que compara el cliente entre dos
    publicaciones. En el detalle va un bloque con las tres cosas que definen
    la compra: cuánto sale que llegue, que se puede retirar, y cómo se paga.
+
+   El renglón verde de la tarjeta se dibuja hoy en home.css, con
+   `.pino-card-envio`. Acá abajo quedó sólo el bloque del detalle.
    ═══════════════════════════════════════════════════════════════════════ */
-
-.card-free-shipping {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 2px 0 0;
-  font-size: 0.79rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--verde-stock);
-}
-
-.card-free-shipping svg {
-  flex-shrink: 0;
-  opacity: 0.9;
-}
 
 /* ── Bloque de entrega en el detalle ───────────────────────────────────── */
 .detail-delivery {
@@ -2561,14 +2467,7 @@
   font-weight: 800;
 }
 @media (max-width: 540px) {
-  .card-free-shipping {
-    font-size: 0.7rem;
-    gap: 4px;
-  }
-  .card-free-shipping svg {
-    width: 13px;
-    height: 13px;
-  }
+
   .detail-delivery {
     padding: 12px 13px;
     gap: 8px;

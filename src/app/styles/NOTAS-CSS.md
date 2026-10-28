@@ -37,12 +37,26 @@ Ojo: varias de esas clases también tienen reglas en `layout.css`, `home.css`
 y `catalog.css`. Esas siguen ahí (ver más abajo), así que `.service-ribbon` y
 compañía todavía aparecen en la hoja, aunque ya no puedan pintar nada.
 
+**2026-10-28 — las clases muertas de `layout.css`, `home.css` y
+`catalog.css`** (punto 1, tercera tanda). Acá terminaron de irse las reglas de
+la cinta de servicios y de la franja de confianza, que vivían repartidas entre
+varios archivos, más restos de `catalog.css`: el marco de foto cuando era un
+`<button>` (hoy es un `div`), el resumen de catálogo, los badges de producto y
+`.neutral`, un tercer estado de stock que nunca se usó.
+
+- `layout.css` 1.239 → 1.162 líneas
+- `home.css` 1.942 → 1.809
+- `catalog.css` 2.686 → 2.585
+
+Con esto no queda nada muerto en esos archivos. Siguen en pie `admin.css` (8),
+`cart.css` (3) y `skeletons.css` (3).
+
 Todo lo demás de esta lista sigue en su lugar y la web se ve exactamente igual
 que antes. Cómo se comprobó, al final del archivo.
 
 ---
 
-## 1. Clases que no existen en ninguna pantalla (122, quedan 37)
+## 1. Clases que no existen en ninguna pantalla (122, quedan 14)
 
 Estas clases están escritas en el CSS pero no aparecen en ningún archivo
 `.jsx`/`.js` del proyecto. O sea: el navegador lee esas reglas y nunca
@@ -151,7 +165,7 @@ tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
 - `.login-form` — 1 regla(s), línea(s) 227
 - `.product-description-preview` — 1 regla(s), línea(s) 32
 
-### `src/app/styles/home.css` — 11
+### ~~`src/app/styles/home.css` — 11~~ — BORRADAS el 2026-10-28
 
 - `.trust-item` — 4 regla(s), línea(s) 836, 844, 845, 995
 - `.dark` — 2 regla(s), línea(s) 287, 292
@@ -165,7 +179,7 @@ tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
 - `.welcome-location-cta` — 1 regla(s), línea(s) 1380
 - `.welcome-locations-list` — 1 regla(s), línea(s) 1345
 
-### `src/app/styles/catalog.css` — 9
+### ~~`src/app/styles/catalog.css` — 9~~ — BORRADAS el 2026-10-28
 
 - `.card-free-shipping` — 4 regla(s), línea(s) 2509, 2520, 2564, 2568
 - `.image-frame-btn` — 3 regla(s), línea(s) 40, 962, 971
@@ -188,7 +202,7 @@ tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
 - `.feat-order` — 1 regla(s), línea(s) 1048
 - `.stock-btn-load` — 1 regla(s), línea(s) 151
 
-### `src/app/styles/layout.css` — 3
+### ~~`src/app/styles/layout.css` — 3~~ — BORRADAS el 2026-10-28
 
 - `.footer-contact-link` — 2 regla(s), línea(s) 310, 315
 - `.service-pill-branches` — 1 regla(s), línea(s) 721
@@ -1207,6 +1221,38 @@ Dos cosas que conviene saber:
   la hoja y abajo siguen las reglas vivas, cada una con su propio comentario.
   Un encabezado se borra sólo si se borraron todas las reglas que encabezaba,
   y nunca el comentario de arriba de todo del archivo.
+
+### La tercera tanda: `layout.css`, `home.css` y `catalog.css`
+
+Mismo método otra vez. Lo que apareció de nuevo:
+
+- **Un encabezado que no se podía borrar aunque sus reglas estuvieran
+  muertas.** El bloque de **ENVÍO Y ENTREGA** de `catalog.css` explica dos
+  cosas: el renglón verde de "Envío gratis" en la tarjeta y el bloque de
+  entrega del detalle. Lo primero ya no se dibuja desde acá (hoy es
+  `.pino-card-envio`, en `home.css`), pero lo segundo sigue vivo justo abajo.
+  Se conservó el comentario y se le agregó una línea diciendo dónde está
+  ahora el renglón verde. Los otros nueve encabezados sí se fueron enteros,
+  revisados uno por uno.
+- **Dos nombres sospechosamente genéricos.** `.dark` resultó ser
+  `.info-card.dark`, que depende de una clase ya muerta. `.neutral` era un
+  tercer estado de stock al lado de `.in-stock` y `.sold-out`, que no se usa
+  en ninguna parte.
+- **Una trampa de la comparación en pantalla**, que no tiene que ver con el
+  borrado pero conviene saberla para la próxima: el fondo del inicio va
+  pasando fotos solo, y las dos fotos de la comparación se sacan con segundos
+  de diferencia. Si la diapositiva cambia en el medio, la clase `.active` se
+  mueve de un `div` a otro y eso se ve como una diferencia de estilo que la
+  hoja no causó. Ahora la herramienta guarda también las clases de cada
+  elemento, así que distingue sola "cambió la hoja" de "cambió la página".
+
+En pantalla: inicio, catálogo, ficha con el bloque de entrega, carrito, menú
+del celular, sobre nosotros, contacto, checkout, resultado, arrepentimiento y
+privacidad, a 1280, 1100, 900, 760, 480 y 390 px. Cero diferencias. Más un
+elemento por cada uno de los 584 selectores que quedaron en los tres
+archivos, para cubrir lo que no se puede abrir: cero. Contra el build de
+producción, las 191 declaraciones que dejó de emitir son todas de clases
+muertas.
 
 ### La única diferencia en el archivo compilado
 
