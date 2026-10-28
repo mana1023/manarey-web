@@ -51,12 +51,51 @@ varios archivos, más restos de `catalog.css`: el marco de foto cuando era un
 Con esto no queda nada muerto en esos archivos. Siguen en pie `admin.css` (8),
 `cart.css` (3) y `skeletons.css` (3).
 
+**2026-10-28 — `admin.css`, `cart.css`, `skeletons.css` y lo último de
+`globals.css`** (punto 1, cuarta y última tanda). El pill de login del admin,
+el badge de "sin foto", los botones de reordenar destacados, el pie del
+carrito, tres variantes de placeholder de carga que nunca se usaron y, en
+`globals.css`, el último resto de `.image-frame-btn` (el efecto al tocarlo en
+el celular).
+
+- `admin.css` 1.248 → 1.188 líneas
+- `cart.css` 498 → 479
+- `skeletons.css` 97 → 94
+- `globals.css` 90 → 85
+
+**Con esto no queda ninguna clase muerta en toda la hoja.**
+
+### Las dos que NO se borraron, y por qué importa
+
+`.aop-avisos--activado` y `.aop-avisos--apagado` figuraban en esta lista y
+**están vivas**. Estuve a punto de borrarlas. El motivo es que
+`AvisosCelular.jsx` arma la clase pegando una variable:
+
+```jsx
+<section className={`aop-avisos aop-avisos--${estado}`}>
+```
+
+donde `estado` vale `activado`, `apagado`, `iphone`, `bloqueado` o
+`no-soportado`. El texto `aop-avisos--activado` no está escrito en ningún
+lado, así que buscar el nombre no lo encuentra. Son las que le dan el verde
+al panel cuando los avisos están prendidos y el ámbar cuando están apagados.
+
+Se revisó el proyecto entero: hay 40 lugares donde una clase se arma con
+`${...}`, y **sólo dos** pegan una variable a un prefijo, los dos en
+`AvisosCelular.jsx` (`aop-avisos--` e `is-`). En los otros 38 lo que se pega
+son textos fijos, que la búsqueda sí ve. También se revisaron los cinco
+commits anteriores: ninguno tocó una clase con esos prefijos.
+
+La herramienta ahora saca sola esa lista de prefijos y no toca ninguna clase
+que empiece con uno. Si algún día se agrega otro `className={`x-${algo}`}`,
+queda cubierto sin tener que acordarse.
+
 Todo lo demás de esta lista sigue en su lugar y la web se ve exactamente igual
 que antes. Cómo se comprobó, al final del archivo.
 
 ---
 
-## 1. Clases que no existen en ninguna pantalla (122, quedan 14)
+## 1. Clases que no existen en ninguna pantalla (122, quedan 2 — a propósito)
 
 Estas clases están escritas en el CSS pero no aparecen en ningún archivo
 `.jsx`/`.js` del proyecto. O sea: el navegador lee esas reglas y nunca
@@ -191,7 +230,7 @@ tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
 - `.product-badge` — 1 regla(s), línea(s) 326
 - `.related-price` — 1 regla(s), línea(s) 875
 
-### `src/app/styles/admin.css` — 8
+### ~~`src/app/styles/admin.css` — 8~~ — BORRADAS 6 el 2026-10-28 (ver abajo)
 
 - `.featured-reorder-btn` — 3 regla(s), línea(s) 1053, 1066, 1067
 - `.admin-login-pill` — 2 regla(s), línea(s) 13, 18
@@ -208,13 +247,13 @@ tocaron: están más abajo, en las secciones de `layout.css`, `home.css`,
 - `.service-pill-branches` — 1 regla(s), línea(s) 721
 - `.service-pill-desktop` — 1 regla(s), línea(s) 719
 
-### `src/app/styles/cart.css` — 3
+### ~~`src/app/styles/cart.css` — 3~~ — BORRADAS el 2026-10-28
 
 - `.cart-checkout-actions` — 1 regla(s), línea(s) 125
 - `.cart-footer-note` — 1 regla(s), línea(s) 367
 - `.cart-price` — 1 regla(s), línea(s) 12
 
-### `src/app/styles/skeletons.css` — 3
+### ~~`src/app/styles/skeletons.css` — 3~~ — BORRADAS el 2026-10-28
 
 - `.skeleton-card` — 1 regla(s), línea(s) 16
 - `.skeleton-text` — 1 regla(s), línea(s) 13
@@ -1253,6 +1292,25 @@ elemento por cada uno de los 584 selectores que quedaron en los tres
 archivos, para cubrir lo que no se puede abrir: cero. Contra el build de
 producción, las 191 declaraciones que dejó de emitir son todas de clases
 muertas.
+
+### La cuarta tanda: `admin.css`, `cart.css`, `skeletons.css`, `globals.css`
+
+Lo importante de esta tanda no es lo que se borró, que es poco, sino el
+agujero que apareció en el método y está contado arriba: una clase armada
+con una variable no se encuentra buscando su nombre. Dos reglas vivas
+estuvieron a punto de irse.
+
+Cómo se comprobó que esas dos siguen enteras: se dibujó el panel de avisos
+con las dos clases y se miró el color calculado. `--activado` sigue con el
+fondo verde (`rgb(240, 248, 242)`) y `--apagado` con el ámbar
+(`rgb(255, 247, 230)`), que es justo lo que se habría perdido.
+
+El resto, como siempre: lo que queda está en el mismo orden; en pantalla se
+comparó inicio, carrito con producto y checkout a 1280 y 390 px, más un
+elemento por cada uno de los 251 selectores que quedaron en los tres
+archivos, porque al `/admin` de verdad no se entra sin cuenta; y contra el
+build de producción, las 61 declaraciones que dejó de emitir son todas de
+clases muertas.
 
 ### La única diferencia en el archivo compilado
 

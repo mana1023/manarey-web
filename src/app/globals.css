@@ -37,11 +37,6 @@
 @import "./styles/legal.css";
 
 @media (hover: none) and (pointer: coarse) {
-  .image-frame-btn:active {
-    opacity: 0.85;
-    transform: scale(0.98);
-    transition: transform 0.12s, opacity 0.12s;
-  }
   .primary-button:active,
   .ghost-button:active {
     transform: scale(0.96);
