@@ -1017,9 +1017,15 @@ L1237  .welcome-actions  { display: flex }  = L1752
 
 ---
 
-## 3. Variables de color que no existen
+## 3. Variables de color que no existen — RESUELTO el 2026-10-28
 
-Estas `var(--…)` apuntan a una variable que nunca se define en `:root`.
+**Ya no quedan.** Los 12 usos de `--text-muted` y `--text-secondary` pasaron
+a `--muted`, que era lo que querían decir. Se hizo junto con el cambio de
+las secciones a claro, mirando cada pantalla: ninguno de esos textos cambió
+de aspecto de forma visible, porque el color que heredaban ya era parecido
+al de `--muted`. La lista queda abajo como registro.
+
+Estas `var(--…)` apuntaban a una variable que nunca se define en `:root`.
 Cuando además no tienen valor de respaldo, la declaración entera se cae y
 el texto termina con el color que herede del padre — que puede ser el que
 se quería o no, pero por accidente.
@@ -1047,9 +1053,7 @@ se quería o no, pero por accidente.
 - `--app-color` (3 usos): siempre se usa con valor de respaldo.
 - `--st-color` (4 usos): se la pasa el componente desde el JSX, con `style={{ "--st-color": … }}`.
 
-Lo más probable es que `--text-secondary` y `--text-muted` quisieran ser
-`--muted`, que sí existe. Pero cambiarlas **sí cambia cómo se ve**, así que
-queda para decidir mirando cada pantalla.
+Efectivamente `--text-secondary` y `--text-muted` querían ser `--muted`.
 
 ---
 
