@@ -449,9 +449,14 @@ export async function syncOrderToVentas(order) {
     whatsapp: "efectivo",
   };
   const formaPago = formaMapping[order.payment_method] || "tarjeta";
-  const incluyeEnvio = order.shipping_zone_id === "delivery" ? 1 : 0;
 
+  // Cualquier cosa que no sea retiro es un envio. Antes preguntaba por
+  // "delivery" a secas y la zona no siempre vale "delivery": hay 3 pedidos
+  // con zona "near" que cobraron $12.000 de envio y, si alguno se paga,
+  // entran al sistema como "sin envio". El retiro es el unico caso que hay
+  // que reconocer; el resto, por descarte, lleva envio.
   const isPickup = order.shipping_zone_id === "pickup";
+  const incluyeEnvio = isPickup ? 0 : 1;
 
   // Para retiro: local = sucursal real, cliente_nombre = "Pagina Web" (para el historial)
   // Para envío: local = "Pagina Web", cliente_nombre = nombre real del cliente

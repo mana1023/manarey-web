@@ -41,8 +41,13 @@ export async function POST(request) {
       console.error("[transfer] MP preference error:", mpErr?.message || mpErr);
     }
 
-    // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos)
-    syncOrderToVentas({
+    // Sincronizar con ventas del sistema de escritorio (para aparecer en envíos).
+    //
+    // Dentro de after(), igual que el aviso de más abajo: sin esto la
+    // llamada quedaba suelta y Vercel apaga la función en cuanto devuelve
+    // la respuesta, así que la copia a `ventas` se cortaba a mitad de
+    // camino y el pedido no aparecía nunca en Entregas.
+    after(() => syncOrderToVentas({
       order_code: order.orderCode,
       payment_method: "transfer",
       customer_name: order.customer.fullName,
@@ -55,7 +60,7 @@ export async function POST(request) {
       subtotal: order.summary.subtotal,
       total: order.summary.total,
       raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
-    }).catch((e) => console.error("[transfer] syncOrderToVentas error:", e?.message || e));
+    }).catch((e) => console.error("[transfer] syncOrderToVentas error:", e?.message || e)));
 
     const phone = order.customer.phone;
     if (phone) {

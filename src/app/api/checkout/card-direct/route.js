@@ -141,9 +141,12 @@ export async function POST(request) {
         paymentStatus: "approved",
         status: "paid",
         rawPayload: JSON.stringify(mpData),
-      }).catch(() => {});
+      }).catch((e) => console.error("[card-direct] markOrderPayment error:", e?.message || e));
 
-      syncOrderToVentas({
+      // En after() por lo mismo que el aviso de más abajo: suelta, Vercel
+      // la corta al responder. Es la copia que hace que el pedido salga en
+      // Entregas, y no repite si markOrderPayment ya la hizo.
+      after(() => syncOrderToVentas({
         order_code: order.orderCode,
         payment_method: "card",
         customer_name: order.customer.fullName,
@@ -156,7 +159,7 @@ export async function POST(request) {
         subtotal: order.summary.subtotal,
         total: order.summary.total,
         raw_payload: JSON.stringify({ customer: order.customer, summary: order.summary }),
-      }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e));
+      }).catch((e) => console.error("[card-direct] syncOrderToVentas error:", e?.message || e)));
 
       // WhatsApp al cliente
       const phone = customer.telefono || customer.phone;
