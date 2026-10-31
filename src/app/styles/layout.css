@@ -729,8 +729,11 @@
   border-bottom: 1px solid rgba(201, 160, 64, 0.14);
 }
 .mobile-nav-close {
-  width: 34px;
-  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border: 1.5px solid rgba(88, 61, 28, 0.14);
   background: transparent;
   border-radius: 50%;

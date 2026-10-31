@@ -1,6 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  IconoAtencion,
+  IconoBanco,
+  IconoChat,
+  IconoDato,
+  IconoRegalo,
+  IconoTarjeta,
+} from "@/components/icons";
 import { BrandLogo } from "@/components/brand-logo";
 import { DIA_DE_ENTREGA, storeBranches, storeSettings } from "@/lib/store-config";
 import { calculateShippingCost } from "@/lib/shipping";
@@ -225,13 +233,17 @@ function TransferInfo({ total, order, onWhatsApp }) {
         <span className="cf-transfer-amount-label">Total a transferir</span>
         <span className="cf-transfer-amount-value">{currencyFmt.format(total)}</span>
         <span className="cf-transfer-exact-warning">
-          ⚠️ Transferí el monto exacto para que se confirme automáticamente
+          <IconoAtencion size={15} />
+          Transferí el monto exacto para que se confirme automáticamente
         </span>
       </div>
 
       {/* Sugerencia MercadoPago (solo texto, sin botón) */}
       <p className="cf-transfer-mp-tip">
-        💡 Podés pagar abriendo <strong>MercadoPago</strong>, <strong>Ualá</strong>, <strong>MODO</strong> u otra billetera y transferiendo al alias de abajo.
+        <IconoDato size={15} />
+        <span>
+          Podés pagar abriendo <strong>MercadoPago</strong>, <strong>Ualá</strong>, <strong>MODO</strong> u otra billetera y transferiendo al alias de abajo.
+        </span>
       </p>
 
       {/* Alias y CVU copiables */}
@@ -284,7 +296,8 @@ function TransferInfo({ total, order, onWhatsApp }) {
           envianos el comprobante con el código <strong>{order}</strong>.
         </p>
         <button className="cf-whatsapp-btn cf-whatsapp-btn-primary" type="button" onClick={onWhatsApp}>
-          💬 Enviar comprobante por WhatsApp
+          <IconoChat size={18} />
+          Enviar comprobante por WhatsApp
         </button>
       </div>
     </div>
@@ -1180,7 +1193,8 @@ export function CheckoutFlow({ initialCustomer }) {
                       <p className="cf-error">{shippingInfo.message}</p>
                     ) : shippingInfo.waived ? (
                       <p className="cf-muted">
-                        {shippingInfo.zoneLabel} ({distanceKm} km) → <strong>Envío gratis</strong> 🎉
+                        {shippingInfo.zoneLabel} ({distanceKm} km) → <strong>Envío gratis</strong>{" "}
+                        <IconoRegalo size={15} />
                       </p>
                     ) : (
                       <p className="cf-muted">
@@ -1191,7 +1205,9 @@ export function CheckoutFlow({ initialCustomer }) {
                   )}
                   {distanceKm && !shippingQuoting && shippingFallback && (
                     <div className="cf-shipping-fallback">
-                      <span className="cf-shipping-fallback-icon">⚠️</span>
+                      <span className="cf-shipping-fallback-icon">
+                        <IconoAtencion size={18} />
+                      </span>
                       <div>
                         <p className="cf-shipping-fallback-title">
                           {shippingFallback === "city"
@@ -1250,7 +1266,9 @@ export function CheckoutFlow({ initialCustomer }) {
                     onClick={() => setPaymentMethod("card")}
                     type="button"
                   >
-                    <span className="cf-payment-icon">💳</span>
+                    <span className="cf-payment-icon">
+                      <IconoTarjeta size={22} />
+                    </span>
                     <div>
                       <strong>Tarjeta de crédito o débito</strong>
                       <span>Formulario seguro con Mercado Pago. Todas las tarjetas.</span>
@@ -1262,7 +1280,9 @@ export function CheckoutFlow({ initialCustomer }) {
                     type="button"
                     disabled={paymentBusy}
                   >
-                    <span className="cf-payment-icon">🏦</span>
+                    <span className="cf-payment-icon">
+                      <IconoBanco size={22} />
+                    </span>
                     <div>
                       <strong>Transferencia / Billetera virtual</strong>
                       <span>MercadoPago, Cuenta DNI, Ualá, MODO, CBU / CVU — cualquier app.</span>
@@ -1275,7 +1295,9 @@ export function CheckoutFlow({ initialCustomer }) {
                       type="button"
                       disabled={paymentBusy}
                     >
-                      <span className="cf-payment-icon">💬</span>
+                      <span className="cf-payment-icon">
+                        <IconoChat size={22} />
+                      </span>
                       <div>
                         <strong>Coordinar por WhatsApp</strong>
                         <span>Te enviamos todos los datos del pedido para cerrarlo en chat.</span>

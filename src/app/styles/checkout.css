@@ -768,9 +768,20 @@
 
 /* ── Surcharge breakdown ──────────────────────────────────────────── */
 
+/* Era `font-size: 2rem` porque adentro habia un emoji. Ahora hay un SVG,
+   que trae su propio tamaño: lo que hace falta acá es el circulo que lo
+   sostiene y el dorado de la marca. */
 .cf-payment-icon {
-  font-size: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(210, 162, 62, 0.14);
+  border: 1.5px solid rgba(169, 115, 30, 0.24);
+  color: var(--gold-text);
 }
 
 /* MP Brick loading */
@@ -817,14 +828,24 @@
   letter-spacing: -0.02em;
 }
 .cf-transfer-exact-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.76rem;
   color: #f5c842;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
 
+.cf-transfer-exact-warning svg {
+  flex-shrink: 0;
+}
+
 /* Sugerencia MP (sin botón) */
 .cf-transfer-mp-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   margin: 0;
   font-size: 0.84rem;
   color: #5a4a38;
@@ -947,9 +968,10 @@
 }
 
 .cf-shipping-fallback-icon {
-  font-size: 1.1rem;
+  display: inline-flex;
   flex-shrink: 0;
   margin-top: 1px;
+  color: var(--ambar-stock);
 }
 
 .cf-shipping-fallback-title {
@@ -1050,6 +1072,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   min-height: 48px;
   padding: 12px 22px;
   border: 0;

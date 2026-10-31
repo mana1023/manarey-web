@@ -180,6 +180,10 @@
   max-width: 260px;
 }
 .cart-empty-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  text-align: left;
   font-size: 0.78rem;
   color: var(--muted);
   margin: 0;

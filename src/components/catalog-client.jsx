@@ -1,6 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  IconoCarrito,
+  IconoChat,
+  IconoCruz,
+  IconoDato,
+  IconoEstrellaLlena,
+  IconoMapa,
+  IconoPin,
+} from "@/components/icons";
 import { upload } from "@vercel/blob/client";
 import { BrandLogo } from "@/components/brand-logo";
 import { ProductImage } from "@/components/product-image";
@@ -1552,7 +1561,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           <nav className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-nav-header">
               <BrandLogo compact />
-              <button className="mobile-nav-close" onClick={() => setMobileNavOpen(false)} type="button" aria-label="Cerrar menú">✕</button>
+              <button className="mobile-nav-close" onClick={() => setMobileNavOpen(false)} type="button" aria-label="Cerrar menú">
+                <IconoCruz size={18} />
+              </button>
             </div>
             <div className="mobile-nav-links">
               {[
@@ -2362,7 +2373,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                           badges={
                             <div className="card-image-badges">
                               {product.isFeatured && !product.isSoldOut && (
-                                <span className="card-badge card-badge-featured">⭐ Destacado</span>
+                                <span className="card-badge card-badge-featured">
+                                  <IconoEstrellaLlena size={11} />
+                                  Destacado
+                                </span>
                               )}
                               {product.isSoldOut && (
                                 <span className="card-badge card-badge-soldout">Sin stock</span>
@@ -2529,7 +2543,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                             </button>
                             {product.isSoldOut ? (
                               <a className="primary-button" href={buildWhatsAppLink(product)} target="_blank" rel="noreferrer">
-                                💬 Consultar
+                                <IconoChat size={16} />
+                                Consultar
                               </a>
                             ) : (
                               <button className="primary-button" onClick={() => addToCart(product, { quantity: isSillaPack(product) ? 6 : 1 })} type="button">
@@ -2687,7 +2702,8 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                       <strong>{branch.name}</strong>
                       <p>{branch.address}</p>
                       <a className="branch-directions-btn" href={branch.mapsUrl} target="_blank" rel="noreferrer noopener">
-                        🗺️ Cómo llegar
+                        <IconoMapa size={16} />
+                        Cómo llegar
                       </a>
                     </div>
                   </div>
@@ -2812,7 +2828,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
               <div className="contact-branches-grid">
                 {storeBranches.map((branch) => (
                   <div className="contact-branch-card" key={branch.id}>
-                    <span className="contact-branch-icon">📍</span>
+                    <span className="contact-branch-icon">
+                      <IconoPin size={20} />
+                    </span>
                     <div>
                       <strong>{branch.name === "Longchamps" ? "Central — Longchamps" : branch.name}</strong>
                       <p>{branch.address}</p>
@@ -3699,7 +3717,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
           <aside className="cart-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="cart-header">
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: "1.4rem" }}>🛒</span>
+                <IconoCarrito size={24} />
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Tu carrito</h3>
                   {cart.length > 0 && (
@@ -3709,7 +3727,9 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                   )}
                 </div>
               </div>
-              <button className="cart-close-btn" onClick={() => setCartOpen(false)} type="button" aria-label="Cerrar carrito">✕</button>
+              <button className="cart-close-btn" onClick={() => setCartOpen(false)} type="button" aria-label="Cerrar carrito">
+                <IconoCruz size={18} />
+              </button>
             </div>
 
             {cart.length === 0 ? (
@@ -3745,7 +3765,10 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                     </a>
                   )}
                 </div>
-                <p className="cart-empty-hint">💡 También podés cerrar la venta por WhatsApp sin pagar online.</p>
+                <p className="cart-empty-hint">
+                  <IconoDato size={15} />
+                  <span>También podés cerrar la venta por WhatsApp sin pagar online.</span>
+                </p>
               </div>
             ) : (
               <>
