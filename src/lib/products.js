@@ -190,6 +190,9 @@ function mapProduct(row) {
     voltaje: row.voltaje || null,
     material: row.material || null,
     capacidad: row.capacidad || null,
+    // Unidades vendidas en el local en los ultimos 12 meses. Ordena el
+    // catalogo: lo que se vende es lo que se muestra primero.
+    unidadesVendidas: Number(row.unidades_vendidas || 0),
     isFeatured: row.is_featured === true || row.is_featured === "true",
     oculto: row.oculto === true || row.oculto === "true",
     featuredOrder: row.featured_order !== null && row.featured_order !== undefined ? Number(row.featured_order) : null,
@@ -225,6 +228,24 @@ export async function getCatalogProducts() {
         (array_remove(array_agg(nullif(trim(descripcion), '') order by length(nullif(trim(descripcion), '')) desc), null))[1] as raw_description
       from public.productos
       group by 1
+    ),
+    -- Cuanto se vendio de cada cosa en el local en el ultimo año. Es el
+    -- dato que ordena el catalogo: sin esto la tienda abria en orden
+    -- alfabetico y lo primero que veia el cliente era un acolchado,
+    -- mientras la silla que vende 438 por año quedaba enterrada en la S.
+    ventas_12m as (
+      select
+        md5(concat_ws('|',
+          lower(trim(d.producto_nombre)),
+          lower(coalesce(trim(d.producto_medida), '')),
+          lower(coalesce(trim(d.producto_color), ''))
+        )) as product_key,
+        sum(d.cantidad)::integer as unidades
+      from public.detalle_ventas d
+      join public.ventas v on v.id = d.venta_id
+      where v.fecha >= now() - interval '12 months'
+        and coalesce(v.estado, '') <> 'anulada'
+      group by 1
     )
     select
       grouped.product_key,
@@ -251,9 +272,11 @@ export async function getCatalogProducts() {
       meta.is_featured,
       meta.featured_order,
       meta.images_data,
-      meta.oculto
+      meta.oculto,
+      coalesce(ventas_12m.unidades, 0) as unidades_vendidas
     from grouped
     left join public.productos_web_metadata meta on meta.product_key = grouped.product_key
+    left join ventas_12m on ventas_12m.product_key = grouped.product_key
     order by
       case when grouped.stock_total > 0 then 0 else 1 end,
       grouped.categoria nulls last,

@@ -84,6 +84,117 @@ function getMeasureMeta(rawMeasure) {
   return { label: "Medida", value: medida, tipo: "otro" };
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   EL ORDEN DE LA VITRINA
+   ───────────────────────────────────────────────────────────────────────
+   El orden por defecto se llamaba "Destacados primero" y en realidad era
+   alfabético: ni siquiera miraba is_featured. El catálogo abría con un
+   acolchado y dos afeitadoras — cero ventas entre las tres — mientras la
+   silla hindu eco, que vende 438 por año, quedaba enterrada en la S. Las
+   primeras 20 tarjetas sumaban 197 unidades vendidas sobre un catálogo
+   que mueve miles.
+
+   Ahora manda lo que se vende, con tres correcciones:
+
+   - log1p sobre las unidades. La diferencia entre 0 y 20 ventas importa
+     mucho más que entre 400 y 420; sin el logaritmo un solo producto
+     aplasta a todo el resto.
+   - El pino y la melamina suman. Son la especialidad de la casa y lo que
+     conviene mostrar primero.
+   - Sin foto va al fondo, sin excepción. Una tarjeta vacía en la grilla
+     no vende y encima hace parecer rota la página.
+
+   Y después una pasada de variedad, que es lo que lo hace mirable: el
+   puntaje solo da la lista correcta pero aburrida (siete sillas de pino
+   seguidas). La pasada evita repetir nombre y categoría de lo que se
+   acaba de mostrar, y cada tres lugares pide una banda de precio
+   distinta — si no, lo caro nunca aparece, porque un ropero de $360.000
+   jamás va a vender las unidades de una silla de $18.000.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const ES_PINO = /pino/;
+const ES_MELAMINA = /melamina/;
+
+/** Resume un grupo de variantes en los datos que deciden su lugar. */
+function resumenDeGrupo(variantes) {
+  let unidades = 0;
+  let precioMin = Infinity;
+  let conFoto = false;
+  let destacado = false;
+  let sinStock = true;
+  for (const v of variantes) {
+    unidades += Number(v.unidadesVendidas || 0);
+    if (v.precioVenta > 0) precioMin = Math.min(precioMin, v.precioVenta);
+    if (v.imageData) conFoto = true;
+    if (v.isFeatured) destacado = true;
+    if (!v.isSoldOut) sinStock = false;
+  }
+  const primera = variantes[0] || {};
+  return {
+    unidades,
+    precioMin: precioMin === Infinity ? 0 : precioMin,
+    conFoto,
+    destacado,
+    sinStock,
+    nombre: (primera.nombre || "").toLowerCase(),
+    categoria: primera.categoria || "",
+    material: (primera.materialSistema || "").toLowerCase(),
+  };
+}
+
+function puntajeDeVitrina(r) {
+  let p = Math.log1p(r.unidades);
+  if (r.destacado) p += 3;
+  if (ES_PINO.test(r.material)) p += 1;
+  else if (ES_MELAMINA.test(r.material)) p += 0.6;
+  if (!r.conFoto) p -= 10;
+  if (r.sinStock) p -= 20;
+  return p;
+}
+
+/**
+ * Ordena los grupos para la vitrina: primero por puntaje, después una
+ * pasada que reparte categorías y precios para que no se repita.
+ */
+function ordenarVitrina(grupos) {
+  const conResumen = grupos.map((g) => ({ ...g, _r: resumenDeGrupo(g.variants) }));
+  conResumen.sort((a, b) => puntajeDeVitrina(b._r) - puntajeDeVitrina(a._r));
+
+  // Bandas por terciles de precio sobre lo que se está mostrando.
+  const precios = conResumen.map((g) => g._r.precioMin).sort((a, b) => a - b);
+  const corte1 = precios[Math.floor(precios.length / 3)] ?? 0;
+  const corte2 = precios[Math.floor((precios.length * 2) / 3)] ?? 0;
+  const banda = (g) => (g._r.precioMin < corte1 ? 0 : g._r.precioMin < corte2 ? 1 : 2);
+
+  const quedan = conResumen;
+  const salida = [];
+  while (quedan.length) {
+    const ultimos = salida.slice(-3);
+    const nombres = new Set(ultimos.map((g) => g._r.nombre));
+    const categorias = new Set(ultimos.map((g) => g._r.categoria));
+    const bandaDelTurno = salida.length % 3;
+
+    // Dos vueltas: la primera exige la banda del turno, la segunda la
+    // suelta. Así la banda se respeta cuando se puede y nunca traba.
+    let elegido = -1;
+    for (const exigirBanda of [true, false]) {
+      const tope = Math.min(quedan.length, 40);
+      for (let i = 0; i < tope; i++) {
+        const g = quedan[i];
+        if (nombres.has(g._r.nombre)) continue;
+        if (categorias.has(g._r.categoria)) continue;
+        if (exigirBanda && banda(g) !== bandaDelTurno) continue;
+        elegido = i;
+        break;
+      }
+      if (elegido >= 0) break;
+    }
+    if (elegido < 0) elegido = 0;
+    const [g] = quedan.splice(elegido, 1);
+    salida.push(g);
+  }
+  return salida.map(({ _r, ...g }) => g);
+}
 /**
  * Convierte una medida a centímetros para poder ordenar las variantes.
  * "80cm" → 80 · "1,20m" → 120 · "2m" → 200 · "0,60" → 60 · "90x90" → 90
@@ -948,8 +1059,16 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
       });
     }
 
+    // El orden de vitrina va sobre los grupos, no sobre los productos: un
+    // mueble con seis medidas es UNA tarjeta y tiene que contar como una.
+    // Los otros modos de orden (precio, nombre, stock) ya vienen resueltos
+    // desde filteredProducts y no se tocan.
+    if (sortBy === "relevancia" && !adminBranchFilter) {
+      return ordenarVitrina(groups);
+    }
+
     return groups;
-  }, [filteredProducts, adminBranchFilter, branchStockCache]);
+  }, [filteredProducts, adminBranchFilter, branchStockCache, sortBy]);
 
   // Reset to page 1 whenever filters change
   useEffect(() => {
@@ -2145,7 +2264,7 @@ export function CatalogClient({ initialProducts, session, catalogError }) {
                         onChange={(event) => setSortBy(event.target.value)}
                         aria-label="Ordenar productos"
                       >
-                        <option value="relevancia">Destacados primero</option>
+                        <option value="relevancia">Los más vendidos</option>
                         <option value="precio-asc">Menor precio</option>
                         <option value="precio-desc">Mayor precio</option>
                         <option value="nombre">A – Z</option>
